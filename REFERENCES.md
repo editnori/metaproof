@@ -47,13 +47,6 @@ GitHub's "Cite this repository" button gives the same citation in APA and BibTeX
 32. Meurer A, Smith CP, Paprocki M, Čertík O, Kirpichev SB, Rocklin M, et al. SymPy: symbolic computing in Python. PeerJ Comput Sci. 2017;3:e103. doi:10.7717/peerj-cs.103
 33. BendLang. Bend 2 [software]. Version 2.0.20. 2026. Available from: https://github.com/bendlang/bend/releases/tag/v2.0.20
 
-## Build
+## Disclaimer
 
-I built metaproof with Claude Code (Anthropic, Claude Opus 5.5). Two AI reviewers then read every file independently: Claude in an 8-part line-by-line review, and OpenAI Codex (gpt-6-astra) on its own. Every finding from both was reproduced, fixed with a test, or rejected with a written reason.
-
-On top of that, the work rests on checks anyone can rerun:
-
-- The Python engine is compared number by number with metafor (refs 25 and 26) on three published datasets from metadat (ref 27) and on made-up edge cases. See `validation/crosscheck_report.txt`.
-- The formulas are proved with SymPy (ref 32) over real numbers and with Bend 2 (ref 33) over whole numbers. Each proof's exact reach is spelled out in `validation/proofs/RECEIPTS.txt`.
-
-AI-use statement you can adapt for a paper: "Analyses used metaproof version 1.0.0 (Qassem 2026), whose code was written with AI assistance (Claude Code, Anthropic) and reviewed independently by two AI reviewers. Its results were checked against the metafor R package on published datasets, and the authors take responsibility for the analysis."
+Utilized Claude Opus 5.5 (Anthropic) and Astra (OpenAI) for help.
