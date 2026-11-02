@@ -2,13 +2,13 @@
 
 Every reference below was checked against PubMed, Crossref, CRAN, PyPI or the project's own page on 2026-11-01.
 
-## How to cite metaproof
+## Citation
 
 Qassem L. metaproof: meta-analysis you can check [software]. Version 1.0.0. 2026. Available from: https://github.com/editnori/metaproof
 
 GitHub's "Cite this repository" button gives the same citation in APA and BibTeX, from `CITATION.cff`.
 
-## Methods metaproof follows
+## Methods
 
 1. Higgins JPT, Thomas J, Chandler J, Cumpston M, Li T, Page MJ, et al, editors. Cochrane handbook for systematic reviews of interventions [Internet]. Version 6.5 (updated August 2024). Cochrane; 2024. Available from: https://www.cochrane.org/handbook
 2. Page MJ, McKenzie JE, Bossuyt PM, Boutron I, Hoffmann TC, Mulrow CD, et al. The PRISMA 2020 statement: an updated guideline for reporting systematic reviews. BMJ. 2021;372:n71. doi:10.1136/bmj.n71. PMID: 33782057
@@ -34,7 +34,7 @@ GitHub's "Cite this repository" button gives the same citation in APA and BibTeX
 22. Pustejovsky JE, Rodgers MA. Testing for funnel plot asymmetry of standardized mean differences. Res Synth Methods. 2019;10(1):57-71. doi:10.1002/jrsm.1332. PMID: 30506832
 23. Benjamini Y, Hochberg Y. Controlling the false discovery rate: a practical and powerful approach to multiple testing. J R Stat Soc Series B Methodol. 1995;57(1):289-300. doi:10.1111/j.2517-6161.1995.tb02031.x
 
-## Software metaproof is built on
+## Software
 
 24. R Core Team. R: a language and environment for statistical computing [Internet]. Version 4.6.2. Vienna (Austria): R Foundation for Statistical Computing; 2026. Available from: https://www.R-project.org/
 25. Viechtbauer W. Conducting meta-analyses in R with the metafor package. J Stat Softw. 2010;36(3):1-48. doi:10.18637/jss.v036.i03
@@ -47,7 +47,7 @@ GitHub's "Cite this repository" button gives the same citation in APA and BibTeX
 32. Meurer A, Smith CP, Paprocki M, Čertík O, Kirpichev SB, Rocklin M, et al. SymPy: symbolic computing in Python. PeerJ Comput Sci. 2017;3:e103. doi:10.7717/peerj-cs.103
 33. BendLang. Bend 2 [software]. Version 2.0.20. 2026. Available from: https://github.com/bendlang/bend/releases/tag/v2.0.20
 
-## How metaproof was built and checked
+## Build
 
 I built metaproof with Claude Code (Anthropic, Claude Opus 5.5). Two AI reviewers then read every file independently: Claude in an 8-part line-by-line review, and OpenAI Codex (gpt-6-astra) on its own. Every finding from both was reproduced, fixed with a test, or rejected with a written reason.
 
