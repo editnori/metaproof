@@ -3,7 +3,7 @@ metaproof (Python) vs run_meta.R (R/metafor) cross-check
 run 2026-11-02 02:55 by validation/crosscheck.py
 Python 3.12.16 | numpy 2.5.4 | scipy 1.18.1 | pandas 3.1.0
 R version 4.6.2 (2026-10-29) | metafor 5.2.1
-environment matches requirements-lock.txt and reference_r/R_PACKAGES_LOCK.txt
+environment matches requirements.txt and reference_r/R_PACKAGES_LOCK.txt
 Tolerance |a - b| <= tol * |reference| + floor. tol 1e-6 for estimates, SEs and tau2,
 1e-4 for CIs, prediction intervals, Q-profile limits, influence measures and all other
 statistics. Floor: none for study vi and sei; tol x the row's largest |location| or

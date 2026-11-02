@@ -368,8 +368,8 @@ def test_lock_status_reports_versions_that_differ_from_the_locks(tmp_path, monke
     assert cc.lock_status().startswith("environment matches")
     root = tmp_path / "kit"
     (root / "reference_r" / "lib").mkdir(parents=True)
-    lock = (cc.ROOT / "requirements-lock.txt").read_text()
-    (root / "requirements-lock.txt").write_text(
+    lock = (cc.ROOT / "requirements.txt").read_text()
+    (root / "requirements.txt").write_text(
         lock.replace(f"numpy=={np.__version__}", "numpy==0.0.1"))
     rl = (cc.ROOT / "reference_r" / "R_PACKAGES_LOCK.txt").read_text()
     (root / "reference_r" / "R_PACKAGES_LOCK.txt").write_text(rl)

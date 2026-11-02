@@ -366,13 +366,13 @@ def r_versions():
 
 def lock_status():
     """Whether the running Python environment and reference_r/lib match the versions the kit
-    was verified with (requirements-lock.txt, reference_r/R_PACKAGES_LOCK.txt): Astra 22."""
+    was verified with (requirements.txt, reference_r/R_PACKAGES_LOCK.txt): Astra 22."""
     import importlib.metadata as md
     import re as _re
     norm = lambda n: _re.sub(r"[-_.]+", "-", n).lower()
     want = {}
     for n, v, marker in _re.findall(r"^([A-Za-z0-9_.-]+)==([^ \\;]+)\s*(?:;([^\\]*))?",
-                                    (ROOT / "requirements-lock.txt").read_text(), _re.M):
+                                    (ROOT / "requirements.txt").read_text(), _re.M):
         if "win32" in (marker or "") and sys.platform != "win32":
             continue                      # Windows-only dependency (colorama for pytest)
         want[n] = v
@@ -389,7 +389,7 @@ def lock_status():
     rr = [f"R {n} {rhave.get(n, 'missing')} (lock {v})" for n, v in sorted(rwant.items())
           if rhave.get(n) != v]
     diff = py + rr
-    return ("environment matches requirements-lock.txt and reference_r/R_PACKAGES_LOCK.txt"
+    return ("environment matches requirements.txt and reference_r/R_PACKAGES_LOCK.txt"
             if not diff else "environment differs from the locks: " + "; ".join(diff))
 
 
