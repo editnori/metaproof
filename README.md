@@ -2,13 +2,13 @@
 
 A meta-analysis takes trials that tested the same thing and combines them into one result.
 
-In the NR example in this repo, 4 trials measured systolic blood pressure and each found NR lowered it by 1.5 to 3 mmHg. None of them could tell on its own, since every trial's confidence interval crosses zero. Combined, with the more precise trials counting more, they show 2.5 mmHg lower (95% CI 5.1 lower to 0.2 higher). So the trials lean toward a small drop, but no change is still possible.
+In the NR example in this repo, 4 trials measured systolic blood pressure and each found NR lowered it by 1.5 to 3 mmHg. None of them can show an effect on its own, since every trial's confidence interval crosses zero. Combined, with the more precise trials counting more, they show 2.5 mmHg lower (95% CI 5.1 lower to 0.2 higher). So the combined result favors a small drop, but the interval still includes no change.
 
 metaproof does those steps for every outcome in your review. It takes each trial's means and SDs and works out the difference between the treatment and control groups (like NR and placebo) with its confidence interval. It weights each trial by how precise that difference is, which mostly comes down to sample size, and combines them into one result.
 
 You put each trial's numbers into one spreadsheet and it gives the combined result, how much the trials disagree with each other, the range a new trial would likely fall in, and the forest and funnel plots. It also shows how much each trial counts and what happens when each one is left out, and lists any trial it couldn't use in `excluded.csv` with the reason.
 
-It follows Cochrane's guide for systematic reviews, and every result was also run in R as a second check.
+It follows Cochrane's guide for systematic reviews, and its results were checked against a second program in R.
 
 Made by Dr. Layth Qassem, PharmD, MSACI. Free to use under the MIT license. How to cite it is in [REFERENCES.md](REFERENCES.md).
 
@@ -61,7 +61,7 @@ Every choice and its reason is in `templates/protocol_template.txt`, which you c
 
 ## Checks
 
-Every result was run in Python and again in R with metafor, the R package most meta-analyses are done in. Across three published datasets, the NR example and a set of edge cases, 696 checks matched and 0 didn't. 346 automated tests check each calculation against worked examples. The core formulas were also proved mathematically, like the pooled result always falling between the smallest and largest study (`validation/proofs/RECEIPTS.txt`).
+Every check ran in Python and again in R with metafor, a widely used R package for meta-analysis. Across three published datasets, the NR example and a set of edge cases, 696 checks matched and 0 didn't. 346 automated tests check each calculation against worked examples. The core formulas were also proved mathematically, like the pooled result always falling between the smallest and largest study (`validation/proofs/RECEIPTS.txt`).
 
 ## Limits
 
