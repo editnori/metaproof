@@ -6,7 +6,7 @@ Paste everything below the line into Claude Code.
 
 I'm doing a systematic review and meta-analysis and want to use metaproof (https://github.com/editnori/metaproof) to run it. Work through these steps in order and stop and ask me if anything fails.
 
-1. Setup. Clone the repo to ~/Projects/metaproof and follow the "Setup on a Mac" section of its README. If something is missing (Xcode command line tools, uv, Homebrew), tell me what to run. Install R and the R engine too, since I want both engines.
+1. Setup. Clone the repo to ~/Projects/metaproof and follow the setup section of its README for my computer (Mac or Windows). If something is missing (Xcode command line tools, uv, Homebrew), tell me what to run. Install R and the R engine too, since I want both engines.
 
 2. Check the install. From the repo, run the tests (`.venv/bin/python -m pytest -q`, after installing requirements-dev.txt), the cross-check (`.venv/bin/python validation/crosscheck.py`) and the R self-check (`Rscript reference_r/tests/check_reference.R`). Tell me the counts. Anything that fails, stop and show me.
 

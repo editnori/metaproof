@@ -4,7 +4,7 @@
 #   Rscript reference_r/install_packages.R <folder>   # into another folder
 #
 # The packages come from a dated Posit Package Manager snapshot of CRAN, so the same
-# versions install every time. They build from source, which needs a C compiler
+# versions install every time. On a Mac they build from source, which needs a C compiler
 # (xcode-select --install on a Mac). After installing, the script checks every version
 # against reference_r/R_PACKAGES_LOCK.txt and stops with an error if one differs.
 
@@ -32,7 +32,7 @@ if (!identical(as.character(getRversion()), r_lock))
 # Only lib and R's own base library are visible, so a dependency already sitting in a
 # personal library still gets installed here (the engine runs with R_LIBS_USER=lib).
 .libPaths(lib, include.site = FALSE)
-install.packages(WANT, lib = lib, repos = SNAPSHOT, type = "source",
+install.packages(WANT, lib = lib, repos = SNAPSHOT, type = if (.Platform$OS.type == "windows") "binary" else "source",
                  dependencies = c("Depends", "Imports", "LinkingTo"))
 
 got <- installed.packages(lib.loc = lib)[, "Version"]

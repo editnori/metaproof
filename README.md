@@ -1,18 +1,24 @@
 # metaproof
 
-Meta-analysis you can check. You fill in an extraction sheet, metaproof pools the studies the way the Cochrane Handbook says to, and a second engine built on metafor (the R package most reviewers already trust) runs the same sheet so you can see both give the same answer.
+metaproof runs the stats for a systematic review and meta-analysis. You put each study's numbers into one spreadsheet. It pools them into one effect estimate per outcome, with forest and funnel plots, following the Cochrane Handbook. A second copy of the same analysis runs in R on metafor, the package most meta-analyses use, so you can check the two match.
 
-Built by Dr. Layth Qassem, PharmD, MSACI. MIT license. How to cite it is in [REFERENCES.md](REFERENCES.md).
+Made by Dr. Layth Qassem, PharmD, MSACI. MIT license. See [REFERENCES.md](REFERENCES.md) for how to cite it and the methods it follows.
 
-## What's in it
+## What it measures
 
-- `metaproof/` the main engine, in Python
-- `reference_r/` the second engine, on metafor
-- `templates/` protocol with every PROSPERO field, extraction workbook and checker, RoB 2, GRADE and PRISMA 2020
-- `validation/` the Python vs R cross-check and the proofs
-- `examples/nicotinamide-riboside/` a worked example for a nicotinamide riboside (NR) review, with a search strategy, a candidate trial list and a made-up extraction sheet. Every example number is labeled SYNTHETIC and none of it is trial data.
+For each outcome you list, metaproof gives:
+
+- the pooled effect and its 95% confidence interval, as a mean difference in the outcome's own unit, Hedges g when studies used different scales, or a ratio of means for lab values like NAD+
+- the prediction interval, which is the range a new study's effect would likely fall in
+- how much the studies disagree with each other (I² and tau²)
+- each study's effect and weight, what happens when each study is left out, and which studies pull the result the most
+- a forest plot and a funnel plot
+
+Any study it leaves out goes in `excluded.csv` with the reason.
 
 ## Setup on a Mac
+
+Open Terminal and run:
 
 ```
 xcode-select --install
@@ -23,59 +29,69 @@ uv venv --python 3.12 .venv
 uv pip install --python .venv/bin/python --require-hashes -r requirements-lock.txt
 ```
 
-You only need that much to run it. The R engine is optional:
+The R check is optional. To add it, run `brew install r` and then `Rscript reference_r/install_packages.R`.
+
+## Setup on Windows
+
+Install Git from https://git-scm.com/download/win. Then open PowerShell and run:
 
 ```
-brew install r
-Rscript reference_r/install_packages.R
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+git clone https://github.com/editnori/metaproof
+cd metaproof
+uv venv --python 3.12 .venv
+uv pip install --python .venv\Scripts\python.exe --require-hashes -r requirements-lock.txt
 ```
 
-It installs metafor 5.2-1 from a dated CRAN snapshot, so you get the exact versions this was checked with.
+Close and reopen PowerShell if `uv` isn't found after installing it.
 
-## Running it on your review
+The R check is optional. To add it, install R from https://cran.r-project.org/bin/windows/base/ and run `Rscript reference_r\install_packages.R`.
 
-1. Fill in `templates/extraction_sheet.xlsx`, one row per arm, outcome and timepoint. The `data_dictionary` sheet explains each column. `templates/HOW_TO_USE_TEMPLATES.txt` walks through each template.
-2. Check the sheet and export it:
+On Windows, write `.venv\Scripts\python` wherever the steps below say `.venv/bin/python`.
+
+## Running it
+
+1. Fill in `templates/extraction_sheet.xlsx`, one row per study arm, outcome and timepoint. The `data_dictionary` tab explains each column, and `templates/HOW_TO_USE_TEMPLATES.txt` covers every template.
+2. Check the sheet and save it as a CSV:
    `.venv/bin/python templates/check_extraction.py extraction_sheet.xlsx --write-csv extraction.csv`
-3. Write a config listing your outcomes. `examples/nicotinamide-riboside/SYNTHETIC_nr_like_config.yaml` is a full example.
+3. Write a config file that lists your outcomes. `examples/nicotinamide-riboside/SYNTHETIC_nr_like_config.yaml` is a full example.
 4. Run it:
-   `.venv/bin/python -m metaproof run extraction.csv --config config.yaml --out out`
-5. Optional, run the R engine on the same files and compare:
-   `Rscript reference_r/run_meta.R --data extraction.csv --config config.yaml --out out_r`
+   `.venv/bin/python -m metaproof run extraction.csv --config config.yaml --out results`
+5. To run the R copy on the same files:
+   `Rscript reference_r/run_meta.R --data extraction.csv --config config.yaml --out results_r`
 
-Each outcome gets its own output with the pooled result, every study's effect, leave-one-out, influence checks, a forest plot and a funnel plot. Anything left out is listed in `excluded.csv` with the reason.
+## The methods
 
-## What it does and the standard behind each step
+Each default and the reason for it is in `templates/protocol_template.txt`.
 
-- Pools studies with random effects (REML), which handles a small number of studies better than the older DerSimonian-Laird method. Cochrane Handbook 10.10.4, Veroniki 2016
-- Widens the confidence interval with Hartung-Knapp when studies disagree and there are at least 3. Handbook 10.10.4.4
-- Doesn't pool fewer than 3 studies
-- Gives a prediction interval, the range where a new study's effect would likely land, and flags it when there are fewer than 5 studies. Handbook 10.10.4.3, IntHout 2016
-- Reports heterogeneity (I², tau²) with a confidence interval. Handbook 10.10.2, Viechtbauer 2007
-- Mean difference keeps the clinical unit. Hedges g when studies use different scales. Ratio of means for outcomes like NAD+ levels. Handbook 6.5.1, 10.5.2
-- Fills a missing change-score SD from a correlation of 0.5, and reruns at 0.2 and 0.8 to show whether that choice matters. Handbook 6.5.2.8
-- Handles crossover trials as paired data. Handbook 23.2, Elbourne 2002
-- Combines multiple NR dose arms so the placebo group is only counted once. Handbook 23.3.4
-- Converts medians and IQRs to means and SDs. Wan 2014, Luo 2018
-- Runs subgroups and meta-regression only with 10 or more studies (Handbook 10.11.5.1), and the funnel plot test the same way (Handbook 13.3.4.4, Sterne 2011)
-- Templates follow PRISMA 2020 (Page 2021), RoB 2 (Sterne 2019) and GRADE (Guyatt 2008)
+- Random-effects pooling with REML, which estimates the between-study spread better than DerSimonian-Laird when there are few studies (Cochrane Handbook 10.10.4)
+- Hartung-Knapp adjustment to the confidence interval when the studies disagree and there are at least 3 (Handbook 10.10.4.4)
+- No pooled number from fewer than 3 studies
+- Prediction interval, flagged when there are fewer than 5 studies (Handbook 10.10.4.3)
+- A missing change-from-baseline SD is filled from a correlation of 0.5, and the analysis reruns at 0.2 and 0.8 to show if that matters (Handbook 6.5.2.8)
+- Crossover trials analyzed as paired data (Handbook 23.2)
+- Multiple dose arms combined, so the placebo group is counted once (Handbook 23.3.4)
+- Medians and IQRs converted to means and SDs (Wan 2014, Luo 2018)
+- Subgroups, meta-regression and the funnel plot test only with 10 or more studies (Handbook 10.11.5.1 and 13.3.4.4)
+- Templates for PRISMA 2020, RoB 2 and GRADE
 
-Every default, its reason and its sensitivity check are in `templates/protocol_template.txt` (section F onward). Full formulas are in `metaproof/METHODS.txt`.
+## How it was checked
 
-## How it's checked
+- The Python and R copies ran on three published datasets that ship with metafor, the NR example and a set of made-up edge cases. 696 checks passed and 0 failed, across 28,904 values. Results are in `validation/crosscheck_report.txt`.
+- 346 automated tests check each formula against worked numbers.
+- The R copy was checked against metafor's own results: 597 passed, 0 failed.
+- Claude and OpenAI Codex each reviewed every file. Every issue they found was fixed with a test or written up with why it was left.
+- The formulas were proved with SymPy, for example that the pooled estimate is always between the smallest and largest study and that I² is always between 0 and 1. The counting rules, like splitting a placebo group across dose arms without changing the total, were proved with Bend2. `validation/proofs/RECEIPTS.txt` lists what each proof covers.
 
-Both engines run three published metafor datasets, the NR example and a set of made-up edge cases, and every value has to match within a relative 1e-6 (1e-4 for intervals and tests). On the last run 696 checks passed and 0 failed, comparing 28,904 values, and checks that don't apply to an analysis are listed as skipped instead of passed (`validation/crosscheck_report.txt`). On top of that, 346 automated tests cover every formula with worked numbers, and the R engine checks itself against metafor (597 passed, 0 failed). Claude and OpenAI Codex each reviewed every file on their own, and every finding was fixed with a test or rejected with a written reason.
+## Example
 
-The formulas are also proved. SymPy proves they behave for any number of studies: weights add to 1, the pooled estimate always sits between the smallest and largest study, I² stays between 0 and 1, and the prediction interval always contains the confidence interval. Bend2 proves the counting rules on whole numbers, like splitting a placebo group across dose arms keeping the total, and five deliberately broken versions get rejected. `validation/proofs/RECEIPTS.txt` says exactly what each proof covers and what it doesn't.
+`examples/nicotinamide-riboside/` is a worked example for a review of nicotinamide riboside (NR). It has a search strategy, a list of candidate NR trials and a sample extraction sheet. Every number in the sample sheet is made up and labeled SYNTHETIC.
 
 ## Limits
 
-- Continuous outcomes only. No risk ratios or odds ratios yet.
-- When a study has several dose arms split for a dose analysis, Hartung-Knapp still counts comparisons, not studies.
-- No skewness test for medians (Shi 2023). Check that by hand.
-- The Embase, CENTRAL and ICTRP searches in the NR example are written but not run. Rows in the NR trial list marked UNVERIFIED still need checking against the paper.
+- Continuous outcomes only. Risk ratios and odds ratios aren't in yet.
+- No skewness test for medians (Shi 2023), so check that by hand.
+- In the NR example, the Embase, CENTRAL and ICTRP searches are written but haven't been run, and rows marked UNVERIFIED in the trial list still need checking.
 - Rerunning the Bend2 proofs needs a Linux machine. See `validation/proofs/README.txt`.
 
-## Your data
-
-Your extraction sheet stays on your computer. metaproof doesn't send anything anywhere.
+Your spreadsheet stays on your computer. metaproof doesn't send it anywhere.

@@ -370,8 +370,12 @@ def lock_status():
     import importlib.metadata as md
     import re as _re
     norm = lambda n: _re.sub(r"[-_.]+", "-", n).lower()
-    want = dict(_re.findall(r"^([A-Za-z0-9_.-]+)==([^ \\]+)", (ROOT / "requirements-lock.txt")
-                            .read_text(), _re.M))
+    want = {}
+    for n, v, marker in _re.findall(r"^([A-Za-z0-9_.-]+)==([^ \\;]+)\s*(?:;([^\\]*))?",
+                                    (ROOT / "requirements-lock.txt").read_text(), _re.M):
+        if "win32" in (marker or "") and sys.platform != "win32":
+            continue                      # Windows-only dependency (colorama for pytest)
+        want[n] = v
     have = {norm(d.metadata["Name"]): d.version for d in md.distributions()}
     py = [f"{n} {v} (lock {want[n]})" if n in want else f"{n} {v} (not in lock)"
           for n, v in sorted(have.items()) if want.get(n) != v]
