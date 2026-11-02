@@ -1,0 +1,44 @@
+analysis: SYNTHETIC_whole_blood_nad
+outcome rows: SYNTHETIC_whole_blood_nad
+config allow_range_only: False
+config bh: False
+config bh_alpha: 0.05
+config combine_arms: {}
+config corr_prepost: 0.5
+config corr_prepost_sensitivity: [0.2, 0.8]
+config corr_within: 0.5
+config corr_within_sensitivity: [0.2, 0.8]
+config crossover_smd_j: True
+config data_basis: final
+config egger_allow_small_k: False
+config egger_min_k: 10
+config estimator: REML
+config hksj: True
+config hksj_adhoc: False
+config hksj_rule: revman
+config level: 0.95
+config measure: ROM
+config median_method: luo
+config metareg_allow_small_k: False
+config metareg_joint: False
+config metareg_min_k: 10
+config metareg_permutations: 0
+config min_k_pool: 3
+config moderators: ['dose_mg_day']
+config multi_arm: combine
+config pi_type: riley
+config prediction_interval: True
+config primary: True
+config report_estimators: ['REML', 'DL', 'PM', 'ML', 'FE']
+config rom_bias_correction: False
+config rom_geary: flag
+config smd_variance: LS
+config subgroup_method: common
+config subgroup_min_k: 10
+config subgroup_min_per_level: 2
+config subgroups: ['design']
+config timepoint: last
+SYNTHETIC-S01: timepoints ['wk4', 'wk12']; kept 'wk12' (last, 12 weeks)
+k = 5 comparisons from 5 studies
+dose_mg_day: blank for ['SYNTHETIC-S03'] (combined arms with different doses, or no dose on the NR rows; see dose_min/dose_max); these comparisons are left out of the dose_mg_day subgroup and meta-regression models
+primary estimator REML (first row of pooled.csv); HKSJ=True, hksj_rule=revman; FE rows never use HKSJ; interval used: HKSJ t(4)

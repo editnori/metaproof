@@ -1,0 +1,23 @@
+# SYNTHETIC example config for tests/data/SYNTHETIC_extraction_example.csv.
+# The outcomes are invented test fixtures, not real NR trial results.
+defaults:
+  estimator: REML
+  hksj: true
+  prediction_interval: true
+  corr_prepost: 0.5
+  corr_prepost_sensitivity: [0.2, 0.8]
+  corr_within: 0.5
+  median_method: luo
+  multi_arm: split
+  timepoint: last
+
+outcomes:
+  SYNTHETIC_blood_marker:
+    measure: ROM
+    subgroups: [population]
+    moderators: [dose_mg_day]
+  SYNTHETIC_systolic_bp:
+    measure: MD
+    data_basis: change     # auto would use final values where change SDs are missing
+  SYNTHETIC_grip_strength:
+    measure: SMD

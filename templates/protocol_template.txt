@@ -1,0 +1,333 @@
+PROTOCOL TEMPLATE
+Nicotinamide riboside (NR) supplementation in humans: systematic review and meta-analysis of randomized trials
+
+How to read this file
+Part 1 lists every PROSPERO registration field in the order of the long-standing PROSPERO form. Check the field list against the live PROSPERO form at submission, because PROSPERO revises its form. Text in [square brackets] is for the review team to fill. Text marked DRAFT is a suggested starting point that the team should confirm or change.
+Part 2 is the statistical analysis plan (SAP). Every open decision has a DEFAULT, the REASON for the default, and the SENSITIVITY analysis that tests it. Sections are lettered A to O so the PRISMA checklist (prisma2020_checklist.csv) can point at them.
+The analysis config (one block per outcome) carries the statistical choices of Part 2: effect measure (A), data basis (B), correlations (C, G), estimator and intervals (F), median conversion (D), multi-arm handling (H), timepoint rule (L), subgroups and moderators (I) and the small-study test settings (J). Several decisions are not config fields and the engines do not apply them: unit harmonization (E) and the result-selection hierarchy (L) are applied at extraction; eligibility (combination products, other NAD+ precursors such as NMN, ineligible arms) and the use of first-period crossover data (G) decide which rows are entered; MIDs (M) are used when results are interpreted; K1, K2, K4 (exclude crossovers), K8, K9 and K11 are run on a filtered copy of the extraction file under their own analysis name; adverse events (O) need a separate analysis. Before each run, check the rows of the extraction file against these decisions (eligible rows, units, scale direction, crossover data used) and record the check. Any change to a default is made in the protocol first, dated in the amendments log at the end, and then in the config or the extraction file.
+
+
+======================================================================
+PART 1. PROSPERO REGISTRATION FIELDS
+======================================================================
+
+1. Review title
+[Effect of nicotinamide riboside supplementation in humans: a systematic review and meta-analysis of randomized controlled trials]
+
+2. Original language title
+[Same as field 1 if written in English.]
+
+3. Anticipated or actual start date
+[YYYY-MM-DD]
+
+4. Anticipated completion date
+[YYYY-MM-DD]
+
+5. Stage of review at time of this submission
+[Tick each stage: preliminary searches; piloting of the study selection process; formal screening of search results against eligibility criteria; data extraction; risk of bias (quality) assessment; data analysis. State started / completed for each. Register before formal screening starts.]
+
+6. Named contact
+[Mohamed Soliman]
+
+7. Named contact email
+[address]
+
+8. Named contact address
+[Institution postal address]
+
+9. Named contact phone number
+[number]
+
+10. Organisational affiliation of the review
+[Massachusetts General Hospital; add department and URL]
+
+11. Review team members and their organisational affiliations
+[Name, title, affiliation for each member. Include the statistical reviewer.]
+
+12. Funding sources/sponsors
+[Funder and grant number, or "None". State the funder's role in design, analysis and reporting.]
+
+13. Conflicts of interest
+[Declare any. Include any relationship with NR manufacturers or suppliers, since most NR trials receive product or funding from industry.]
+
+14. Collaborators
+[Name and affiliation of anyone who is not a team member but contributes.]
+
+15. Review question
+DRAFT: In adults and children, does oral nicotinamide riboside, compared with placebo or no NR, change (a) blood and tissue NAD+ metabolome measures, (b) cardiometabolic, physical function, inflammatory, neurological and other clinical outcomes, and (c) the frequency of adverse events? Secondary questions: is the effect related to dose and duration, and does it differ by population (healthy, older, disease-specific)?
+
+16. Searches
+DRAFT: MEDLINE (Ovid or PubMed), Embase, Cochrane CENTRAL, Web of Science Core Collection, and the trial registers ClinicalTrials.gov and WHO ICTRP, from inception to [date]. No language or date limits. Backward and forward citation searching of included trials and of earlier reviews. Contact manufacturers and trial authors for unpublished or registered-but-unreported trials. Search terms: nicotinamide riboside, NR chloride, Niagen, Tru Niagen, and combination products containing NR [add brand names identified during scoping]. Searches re-run within 6 months of submission.
+[A librarian peer review of the strategy (PRESS) is recommended.]
+
+17. URL to search strategy
+[Link to the full strategies for every source, or "will be published as a supplement".]
+
+18. Condition or domain being studied
+DRAFT: NAD+ metabolism and health outcomes in humans; any condition, including healthy participants.
+
+19. Participants/population
+DRAFT: Inclusion: humans of any age, healthy or with any condition. Exclusion: none by population; population is a prespecified subgroup (section I).
+[Decide: include children? include critically ill patients? include trials where NR is given as an adjunct to standard care? State each.]
+
+20. Intervention(s), exposure(s)
+DRAFT: Oral nicotinamide riboside (any salt form, any dose, any duration of at least [1 day / 1 week]). Combination products are eligible only when the comparison isolates NR (NR plus X versus X alone, or versus placebo plus X). Products where NR cannot be separated from another active compound (e.g. NR plus pterostilbene versus placebo) are [excluded / analysed separately and not pooled with NR alone]. Intravenous NAD+, nicotinamide mononucleotide (NMN), nicotinamide, nicotinic acid and other NAD+ precursors are excluded.
+
+21. Comparator(s)/control
+DRAFT: Placebo, no treatment, or usual care. Active comparators (another NAD+ precursor) are recorded and reported narratively.
+
+22. Types of study to be included
+DRAFT: Randomized controlled trials, parallel or crossover, including cluster and multi-arm trials. Non-randomized studies, single-arm studies and case reports are excluded. Conference abstracts and registry results are included if they report usable outcome data; their status is flagged and tested in a sensitivity analysis.
+
+23. Context
+[Any setting. Add if the team restricts setting.]
+
+24. Main outcome(s)
+DRAFT primary outcomes [team to choose, at most 2 or 3]:
+  (1) whole-blood (or PBMC) NAD+ concentration at end of treatment; effect measure ROM (section A);
+  (2) [a clinical primary, e.g. systolic blood pressure, mmHg; MD];
+  (3) adverse events (participants with at least one adverse event; serious adverse events); RR (section O).
+Timing: end of treatment; when a trial reports several timepoints, the last on-treatment timepoint is used for the primary analysis and the others are reported in a timepoint table.
+
+25. Additional outcome(s)
+DRAFT secondary outcomes [team to edit the list; each needs an outcome key, unit and effect measure in the config]: other NAD+ metabolites (e.g. NAAD, MeNAM, 2-PY); fasting glucose, insulin, HOMA-IR, HbA1c; lipids; blood pressure; body weight, body composition; physical function and muscle strength; inflammatory markers (e.g. IL-6, CRP); mitochondrial function; disease-specific outcomes (e.g. scales in Parkinson disease, heart failure, long COVID); quality of life and fatigue scales. Effect measure per outcome type follows section A.
+
+26. Data extraction (selection and coding)
+DRAFT: Two reviewers screen titles and abstracts, then full texts, independently, with disagreements settled by discussion or a third reviewer. Two reviewers extract data independently into extraction_sheet.xlsx (one row per arm x outcome x timepoint; data dictionary in the workbook), then compare and reconcile. Study characteristics, funding, conflicts of interest and registry IDs are recorded on the study_characteristics sheet. Data in figures only are digitised with [WebPlotDigitizer] by both extractors and the mean of the two readings is used. Authors are contacted once, with one reminder after 2 weeks, for missing data. check_extraction.py must pass before analysis.
+
+27. Risk of bias (quality) assessment
+DRAFT: Cochrane RoB 2 (Sterne JAC et al. BMJ 2019;366:l4898) for each result included in a meta-analysis, effect of assignment to intervention, with the crossover variant (additional domain on period and carryover effects) for crossover trials (Cochrane Handbook v6.5 chapter 23, section 23.2, and the RoB 2 crossover guidance at riskofbias.info). Two reviewers independently, consensus by discussion. Templates: rob2_parallel_template.csv, rob2_crossover_template.csv, rob2_summary_template.csv. Overall judgements feed the risk_of_bias extraction column, the sensitivity analysis in section K and the GRADE risk-of-bias domain.
+
+28. Strategy for data synthesis
+DRAFT: See Part 2. In brief: random-effects meta-analysis by REML, with Hartung-Knapp-Sidik-Jonkman confidence intervals when tau^2 > 0 and at least 3 studies contribute (Wald intervals otherwise), and 95% prediction intervals interpreted only with at least 5 studies; MD, SMD (Hedges g) or ratio of means by outcome type; crossover trials entered as paired estimates; meta-analysis only when at least 3 studies contribute, otherwise structured narrative synthesis following SWiM (Campbell M et al. BMJ 2020;368:l6890). Certainty by GRADE.
+
+29. Analysis of subgroups or subsets
+DRAFT: Prespecified only, each with a stated expected direction: dose (mg/day, continuous in meta-regression, or <1000 vs >=1000 mg/day as a subgroup), duration (<12 vs >=12 weeks), population (healthy vs disease; age <60 vs >=60 [team to set cut-points]), design (parallel vs crossover), overall risk of bias. Limits and credibility rules in section I.
+
+30. Type and method of review
+Intervention; systematic review; meta-analysis.
+
+31. Language
+English. [Add other languages for the review report if any.]
+
+32. Country
+[United States]
+
+33. Other registration details
+[e.g. OSF registration, if any.]
+
+34. Reference and/or URL for published protocol
+[This protocol, with the version date, deposited at OSF or in the project repository.]
+
+35. Dissemination plans
+[Peer-reviewed journal; data, extraction file and analysis code shared publicly (PRISMA 2020 item 27).]
+
+36. Keywords
+nicotinamide riboside; NAD+; vitamin B3; dietary supplement; randomized controlled trial; meta-analysis
+
+37. Details of any existing review of the same topic by the same authors
+[None / reference.]
+
+38. Current review status
+[Ongoing / completed / discontinued.]
+
+39. Any additional information
+[Earlier reviews of NR or NAD+ precursors identified during scoping, and how this review differs.]
+
+40. Details of final report/publication(s) or preprints if available
+[Add when available.]
+
+
+======================================================================
+PART 2. STATISTICAL ANALYSIS PLAN
+======================================================================
+
+Notation. k = number of studies contributing to one meta-analysis. "Study" means one randomized comparison; a multi-arm trial counts once (section H). Handbook = Cochrane Handbook for Systematic Reviews of Interventions, version 6.5 (Higgins JPT, Thomas J, et al., eds); record any later version used at the time of analysis. When the engines split a multi-arm trial (dose analyses only), k_comparisons can exceed k. Every minimum-k rule below counts studies. The HKSJ and prediction-interval degrees of freedom of a split analysis still count comparisons (the engines note this in pooled.csv); because split comparisons are correlated, split analyses are secondary (section H). All numbers in the shared extraction CSV are in the outcome's protocol unit.
+
+----------------------------------------------------------------------
+A. Effect measure per outcome type
+----------------------------------------------------------------------
+DEFAULT
+  Continuous outcome, same unit across studies (e.g. blood pressure in mmHg, glucose after conversion to mmol/L): mean difference (MD), NR minus control.
+  Continuous outcome, same construct on different scales (e.g. different fatigue or physical function instruments): standardized mean difference, Hedges g with the small-sample correction (Hedges LV. J Educ Stat 1981;6:107-128). Scales where higher means worse are sign-flipped before pooling so that one direction means benefit; the flips are listed in the config.
+  Strictly positive concentration outcomes measured on a ratio scale where the effect is expected to be multiplicative or the assays differ between laboratories (default for NAD+ and NAD+ metabolites): ratio of means (ROM), analysed as the log ratio of means and back-transformed to a percent difference (Hedges LV, Gurevitch J, Curtis PS. Ecology 1999;80:1150-1156; Friedrich JO, Adhikari NKJ, Beyene J. BMC Med Res Methodol 2008;8:32).
+  Dichotomous outcomes (adverse events): section O.
+REASON
+  MD keeps the clinical unit and is the most interpretable when units agree (Handbook chapter 6, section 6.5; chapter 10, section 10.5). SMD is the only option when instruments differ but it is harder to interpret and depends on the spread of the population, so it is used only when MD is impossible. NAD+ is reported in different matrices and by different assay platforms with absolute levels that differ between laboratories; a ratio removes the laboratory scale, does not need unit conversion, and matches a multiplicative effect.
+LIMITS
+  ROM needs final values with positive means; it cannot use change scores (a mean change can be zero or negative). The log ratio and its delta-method variance are reliable only when each mean is well away from zero relative to its SD: the engines compute Geary's statistic, mean x sqrt(n) / SD, and flag any arm below 3 (Hedges, Gurevitch & Curtis 1999); config rom_geary = exclude drops such comparisons instead. Metabolites near the limit of detection in placebo arms (e.g. NAAD, MeNAM) are the usual failures. Fold change or percent change from baseline is a different estimand from a ratio of final means and is not entered as a mean; a reported ratio of geometric means (e.g. a model on log values) is analysed separately or as a sensitivity analysis, not pooled with arithmetic-mean ROMs. Different matrices (whole blood, PBMC, muscle, CSF, urine) are separate outcomes and are never pooled together.
+SENSITIVITY
+  For NAD+, repeat with SMD on final values and, where all studies share a unit, with MD. For every ROM analysis, the Lajeunesse small-sample bias correction (Lajeunesse MJ. Ecology 2015;96:2056-2063), run automatically by the engines because NR arms usually have fewer than 20 participants.
+
+----------------------------------------------------------------------
+B. Data preference, arm-level statistics and missing variability
+----------------------------------------------------------------------
+DEFAULT, per arm, in order of preference
+  MD (config data_basis = auto): (1) reported change from baseline with its SD (mean_change with sd_change, or se_change); (2) final values (mean, sd); (3) change computed from baseline and final values with an imputed SD of change (section C), only when neither of the first two is available. This imputes only when the study offers no assumption-free option. Change and final values may be mixed in one MD meta-analysis (Handbook chapter 10, section 10.5.2), and a subgroup by metric is shown. data_basis = change forces change scores (imputing where needed) and is used when the team prefers change scores for an outcome.
+  SMD: final values only. A meta-analysis never mixes change and final values for SMD (Handbook chapter 10, section 10.5.2), because the SDs that standardize them measure different things. An SMD on change scores is computed only from reported SDs of change, never from an imputed one, because an imputed SD of change is the standardiser and the assumed r would then move g itself (Handbook chapter 23, section 23.2.7.2).
+  ROM: final values only (section A).
+  Crossover: section G.
+REASON
+  In a randomized trial, change scores and final values both estimate the same MD; change scores are usually more precise when baseline and follow-up are correlated (Handbook chapter 10, section 10.5.3). NR trials are small, so precision matters.
+DERIVATIONS (applied by the engines, never by hand in the sheet)
+  SD from SE: SD = SE x sqrt(n) (Handbook chapter 6, section 6.5.2.2). An SEM reported as mean +/- SEM is entered in se (or se_change for a change score), never in sd; the checker warns when an SD is far smaller, relative to its mean, than in the other studies of the outcome.
+  SE from a 95% CI of an arm mean: SE = (upper - lower) / (2 x t(0.975, n - 1)); 3.92 may replace 2 x t only when the sample is large, say more than 100 in each group (Handbook chapter 6, section 6.5.2.2). For a between-group difference from a small trial, use t with the trial's degrees of freedom, not 1.96 (Handbook chapter 6, section 6.5.2.3). The extractor enters SE and records the CI in notes.
+  Reported between-group MD (e.g. ANCOVA-adjusted) with its SE, parallel trial: entered in paired_md and paired_se on the NR row and used as it stands for MD analyses (generic inverse variance). At most one such comparison per study: several reported MDs against one shared control cannot be entered, because the control would be counted more than once (Handbook chapter 23, section 23.3.4); the team keeps one prespecified comparison or extracts arm-level data.
+  Medians, quartiles and ranges: section D.
+  SD missing with no way to derive it: contact authors; if still missing, the study is reported narratively and excluded from that meta-analysis. SDs are not borrowed from other studies in the primary analysis. [Optional sensitivity: impute the largest SD from other studies of the same outcome and unit.]
+  Values read from figures: digitised by two extractors; flagged in notes; sensitivity analysis excluding them (section K).
+
+----------------------------------------------------------------------
+C. Change-score correlation (corr_prepost)
+----------------------------------------------------------------------
+DEFAULT
+  When a trial reports baseline and final mean and SD but not the SD of change, SD_change = sqrt(SD_baseline^2 + SD_final^2 - 2 x r x SD_baseline x SD_final), with r = corr_prepost. Default r = 0.5 (config), unless the trial reports r or reports all three SDs, in which case r = (SD_baseline^2 + SD_final^2 - SD_change^2) / (2 x SD_baseline x SD_final) for that trial (Handbook chapter 6, section 6.5.2.8; Follmann D et al. J Clin Epidemiol 1992;45:769-773).
+  If two or more included trials let r be computed for the same outcome, the team reviews those values before unblinding the pooled result and may replace 0.5 with their median; this decision is dated in the amendments log.
+REASON
+  0.5 is a middle value when nothing is known. With r = 0.5 the SD of change equals the SD of final values when baseline and final SDs are equal, so the imputation neither rewards nor penalizes the change-score route.
+SENSITIVITY
+  r = 0.2 and r = 0.8 for every meta-analysis that contains an imputed SD of change. If the conclusion (direction, or whether the CI excludes the MID) changes across this range, the result is reported as sensitive to r and imprecision is considered in GRADE.
+
+----------------------------------------------------------------------
+D. Medians, quartiles and ranges
+----------------------------------------------------------------------
+DEFAULT
+  When an arm reports a median with IQR and/or range, the mean is estimated by Luo D, Wan X, Liu J, Tong T. Stat Methods Med Res 2018;27:1785-1805, and the SD by Wan X, Wang W, Liu J, Tong T. BMC Med Res Methodol 2014;14:135, both using n. Config value: median_method = luo (the engines also accept luo2018_wan2014).
+REASON
+  Both methods use the sample size, unlike older rules of thumb. Luo 2018 was developed as an improvement on the Wan 2014 mean estimator; Wan 2014 remains the standard SD estimator.
+LIMITS
+  Authors usually report medians because the data are skewed, and both methods assume approximate normality; with skew an SD cannot be estimated from an IQR (Handbook chapter 6, section 6.5.2.5). The engines write converted_from_median and median_asymmetry (the larger of the quartile and range skewness ratios) to study_effects.csv for every converted arm. median_asymmetry is a pointer, not a formal test; where it is large, the team applies the skewness test of Shi J et al. (Stat Methods Med Res 2023;32:1338-1360) by hand and records the result, and may use the methods for skewed data of McGrath S et al. (Stat Methods Med Res 2020;29:2520-2537) as a sensitivity analysis.
+  A median with a range but no IQR (Wan 2014 scenario S1) gives a very unstable SD (Handbook chapter 6, section 6.5.2.6): such arms are excluded from the primary analysis (config allow_range_only = false) and added back in a sensitivity analysis.
+SENSITIVITY
+  (1) median_method = wan (Wan 2014 for both mean and SD); (2) exclude studies whose data were converted from medians; (3) add range-only arms. All three are run automatically by the engines and written to sensitivity.csv.
+
+----------------------------------------------------------------------
+E. Unit conversions
+----------------------------------------------------------------------
+DEFAULT
+  Each outcome has one protocol unit (config). Values are converted at extraction using unit_conversions.csv, and the original value and unit are written in notes. Conversion factors multiply means, quartiles, ranges, SDs and SEs; an affine conversion (e.g. HbA1c % to mmol/mol) applies the offset to location values only and the slope to SDs and SEs. Concentrations normalized per cell number or per protein cannot be converted to a volume concentration and are separate outcomes.
+REASON
+  Converting once, at extraction, with the factor written down, gives a second extractor something to check.
+SENSITIVITY
+  Insulin: repeat with the alternative conversion factor if any study needed the uIU/mL to pmol/L conversion. Unit conversion is irrelevant for ROM and SMD.
+
+----------------------------------------------------------------------
+F. Meta-analysis model, minimum k, heterogeneity and prediction intervals
+----------------------------------------------------------------------
+DEFAULT
+  Random-effects model; between-study variance tau^2 by restricted maximum likelihood (REML). Confidence interval for the pooled effect by Hartung-Knapp-Sidik-Jonkman (HKSJ), using a t distribution with k - 1 degrees of freedom (Hartung J, Knapp G. Stat Med 2001;20:3875-3889; Sidik K, Jonkman JN. Stat Med 2002;21:3153-3159), only when tau^2 > 0 and k >= 3; otherwise the Wald (normal) interval. This is the rule RevMan applies (Handbook chapter 10, section 10.10.4.4). Config: estimator = REML, hksj = true, hksj_rule = revman. pooled.csv always carries the Wald, HKSJ and truncated-HKSJ intervals side by side (wald_ci_*, hksj_ci_*, hksj_trunc_ci_*) and names the one used in ci_method.
+  95% prediction interval for the effect in a new study, using t with k - 2 degrees of freedom (config pi_type = riley; Higgins JPT, Thompson SG, Spiegelhalter DJ. J R Stat Soc A 2009;172:137-159; Riley RD, Higgins JPT, Deeks JJ. BMJ 2011;342:d549; Partlett C, Riley RD. Stat Med 2017;36:301-317). pi_type = revman uses t with k - 1 degrees of freedom whatever the confidence interval method (the formula in Handbook chapter 10, section 10.10.4.3). RevMan itself uses the same multiplier as its confidence interval: t with k - 1 degrees of freedom with the HKSJ interval and a standard normal quantile with the Wald interval (section 10.10.4.4); pi_type = metafor reproduces that. The team records which is used. The interval is computed when k >= 3 but is interpreted, and used to judge inconsistency, only when k >= 5 (Handbook chapter 10, section 10.10.4.3); below 5 studies its width mostly reflects the t quantile (t with 1 df is 12.71), and pooled.csv flags it as not interpretable.
+  Heterogeneity reported as tau^2 (and tau in outcome units), I^2 with its interpretation bands (Handbook chapter 10, section 10.10.2; Higgins JPT, Thompson SG. Stat Med 2002;21:1539-1558) and the Q test. With k >= 5 the prediction interval is the main summary of heterogeneity in the text; with fewer studies, the overlap of the study CIs and tau are described instead. The Q-profile CI for tau^2 is reported but flagged as uninformative below 5 studies.
+  Minimum k: a pooled estimate is computed when k >= 3 studies contribute (config min_k_pool = 3). With k = 2 both study estimates are shown in a forest plot without a pooled diamond and described narratively, and the analysis is left out of any multiplicity family; with k = 1 the study result is reported. If a pooled number is needed at k = 2, a fixed-effect estimate is given, labelled as such (config min_k_pool = 2, estimator = FE), or a Bayesian random-effects estimate with a weakly informative prior on tau (Friede T et al. Res Synth Methods 2017;8:79-91), which needs software outside the kit.
+REASON
+  REML has good properties for tau^2 compared with DerSimonian-Laird, which underestimates tau^2 when k is small (Veroniki AA et al. Res Synth Methods 2016;7:55-79; Langan D et al. Res Synth Methods 2019;10:83-98). HKSJ keeps the coverage of the CI close to 95% when k is small and tau^2 is uncertain, where the standard Wald interval is too narrow (IntHout J, Ioannidis JPA, Borm GF. BMC Med Res Methodol 2014;14:25). But with very few studies HKSJ can be far too wide, and when tau^2 is estimated as 0 it can be narrower than the fixed-effect interval (Handbook chapter 10, section 10.10.4.4; Röver C, Knapp G, Friede T. BMC Med Res Methodol 2015;15:99; Jackson D, Law M, Rücker G, Schwarzer G. Stat Med 2017;36:3923-3934); NR outcomes typically have 2 to 5 studies with tau^2 estimated as 0, so HKSJ is restricted to tau^2 > 0 and k >= 3. Random effects are assumed because NR trials differ in dose, duration, population and assay. The prediction interval shows how far effects in new settings may vary, which the CI does not (Handbook chapter 10, section 10.10.4). k >= 3 because with k = 2 the HKSJ interval uses a t quantile with 1 degree of freedom (12.71) and tau^2 cannot be estimated with any reliability; the prediction interval needs k >= 3.
+CAVEATS
+  With k < 5 intervals are usually wide; this is reported as imprecision and is not a reason to switch to a fixed-effect model. When HKSJ is used and its interval is narrower than the Wald interval (the studies agree more than their SEs predict), both intervals are reported and imprecision is judged on the wider one (grade_downgrading_reasons.csv); the truncated-HKSJ interval in pooled.csv is the sensitivity analysis for this case (Bender R et al. Res Synth Methods 2018;9:382-392).
+SENSITIVITY
+  (1) DerSimonian-Laird and Paule-Mandel estimators; (2) common-effect (fixed-effect, inverse-variance) model; (3) HKSJ with the variance multiplier truncated at 1 (Knapp G, Hartung J. Stat Med 2003;22:2693-2710; Röver C, Knapp G, Friede T. BMC Med Res Methodol 2015;15:99), read from the hksj_trunc_ci_* columns of pooled.csv; (4) leave-one-out, by study.
+
+----------------------------------------------------------------------
+G. Crossover trials
+----------------------------------------------------------------------
+DEFAULT
+  Crossover trials enter as a paired (within-person) estimate, combined with parallel trials in one meta-analysis and shown as a design subgroup (Handbook chapter 23, section 23.2; Elbourne DR et al. Int J Epidemiol 2002;31:140-149; Curtin F, Altman DG, Elbourne D. Stat Med 2002;21:2131-2144).
+  Order of preference: (1) a reported paired analysis (paired_md, paired_se on the NR row), preferably from a model with a period term (Handbook chapter 23, section 23.2.5); (2) the SE of the within-person difference computed from a reported paired t statistic, P value or CI (converted to paired_se at extraction, method in notes); (3) arm means and SDs from both periods with SE_diff = sqrt((SD_NR^2 + SD_C^2 - 2 x r_w x SD_NR x SD_C) / n), r_w = corr_within, default 0.5 when not reported or derivable. Route (3) uses the marginal period-condition means, which assumes no period effect and holds only when the sequence groups are balanced; the engines record this in method_notes, and the sequence sizes are extracted (study_characteristics n_per_sequence) to judge it.
+  A crossover result reported only as change within each period cannot be used by the engines; the extractor obtains period means and SDs or a paired estimate, and the checker rejects within-period-change-only rows.
+  SMD for a crossover trial uses the SD of the raw measurements (pooled across periods), not the SD of the differences, so that crossover and parallel SMDs are on the same scale (Handbook chapter 23, section 23.2.7.2), with Hedges' small-sample correction J on N - 1 degrees of freedom so that crossover and parallel rows carry the same correction (config crossover_smd_j = true; false is the sensitivity analysis).
+  First-period-only data: decided here, before data are seen, not after a test for carryover (Handbook chapter 23, section 23.2.4). [Team to choose: never used / used only when no paired data are available.] When used, the trial enters as a parallel trial and is assessed with the parallel RoB 2 tool.
+  Carryover: assessed with the RoB 2 crossover domain on period and carryover effects, using washout_weeks, period_length_weeks and n_per_sequence from study_characteristics; a trial whose arms switched with no washout, or whose washout is not reported, is judged in that domain and tested in section K. Statistical tests for carryover are not used to choose the analysis (Freeman PR. Stat Med 1989;8:1421-1432).
+REASON
+  Analysing a crossover trial as if it were parallel ignores the within-person correlation, which gives the trial too little weight, and counts each participant twice. 0.5 is the conventional value when the correlation is unknown; the sensitivity range brackets it.
+SENSITIVITY
+  corr_within = 0.2 and 0.8 for trials where it was imputed; exclude crossover trials.
+
+----------------------------------------------------------------------
+H. Multi-arm trials
+----------------------------------------------------------------------
+DEFAULT
+  Several NR arms sharing one control arm (typically different doses): for the main analysis the NR arms are combined into one group with the Handbook formulae for combining groups (Handbook chapter 6, Table 6.5.a; chapter 23, section 23.3.4), so the control group is counted once.
+  For dose analyses (section I) each NR arm is kept separate and the shared control group is split evenly between the comparisons (n divided by the number of NR arms, mean and SD unchanged) (Handbook chapter 23, section 23.3.4). Config: multi_arm = combine (default) for every primary analysis; multi_arm = split only for prespecified dose analyses. Split comparisons still share control participants and stay correlated (Handbook chapter 23, section 23.3.5), so the engines report k_studies next to k, base the minimum-k rules on studies and leave out one study (all its comparisons) at a time. A dose-response model that handles the dependence directly (multilevel or robust variance estimation; Hedges LV, Tipton E, Johnson MC. Res Synth Methods 2010;1:39-65) is preferred when enough studies are available; the kit does not implement it.
+  Doses for combined arms: the combined comparison carries no single dose; the engines record the minimum and maximum dose (dose_min, dose_max) and leave dose_mg_day blank, so the comparison drops out of dose models with a logged reason.
+  Several reported between-group MDs (paired_md, paired_se) against one shared control: not entered; one prespecified comparison is kept, or arm-level data are extracted so the arms can be combined (section B).
+  Arms not eligible for the review (e.g. a different NAD+ precursor) are dropped.
+  Two eligible control arms (placebo and no treatment): placebo is used.
+REASON
+  Using the same control group twice in one meta-analysis double counts its participants and correlates the estimates (a unit-of-analysis error). Combining NR arms keeps all randomized participants; splitting the control is needed only when the arms must be compared.
+SENSITIVITY
+  Use only the highest-dose arm against control.
+
+----------------------------------------------------------------------
+I. Subgroup analyses and meta-regression
+----------------------------------------------------------------------
+DEFAULT
+  Only the prespecified characteristics in PROSPERO field 29, each with a stated expected direction, are analysed. A subgroup analysis is run only when each subgroup has at least 2 studies and the meta-analysis has k >= 10 in total; meta-regression on a continuous characteristic (dose in mg/day, duration in weeks) only when k >= 10 (Handbook chapter 10, section 10.11.5.1). No more than [3] characteristics per outcome.
+  Method: mixed-effects meta-regression (REML, Knapp-Hartung adjusted test) with a common tau^2 across subgroups (config subgroup_method = common); the test for subgroup differences is the primary result, not the within-subgroup P values. The engines write a 'not run' row when the minimum counts above are not met (subgroup_min_k = 10, subgroup_min_per_level = 2, metareg_min_k = 10, all counting studies). With fewer than about 20 studies, a permutation P value for the meta-regression is added (config metareg_permutations, e.g. 1000; Higgins JPT, Thompson SG. Stat Med 2004;23:1663-1682).
+  Credibility of any apparent effect modification is judged with ICEMAN (Schandelmaier S et al. CMAJ 2020;192:E901-E906).
+REASON
+  With few studies, subgroup and meta-regression analyses have little power and a high false-positive rate, and study-level characteristics are confounded with each other (dose with population, sponsor and assay). Below k = 10 the results are described in forest plots by subgroup without a formal test.
+
+----------------------------------------------------------------------
+J. Small-study effects and missing results (reporting bias)
+----------------------------------------------------------------------
+DEFAULT
+  Contour-enhanced funnel plots and tests for small-study effects only when k >= 10 studies (studies, not split comparisons) and not when the studies are of similar size (Sterne JAC et al. BMJ 2011;343:d4002; Handbook chapter 13, section 13.3.4.4). The engines refuse egger_min_k below 10 unless egger_allow_small_k = true, which must then be reported as a deviation, and note when the SEs span less than a two-fold range: Egger regression test for MD and ROM (Egger M et al. BMJ 1997;315:629-634); for SMD the modified test with sqrt(1/n1 + 1/n2) as the precision term, because SMD and its SE are correlated (Pustejovsky JE, Rodgers MA. Res Synth Methods 2019;10:57-71).
+  For every meta-analysis, regardless of k: compare registry records (ClinicalTrials.gov, WHO ICTRP) with publications, list registered NR trials that are completed without published results, and record outcomes registered but not reported (Handbook chapter 13).
+REASON
+  Below 10 studies the tests have too little power to separate chance from asymmetry. Registry comparison works at any k, and NR has many small registered trials.
+
+----------------------------------------------------------------------
+K. Sensitivity analyses
+----------------------------------------------------------------------
+Prespecified, reported in one table per outcome next to the primary estimate:
+  K1  Exclude results at high overall risk of bias (RoB 2).
+  K2  Restrict to results at low overall risk of bias.
+  K3  corr_prepost = 0.2 and 0.8 (section C).
+  K4  corr_within = 0.2 and 0.8 (both engines run these automatically under the default corr_within_sensitivity = auto whenever a crossover comparison uses the assumed corr_within; config corr_within_sensitivity = [0.2, 0.8] runs them for every outcome, and [] turns them off with a warning in the log; confirm the rows in sensitivity.csv); exclude crossover trials (section G).
+  K5  Median conversion by Wan 2014; exclude converted studies; add range-only arms (section D). Run automatically.
+  K6  Estimators DL and PM; common-effect model; truncated HKSJ (section F). All in pooled.csv.
+  K7  Exclude studies with any imputed or digitised value (imputed change SD, assumed crossover r, values read from figures, SD from a range alone). Run automatically.
+  K7b ROM only: Lajeunesse bias correction (section A). Run automatically.
+  K8  Exclude conference abstracts and registry-only results.
+  K9  Highest-dose arm only for multi-arm trials (section H).
+  K10 Leave-one-out.
+  [K11 Optional: exclude trials funded by, or supplied with product by, an NR manufacturer.]
+A primary result is called robust if no sensitivity analysis changes its direction or whether its CI excludes the null or the MID.
+
+----------------------------------------------------------------------
+L. Multiplicity
+----------------------------------------------------------------------
+DEFAULT
+  No statistical adjustment for multiple outcomes, subgroups or sensitivity analyses. The [2 or 3] primary outcomes are named in field 24 before searching. Secondary outcomes, subgroups and meta-regressions are labelled exploratory, and every prespecified analysis is reported whatever its result. Interpretation rests on effect sizes, CIs, prediction intervals and GRADE certainty, not on P < 0.05. The engines do not adjust P values unless config bh = true; if the team turns it on, the family is the primary analyses only, one per outcome (config primary = false on every other analysis), and only pooled analyses enter it.
+  Choosing one result per study. The larger multiplicity risk in NR trials is within a study: several matrices, assays, metabolites, timepoints and adjusted or unadjusted analyses for one outcome. One result per study per outcome is chosen by this hierarchy, fixed before extraction: (1) matrix: the outcome definition names the matrix, and other matrices are other outcomes; (2) assay: [team to rank, e.g. LC-MS/MS before enzymatic cycling]; (3) timepoint: the rule in the config (default: the latest timepoint, one per study; Handbook chapter 6, section 6.2.4); (4) analysis: [team to choose, e.g. baseline-adjusted (ANCOVA) before unadjusted; intention-to-treat population before per-protocol]. The choice and the rule that made it are recorded in study_characteristics result_selection. A result chosen against the hierarchy, or a trial that appears to have chosen among several results by their findings, is recorded for RoB 2 question 5.2 (Sterne JAC et al. BMJ 2019;366:l4898).
+REASON
+  Adjusting P values in a meta-analysis of many correlated outcomes is rarely done and would hide the uncertainty that the CIs already show; prespecification and complete reporting address the same problem more directly.
+
+----------------------------------------------------------------------
+M. Certainty of evidence (GRADE)
+----------------------------------------------------------------------
+DEFAULT
+  Each primary outcome and each key secondary outcome is rated with GRADE (Handbook chapter 14, section 14.2; Guyatt GH et al. GRADE guidelines 1, J Clin Epidemiol 2011;64:383-394; Balshem H et al. GRADE guidelines 3, J Clin Epidemiol 2011;64:401-406). Evidence starts at High and is downgraded for risk of bias, inconsistency, indirectness, imprecision and publication bias, using the criteria in grade_downgrading_reasons.csv. Each downgrade has a footnote naming the studies and numbers behind it. Summary-of-findings tables use grade_sof_template.csv. Statements use the wording of GRADE guideline 26 (Santesso N et al. J Clin Epidemiol 2020;119:126-135).
+  Minimal important differences (MIDs) or decision thresholds per outcome: [team to fill, with a source for each, before analysis]. For NAD+, a threshold is a judgement call; state it and the reasoning.
+  NAD+ and other biomarkers are rated as direct evidence for "does NR change NAD+ metabolism" and indirect for clinical benefit.
+REASON
+  GRADE is the standard for Cochrane and most journals; writing the thresholds down before analysis stops them from moving after the results are known.
+
+----------------------------------------------------------------------
+N. Software and reproducibility
+----------------------------------------------------------------------
+  Analyses run from the extraction CSV and a per-outcome config with the kit's analysis engines; two independent engines are run on the same inputs and their results compared. Code, extraction file, config and outputs are shared (PRISMA 2020 item 27). [Record engine names and versions.]
+
+----------------------------------------------------------------------
+O. Dichotomous outcomes (adverse events)
+----------------------------------------------------------------------
+DEFAULT
+  Participants with at least one adverse event, with at least one serious adverse event, and withdrawals due to adverse events: risk ratio, random-effects inverse-variance meta-analysis (REML tau^2, with the section F rules for HKSJ, minimum k and prediction intervals). Mantel-Haenszel methods are fixed-effect only (Handbook chapter 10, section 10.4.1); the random-effects method for dichotomous data is inverse variance (Handbook chapter 10, section 10.4). Sensitivity analyses: (1) Mantel-Haenszel fixed-effect risk ratio; (2) when events are rare (below 1% in both arms), Peto one-step odds ratio, which is the least biased method at those rates provided the arm sizes within each trial are not substantially imbalanced and the effect is not very large (Handbook chapter 10, section 10.4.4.3; Bradburn MJ, Deeks JJ, Berlin JA, Localio AR. Stat Med 2007;26:53-77) [team to confirm]. A trial with zero events in one arm enters with 0.5 added to each cell of its 2x2 table, as RevMan does, and the correction is reported (Handbook chapter 10, section 10.4.4.1). Trials with zero events in both arms are reported but do not contribute to the risk ratio (Handbook chapter 10, section 10.4.4.2). Software: metafor rma (measure = "RR"), rma.mh and rma.peto.
+NOTE
+  The kit's shared extraction interface covers continuous outcomes. Adverse events need a separate extraction table (events and n per arm) and a separate analysis; this is an open item for the kit.
+
+
+======================================================================
+AMENDMENTS LOG
+======================================================================
+date | section | change | reason | made before or after seeing pooled results
+[YYYY-MM-DD] | | | |

@@ -1,0 +1,6 @@
+estimator,k,test,stat,df,pval,hksj,converged,iterations,notes
+REML,4,z,0.8927906536082588,,0.3719692924583752,False,True,1,HKSJ not used (hksj_rule revman: tau2 = 0 or k - p < 2); Wald z used
+DL,4,z,0.8927906536082588,,0.3719692924583752,False,True,0,HKSJ not used (hksj_rule revman: tau2 = 0 or k - p < 2); Wald z used
+PM,4,z,0.8927906536082588,,0.3719692924583752,False,True,0,HKSJ not used (hksj_rule revman: tau2 = 0 or k - p < 2); Wald z used
+ML,4,z,0.8927906536082588,,0.3719692924583752,False,True,1,HKSJ not used (hksj_rule revman: tau2 = 0 or k - p < 2); Wald z used
+FE,4,z,0.8927906536082588,,0.3719692924583752,False,True,0,

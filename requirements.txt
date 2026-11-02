@@ -1,0 +1,19 @@
+# What the engine, the checker and the plots need, at the versions the kit was checked with.
+# Python 3.12. Install with: uv pip install -r requirements.txt
+# The same versions with PyPI hashes are in requirements-lock.txt.
+contourpy==1.4.0
+cycler==0.12.1
+et-xmlfile==2.0.0
+fonttools==4.68.0
+kiwisolver==1.5.1
+matplotlib==3.11.2
+numpy==2.5.4
+openpyxl==3.1.5
+packaging==26.3
+pandas==3.1.0
+pillow==13.0.0
+pyparsing==3.3.3
+python-dateutil==4.0.0
+pyyaml==6.0.3
+scipy==1.18.1
+tzdata==2026.6

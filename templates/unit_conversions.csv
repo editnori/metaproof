@@ -1,0 +1,11 @@
+analyte,from_unit,to_unit,multiply_by,offset,applies_to_sd,note
+any concentration,nmol/mL,umol/L,1,0,yes,Same quantity (1 nmol/mL = 1 umol/L).
+any concentration,nmol/L,umol/L,0.001,0,yes,
+NAD+,ug/mL,umol/L,1.5073,0,yes,"Molar mass of NAD+ taken as 663.43 g/mol (1000/663.43). Only for a matched matrix; per-cell or per-protein values (e.g. pmol per 10^6 PBMC, nmol/mg protein) cannot be converted to a concentration and are separate outcomes."
+glucose,mg/dL,mmol/L,0.0555,0,yes,Molar mass 180.16 g/mol (10/180.16).
+total/LDL/HDL cholesterol,mg/dL,mmol/L,0.02586,0,yes,Divide by 38.67.
+triglycerides,mg/dL,mmol/L,0.01129,0,yes,Divide by 88.57 (triolein convention).
+insulin,uIU/mL,pmol/L,6.00,0,yes,"Factor 6.00 is the usual convention; some laboratories use 6.945. Record the factor the study used, if stated, in notes."
+creatinine,mg/dL,umol/L,88.42,0,yes,
+HbA1c,% (NGSP),mmol/mol (IFCC),10.929,-23.50,slope only,"Affine: mmol/mol = 10.929 x (% - 2.15) = 10.929 x % - 23.50. Apply the offset to means and quartiles; multiply SDs and SEs by the slope only."
+time,days,weeks,0.142857,0,n/a,duration_weeks = days / 7.

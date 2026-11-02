@@ -1,0 +1,2 @@
+Generated 2026-11-01 21:17 CST by reference_r/make_reference_data.R
+R 4.6.2 | metafor 5.2.1 | metadat 1.6.0

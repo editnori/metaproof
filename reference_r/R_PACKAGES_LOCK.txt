@@ -1,0 +1,21 @@
+R packages the kit's reference engine was verified with (reference_r/lib). They install
+from the dated Posit snapshot of CRAN at https://packagemanager.posit.co/cran/2026-11-01.
+validation/crosscheck.py prints whether the library still matches this list in the header
+of validation/crosscheck_report.txt.
+
+R 4.6.2 (2026-10-29)
+
+Package    Version     Why
+metafor    5.2-1       pooling, escalc, predict, confint, influence, regtest, plots
+metadat    1.6-0       the published methods datasets in validation/reference_data
+jsonlite   2.0.0       JSON configs and config_resolved.json
+yaml       2.3.12      YAML configs
+mathjaxr   2.0-0       metafor dependency
+numDeriv   2016.8-1.1  metafor dependency
+pbapply    1.7-5       metafor dependency
+digest     0.6.39      yaml dependency
+
+To install exactly these versions into reference_r/lib:
+  Rscript reference_r/install_packages.R
+It builds from source, which needs a C compiler (xcode-select --install on a Mac), and
+stops with an error if any installed version differs from this list.

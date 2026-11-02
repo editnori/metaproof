@@ -1,0 +1,400 @@
+NR review: pooling problems by outcome family, and the kit setting for each
+==========================================================================
+
+Built from the screened abstracts and registry records in nr_candidate_trials.csv
+(record IDs R001-R092). Full texts were not read. Every "trial reports X" below
+means "the PubMed abstract or the registry record says X". Confirm it in the full
+text at extraction.
+
+Kit names used below:
+  extraction columns: see templates/extraction_data_dictionary.csv
+  config keys: see metaproof/config.py (defaults block, per-outcome overrides)
+  example: examples/nicotinamide-riboside/SYNTHETIC_nr_like_extraction.csv + examples/nicotinamide-riboside/SYNTHETIC_nr_like_config.yaml
+           (invented numbers; shapes only)
+
+
+A. Problems that cut across every family
+----------------------------------------
+
+A1 Crossover trials
+   Trials: Martens 2018 (R023), Remie 2020 (R016), Nascimento 2021 (R017),
+   Elhassan 2019 (R020), Ahmadi 2023 (R013, three periods: NR, CoQ10, placebo),
+   Wu 2025 SCD/MCI (R008), Shoji 2025 Werner (R007, 26-week periods),
+   Dolopikou 2020 (R022, single dose), NIH immunity trial NCT02812238 (R025).
+   Problem: a paired analysis needs the within-person correlation, which is rarely
+   reported. Analysing the periods as if they were parallel groups wastes the
+   pairing and gives too much variance, but it is conservative (Elbourne DR, Altman DG,
+   Higgins JPT, et al. Int J Epidemiol 2002;31(1):140-149; Cochrane Handbook
+   chapter 23, section 23.2). Carry-over and period effects need a judgement in the
+   RoB 2 crossover tool. Washout lengths were not in the abstracts.
+   Kit:
+   - design = crossover; one row per treatment condition (not per sequence); same n on both rows.
+   - Use paired_md + paired_se on the NR row when the trial reports a paired
+     difference with its SE or CI. This needs no correlation.
+   - Otherwise enter the period means and SDs. corr_within (row) wins over the
+     config corr_within (default 0.5). When a crossover uses the assumed r, both
+     engines rerun at r = 0.2 and 0.8 by default (corr_within_sensitivity: auto); a
+     list such as [0.2, 0.8] always runs, and [] turns it off with a log warning.
+   - For ROM and SMD the kit derives r from paired_se when both period SDs are given.
+     Crossover SMD carries Hedges' J on N - 1 df, like parallel g (crossover_smd_j).
+   - Built from period means, the paired MD assumes no period effect (balanced
+     sequences); the kit says so in method_notes. Prefer a period-adjusted paired
+     estimate (Cochrane Handbook v6.5, section 23.2.5).
+   - A row with only within-period change (mean_change, sd_change) cannot be used;
+     the checker rejects it. Enter period means and SDs or the paired estimate.
+   - Record washout_weeks, period_length_weeks, n_per_sequence and crossover_analysis
+     on study_characteristics; RoB 2 domain S needs them. R007 (Shoji 2025) switched
+     after 26 weeks and its abstract states no washout.
+   - First-period-only data: decide in the protocol before extraction (Handbook v6.5,
+     section 23.2.4), never after a carry-over test, and assess those results with the
+     parallel RoB 2 tool. Enter them as design = parallel, with a note.
+   - Three-period trial (R013): extract the NR and placebo periods only. The CoQ10
+     period is not an NR comparison.
+   - Combining parallel and crossover trials in one analysis follows Curtin F,
+     Altman DG, Elbourne D. Stat Med 2002;21(15):2131-2144. Use subgroups: [design]
+     to show both.
+
+A2 Change from baseline vs final values
+   Trials report either. Examples: NOPARK (R001) MMRM change; Lin 2025 (R006)
+   change +/- SD; Remie (R016) period values with change +/- SE; Orr (R012) change.
+   Problem: MD can mix change and final values across trials. SMD should not
+   (Cochrane Handbook chapter 10, section 10.5.2). Imputing an SD of change needs a
+   baseline-to-follow-up correlation (Handbook chapter 6, section 6.5.2.8).
+   Kit:
+   - data_basis: auto. For MD: reported change (with sd_change or se_change), else
+     final values, else change with an imputed SD; nothing is imputed when the study
+     offers an assumption-free option. For SMD: final values only (Handbook v6.5,
+     section 10.5.2), so auto is safe for SMD.
+   - data_basis: change forces change scores. Under SMD it needs a reported SD of
+     change in every arm: an imputed SD would be the standardiser, so the assumed r
+     would move g itself (Handbook v6.5, section 23.2.7.2); such studies are excluded
+     with a reason.
+   - corr_prepost (default 0.5) and corr_prepost_sensitivity (default [0.2, 0.8]).
+     A row-level corr_prepost wins; compute it from a trial that reports baseline,
+     final and change SDs (metaproof.conversions.corr_from_sds).
+   - The SD imputation happens only when baseline_mean, baseline_sd, mean and sd are all filled.
+   - Change reported with its SE: put it in se_change (extension column); the
+     engines convert it.
+   - The log warns "SMD mixes change and final values" only when parallel rows mix
+     the two; crossover rows (data_basis = paired) no longer trigger it.
+
+A3 Multiple NR doses and multi-arm trials
+   Trials: Conze 2019 (R021, NR 100/300/1000 + placebo), Dellinger 2017 (R029, NRPT
+   1X/2X + placebo), NRPT NAFLD (R030, 1x/2x + placebo), Simic 2020 (R032, four dose
+   steps sharing four placebo patients), Christen 2026 (R003, NR, NMN, nicotinamide,
+   placebo), NICE (R010, NR+placebo, NR+resveratrol, placebo), Lin 2025 NEET (R006,
+   NR+exercise, placebo+exercise, NR alone), Lin 2026 Friedreich (R027, 2 x 2
+   factorial).
+   Problem: a shared placebo arm must not be counted twice (Handbook chapter 23,
+   section 23.3.4). Some arms are not NR contrasts at all.
+   Kit:
+   - multi_arm: combine (default) merges the NR arms (Handbook Table 6.5.a), so the
+     control is counted once; this is the main analysis (protocol H). multi_arm:
+     split divides the shared control n across the NR arms and is for prespecified
+     dose analyses only: the split rows still share placebo participants and are
+     correlated (Handbook v6.5, sections 23.3.4 and 23.3.5). The kit reports
+     k_studies beside k and applies every minimum-k rule to studies; leave-one-out
+     drops a whole trial. combine_arms: {study_id: {new_label: [arm, arm]}} merges
+     named arms only.
+   - A combined arm has no single dose: dose_mg_day is left blank (dose_min and
+     dose_max are written) and the comparison drops out of dose models, with the
+     reason in log.txt. The control row's dose is never used.
+   - Several reported between-group MDs (paired_md, paired_se) against one control
+     are refused (Handbook v6.5, section 23.3.4); keep one prespecified comparison or
+     extract arm-level data.
+   - The kit compares every is_control = 0 row with the control row. So do NOT
+     extract arms that are not an NR contrast: the NMN and nicotinamide arms of R003,
+     the NR+resveratrol arm of R010 (unless running a mixtures sensitivity analysis),
+     the NR-alone arm of R006 (its only comparator gets exercise too). Record them in
+     notes. The SYNTHETIC example row S07 shows this.
+   - Factorial (R027): the four groups are distinct people. Enter two study_ids
+     (e.g. Lin2026_noEx: NR vs placebo; Lin2026_Ex: NR+exercise vs placebo+exercise),
+     or pick one per the protocol. Do not use both and also a pooled factorial estimate.
+   - Dose: moderators: [dose_mg_day] with multi_arm: split runs a meta-regression,
+     only with at least 10 studies (metareg_min_k; Handbook v6.5, section
+     10.11.5.1). Below that the kit writes a 'not run' row. A model for dependent
+     effects (multilevel or robust variance estimation; Hedges LV, Tipton E, Johnson
+     MC. Res Synth Methods 2010;1(1):39-65) would handle split arms properly; the kit
+     does not implement it.
+   - Salt form: most trials dose NR chloride. NR cation 255.25 g/mol, NR chloride
+     290.70 g/mol (PubChem, checked 2026-11-02), so 1000 mg NR chloride = about 878 mg
+     NR. Put the dose as reported in dose_mg_day and the salt form in notes. Convert
+     only if trials mix forms.
+
+A4 Multiple timepoints
+   Trials: Wu 2025 long-COVID (R005: 5, 10, 20 weeks; only 0-10 weeks is a
+   randomized placebo comparison; delayed start after that), Conze 2019 (R021:
+   effects "within 2 weeks", maintained to 8 weeks), NOPARK (R001: MMRM to 52
+   weeks), Norheim (R009: 6 weeks plus 12-week follow-up off treatment), Jensen
+   (R031: 2 h to 30 days after injury).
+   Problem: one timepoint per study per analysis (Handbook chapter 6, section 6.2 on
+   unit of analysis). The choice must be set in the protocol, not after seeing the data.
+   Kit:
+   - One row per arm per timepoint. first/last order timepoints in weeks: the label
+     is read with its unit ('day 21' is 3 weeks, earlier than 'wk6'), or the
+     timepoint_weeks extension column is used when filled (the checker fills it from
+     duration_weeks). A study the rule cannot place (e.g. a label 'end' with no
+     timepoint_weeks) goes to excluded.csv with the reason; it no longer stops the run.
+   - timepoint: last | first | <exact label> | [list of labels]. A list is a priority
+     order: each study keeps the first listed label it reports, so one timepoint per
+     study (Handbook v6.5, section 6.2.4). Two rows with the same arm label in one
+     analysis are refused. Run a second
+     analysis key with outcome: <same outcome> and a different timepoint rule for a
+     sensitivity or a "short-term vs long-term" split (SYNTHETIC example:
+     SYNTHETIC_whole_blood_nad_earliest).
+   - For R005 extract only wk10 for the randomized comparison.
+   - Follow-up after stopping NR (R009 week 18) is a different question (persistence);
+     give it its own outcome key.
+
+A5 Tiny n and few trials
+   Most NR RCTs randomize 8-60 people. Exceptions: NOPARK 410, NRPT NAFLD 111,
+   Dellinger 2017 120, NICE 90. Per outcome, expect k well under 10.
+   Problems: tau^2 is poorly estimated; Wald intervals are too narrow; funnel-plot
+   tests have no power; one large trial (NOPARK) can dominate.
+   Kit:
+   - estimator: REML (default) with hksj: true and hksj_rule: revman (defaults): HKSJ
+     only when tau2 > 0 and k >= 3, otherwise the Wald interval (Handbook v6.5,
+     section 10.10.4.4; Hartung J, Knapp G. Stat Med 2001;20(24):3875-3889). With
+     tau2 = 0 untruncated HKSJ can be narrower than the fixed-effect interval, and at
+     k = 2 it uses t(1) = 12.71 (Jackson D, Law M, Rucker G, Schwarzer G. Stat Med
+     2017;36(25):3923-3934). pooled.csv writes the Wald, HKSJ and truncated-HKSJ
+     intervals side by side, so "report both when HKSJ is narrower" needs one run.
+   - min_k_pool: 3 (default): with 2 studies the forest plot shows both without a
+     diamond and pooled.csv is blank with a note.
+   - pooled.csv gives every estimator (REML, DL, PM, ML, FE) as a built-in sensitivity.
+   - prediction_interval: true. Computed from k >= 3 but flagged "not interpretable"
+     below 5 studies (Handbook v6.5, section 10.10.4.3); the tau2 CI is flagged the
+     same way.
+   - egger_min_k: 10 keeps the small-study test off below 10 studies (counted as
+     studies, not split comparisons); lowering it needs egger_allow_small_k: true
+     (Sterne JAC, Sutton AJ, Ioannidis JPA, et al. BMJ 2011;343:d4002).
+   - SMD uses Hedges g with the exact J correction (kit default), which matters at n < 20.
+   - leave1out.csv and influence.csv show whether one trial drives the result.
+
+A6 Ratio and percent outcomes
+   Trials often report NAD+ as fold change or percent change (Conze R021: +22%,
+   +51%, +142%; Dellinger R029: about +40% and +90%; Wu R005: 2.6-3.1 fold; NR-SAFE
+   R011: up to 5-fold), and inflammatory markers on a log scale (Norheim R009:
+   sputum IL-8 -52.6%, 95% CI -75.7% to -7.6%).
+   Problems: percent change alone cannot be pooled without the arm means and SDs. A
+   model-based percent difference is a log ratio, not a mean difference.
+   Kit:
+   - measure: ROM (log ratio of means; Hedges LV, Gurevitch J, Curtis PS. Ecology
+     1999;80(4):1150-1156; Friedrich JO, Adhikari NKJ, Beyene J. BMC Med Res Methodol
+     2008;8:32). Needs arm means > 0 and uses final values only (data_basis: final).
+   - Geary's check: the kit flags any arm with mean x sqrt(n) / SD < 3 (rom_geary:
+     flag) or drops the comparison (rom_geary: exclude). NAAD and MeNAM in placebo
+     arms, near the limit of detection, are the usual failures; use MD for those
+     analytes. The Lajeunesse bias correction (Lajeunesse MJ. Ecology
+     2015;96(8):2056-2063) runs automatically as a sensitivity analysis.
+   - Fold change or percent change entered as 'mean' gives a ratio of mean fold
+     changes, a different estimand; the checker rejects rows that look like that.
+   - A reported parallel between-group MD with its SE (e.g. MMRM- or ANCOVA-
+     adjusted) can now be entered in paired_md and paired_se on one NR row, and is
+     used as it stands for MD analyses (one such comparison per study). There is
+     still no column for a ready-made log ratio for ROM.
+     Example: the Norheim IL-8 percent difference converts to
+     log ratio = ln(1 - 0.526) = -0.747. This is a model-based, probably log-scale and
+     baseline-adjusted ratio of geometric means, not an arithmetic-mean ROM (Higgins
+     JPT, White IR, Anzures-Cabrera J. Stat Med 2008;27(29):6072-6092), so it belongs
+     in a separate analysis or a sensitivity analysis only. Back-calculate its SE from
+     the CI with t on the trial's df, not 1.96, because the trial is small (Handbook
+     v6.5, section 6.5.2.3): SE = (ln(0.924) - ln(0.243)) / (2 x t(0.975, df)). With
+     1.96 the value would be 0.341, which understates the SE.
+
+A7 Skewed outcomes reported as median and IQR
+   Likely in inflammatory markers, insulin, HOMA-IR, triglycerides, AEs counts, and
+   some NAD+ data. Registry results for Thomas 2026 (R004, skin nerve fibres) and
+   Lin 2026 Friedreich (R027, peak VO2 change) are medians.
+   Kit:
+   - median with q1/q3 and/or min/max; median_method: luo (default) or wan.
+     Wan X, Wang W, Liu J, Tong T. BMC Med Res Methodol 2014;14:135. Luo D, Wan X,
+     Liu J, Tong T. Stat Methods Med Res 2018;27(6):1785-1805.
+   - Both assume near-normal data, and medians are reported because data are skewed
+     (Handbook v6.5, section 6.5.2.5). Median + range without IQR is excluded unless
+     allow_range_only: true (Handbook v6.5, section 6.5.2.6); the kit adds it back as a
+     sensitivity analysis. study_effects.csv has converted_from_median and
+     median_asymmetry columns, and the K5 sensitivity analyses (Wan for both, exclude
+     converted rows) run automatically. median_asymmetry is a pointer, not the Shi
+     2023 skewness test (Shi J et al. Stat Methods Med Res 2023;32(7):1338-1360),
+     which has to be applied by hand.
+   - Kit gap: median columns are for final values. A median (IQR) of change, as in
+     the R027 registry results, has no column. Use the publication's means if given,
+     or ask the authors.
+   - If a trial reports geometric means or results on the log scale, see Higgins JPT,
+     White IR, Anzures-Cabrera J. Stat Med 2008;27(29):6072-6092 before converting.
+
+A8 Units
+   Kit: no automatic unit conversion. Convert at extraction with
+   templates/unit_conversions.csv and write the factor in notes. Different matrices
+   (whole blood, PBMC, plasma, muscle, CSF, urine) are different outcomes, not units.
+
+A9 Several reports of one trial
+   NCT02303483 (Dollerup: R019, R043, R044), NCT03579693 (Ahmadi: R013, R041,
+   R042), NADPARK (R015, R045), Martens 2018 (R023, R046), NCT02835664 (Remie R016,
+   BAT R017), NCT02812238 (R025, R026), NCT03489200 (R033 and R034 give different
+   designs and n for one NCT), NCT04044131 (one NCT for the AD and PD trials).
+   Kit: one study_id per trial (same value in RoB 2 and GRADE files); take each
+   outcome from the report that has it; never enter the same participants twice
+   (Handbook chapter 5, section 5.2.1).
+
+A10 Co-interventions and mixtures
+   NRPT (R029-R032, R033, R034, R061), CMA (R035-R039), NR+ketones (R040),
+   NR+resveratrol arm (R010), exercise trials (R006, R027, R028).
+   Kit: no special setting. Decide eligibility in the protocol (search_strategy.txt
+   section 1.2). For a mixtures sensitivity analysis, give the mixture trials their
+   own population or a text moderator and use subgroups, or run a separate outcome
+   key on a separate extraction file.
+
+
+B. By outcome family
+--------------------
+
+B1 Blood NAD+ metabolome (NAD)
+   Trials (R-numbers): R003, R005, R009, R011, R012, R014, R015, R021, R022, R023,
+   R029, R032, R002, R004 (plasma: no rise), R020 (muscle), R019/R044 (muscle: no
+   rise), R018 (muscle), R046 (neuronal EVs), R015 (brain MRS, CSF).
+   Problems: different matrices (whole blood, PBMC, plasma, erythrocyte NADH,
+   muscle, brain, CSF, urine catabolites); different assays (LC-MS, enzymatic
+   cycling; registry results for NCT04818216 report ug/mL); results given as fold or
+   percent change (A6); several doses (A3); several timepoints (A4); crossovers (A1);
+   very large between-trial heterogeneity expected.
+   Kit: one outcome key per matrix (whole_blood_nad, pbmc_nad, muscle_nad, ...);
+   measure: ROM, data_basis: final; moderators: [dose_mg_day]; subgroups: [design]
+   or [population]; prediction_interval: true. Do not use ROM for NAAD or other
+   analytes near zero in the control arm (A6). The NAD+ ug/mL to umol/L factor is in
+   unit_conversions.csv.
+
+B2 Blood pressure and arterial stiffness (BP)
+   Trials: R023 (SBP, PWV; exploratory), R002 (secondary), R006 (daytime SBP
+   primary; PWV; nighttime BP), R016 (ambulatory BP, crossover), R007 (CAVI), R062
+   (non-randomized). Upcoming: Freeberg protocol R051 (NCT03821623, 94-118 planned).
+   Problems: office vs 24-h vs daytime vs nighttime BP are different outcomes;
+   change vs final mix (A2); crossover (A1); co-intervention arm structure in R006
+   (A3); PWV (m/s) and CAVI (unitless) are not the same construct.
+   Kit: outcome keys sbp_office, sbp_daytime, sbp_24h, ...; measure: MD (mmHg),
+   data_basis: auto; corr_prepost from a trial that reports all three SDs, with
+   sensitivity; arterial stiffness as its own key with SMD (data_basis: auto, which
+   means final values for SMD) if PWV and CAVI are pooled, or MD per index.
+
+B3 Glucose and insulin sensitivity (GLU)
+   Trials: R019 (clamp; 12 weeks; 2000 mg/day), R043 (OGTT, beta-cell function,
+   incretins: same trial as R019), R016 (clamp; crossover), R028 (glucose biomarkers;
+   exercise in both arms), R055 (non-randomized twins).
+   Problems: different measures of insulin sensitivity (clamp M-value or Rd,
+   HOMA-IR, Matsuda, OGTT AUC); clamp units (mg/kg/min vs umol/kg/min; per kg body
+   weight vs per kg fat-free mass); glucose mg/dL vs mmol/L; insulin uIU/mL vs pmol/L
+   (factor 6.00 or 6.945); HOMA-IR is skewed (A7); one trial spread over two reports
+   (A9).
+   Kit: fasting_glucose and fasting_insulin as MD after unit conversion
+   (unit_conversions.csv); insulin_sensitivity as SMD on final values (data_basis:
+   auto or final) if clamp and index measures are pooled, or MD per method; median
+   inputs for HOMA-IR (median_method), with the skew caveats in A7.
+
+B4 Lipids (LIP)
+   Trials: R021 (LDL-C; "did not elevate"), R013 (lipidomics: triglycerides,
+   ceramides; crossover), R030 (ceramide 14:0; NRPT).
+   Problems: few trials with standard lipid panels; pterostilbene may itself raise
+   LDL-C (letter, PMID 30482564, title "Pterostilbene raises low density lipoprotein
+   cholesterol in people"), so NRPT trials confound any lipid result; lipidomics
+   yields hundreds of species (pick the protocol-named ones); mg/dL vs mmol/L;
+   triglycerides skewed.
+   Kit: ldl_c, hdl_c, total_c, triglycerides as MD in mmol/L after conversion;
+   triglycerides via median columns if needed; keep NRPT trials out of the primary
+   lipid analysis (A10). The kit does not adjust P values unless bh: true (protocol
+   L says no adjustment); if used, the family is primary analyses only, one per
+   outcome. Neither fixes the real risk here, selective choice among lipid species,
+   assays and timepoints within a trial: pick one result per study with the protocol
+   hierarchy (Part 2, section L), record it in study_characteristics
+   result_selection, and carry any deviation to RoB 2 question 5.2.
+
+B5 Inflammatory markers (INF)
+   Trials: R009 (sputum IL-8 primary, plasma IL-6), R020 (circulating cytokines),
+   R015 (serum and CSF cytokines), R041 (IL-2, IL-13, CRP; crossover estimated
+   differences with 95% CI), R016 (plasma inflammatory markers), R014 (NLRP3
+   expression), R024 and R025 (ex vivo Th17 / IL-17 secretion after stimulation),
+   R026 (ex vivo monocyte IFN-beta), R065 (PBMC cytokine expression; non-randomized).
+   Problems: many markers per trial (selective reporting risk); circulating levels,
+   gene expression and stimulated ex vivo secretion are different constructs; skewed
+   data reported as medians or on a log scale (A6, A7); values below the detection
+   limit; pg/mL vs ng/mL; hs-CRP mg/L vs mg/dL (x 10); sputum vs plasma.
+   Kit: one outcome key per marker and matrix (crp_serum, il6_plasma,
+   il8_sputum, ...); measure: ROM (final values) or MD on converted units; the R041
+   crossover estimates go in paired_md / paired_se on the NR row; ex vivo assays as
+   separate keys, probably narrative only.
+
+B6 Body composition (BODY)
+   Trials: R016 (fat-free mass %; crossover), R019 (DXA, MRI), R028 (intramuscular
+   fat, muscle cross-sectional area), R033 (muscle/fat weight ratio; EH301), R034
+   (anthropometry; NRPT + diet), R055 (non-randomized).
+   Problems: kg vs % of body mass; DXA vs MRI vs BIA vs skinfolds; between-person
+   variance is large and baseline-to-follow-up correlation is very high, so final
+   values are a poor basis and the default r = 0.5 badly overstates the SD of change.
+   Kit: data_basis: change; set corr_prepost for this key from a trial that reports
+   all three SDs (expect a high value) and widen corr_prepost_sensitivity around it;
+   fat_mass_kg and lean_mass_kg as MD; percent measures as their own keys.
+
+B7 Muscle and physical function (MUSC)
+   Trials: R013 (VO2 peak mL/min/kg; crossover), R027 (peak VO2 L/min; factorial;
+   registry medians), R022 (VO2max, torque, fatigue index; single dose), R010
+   (6-minute walk; three arms), R012 (walking speed), R008 (step counts), R031 (strength
+   after injury; NRPT), R033 (MRC strength; EH301), R019/R044, R016, R020, R018
+   (muscle mitochondrial respiration).
+   Problems: VO2 in L/min vs mL/kg/min (needs body mass to convert); factorial and
+   three-arm structures (A3); medians of change (A7); practice effects in walking
+   tests (R012 placebo improved); one-sided 90% CI in NICE (R010); mitochondrial
+   respiration units differ by protocol.
+   Kit: one key per test (vo2peak_rel, vo2peak_abs, six_mwd, grip_strength, ...);
+   MD within a test, SMD across tests (final values); factorial as two
+   study_ids; NICE: extract NR+placebo vs placebo only for NR-alone; convert the
+   one-sided interval to an SE before entry (the 90% one-sided bound is not a 95%
+   two-sided interval; check whether the paper also reports a two-sided CI).
+
+B8 Cognition (COG)
+   Trials: R001 (MDS-UPDRS part I includes non-motor items; other), R002 (cognitive
+   composite primary), R005 (ECog, RBANS, TMT-B; delayed start), R008 (RBANS;
+   crossover), R012 (MoCA), R035 (ADAS-Cog; CMA), R036 (MoCA; CMA), R040 (processing
+   speed; NR + ketones), R062 (non-randomized).
+   Problems: different instruments and scales; direction differs (higher is worse
+   for TMT-B time and ADAS-Cog); learning across periods in crossovers (period
+   effects); delayed-start design (R005, only wk10 randomized); most trials are
+   8-12 weeks, too short for clinical decline.
+   Kit: measure: SMD with data_basis: auto (final values for SMD); data_basis: change
+   only where every trial reports an SD of change; timepoint per protocol (A4).
+   Kit gap: no "higher is better" column. Multiply means (or change means) by -1 at
+   extraction for instruments where higher is worse, and say so in notes. Do not do
+   this for ROM.
+
+B9 Other outcomes (OTHER)
+   - Neurological rating scales: MDS-UPDRS (R001, R011, R015; R036 UPDRS for CMA),
+     ALSFRS-R (R033), ataxia scales (non-randomized R058, R059).
+     MD within a scale; NOPARK's MMRM-adjusted difference can go in paired_md and
+     paired_se on one parallel NR row (MD only; A6).
+   - Adverse events and tolerability (nearly every trial; primary in R011, R014, R021).
+     Kit gap: the engines handle continuous outcomes only (MD, SMD, ROM). Dichotomous
+     outcomes (participants with any AE, serious AE, withdrawals due to AE) need
+     risk ratios or risk differences (Handbook chapter 10 on dichotomous data and
+     rare events), which the kit does not compute. Plan a separate tool or a
+     narrative table.
+   - Liver fat and enzymes (R030, R038, R019), renal function (R013 eGFR, R007
+     creatinine, R032), homocysteine and one-carbon metabolism (R011, R021, R045),
+     cerebral blood flow (R002, R012), brain imaging (R015, R040), epigenetic age
+     (R009, R012, R069), skin ulcers (R007), lactation (protocol R053).
+     Mostly single trials: report narratively unless k >= 2 for one construct.
+
+
+C. What to settle in the protocol before extraction
+---------------------------------------------------
+  1. NR alone vs mixtures (A10) and whether NMN is a separate comparison
+     (search_strategy.txt section 1.3).
+  2. The outcome key list, one key per construct and matrix (A8, B1-B9).
+  3. The timepoint rule per outcome (A4).
+  4. The source of each assumed correlation, and the sensitivity range (A1, A2).
+  5. Which multi-arm and factorial arms are extracted (A3).
+  6. How adjusted or log-scale effects are handled: adjusted MDs via paired_md and
+     paired_se (MD only); ratios of geometric means as a separate or sensitivity
+     analysis (A6).
+  8. Whether first-period crossover data are ever used (A1), and the hierarchy for
+     choosing one result per study among matrices, assays, timepoints and analyses
+     (B4; protocol Part 2, section L).
+  7. How adverse events are synthesised (B9).

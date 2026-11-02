@@ -1,0 +1,288 @@
+NR systematic review: search strategy
+=====================================
+
+Question: randomized trials of oral nicotinamide riboside (NR) in humans.
+PubMed run: 2026-11-02 02:38 UTC (2026-11-01 evening, US time).
+ClinicalTrials.gov API v2 run: 2026-11-02 UTC.
+Embase, CENTRAL and WHO ICTRP: written here, NOT run (no access from this machine).
+
+Files in examples/nicotinamide-riboside/scout/
+  search_strategy.txt                   this file
+  pubmed_retrieved_pmids_2026-11-02.txt the 353 PMIDs retrieved by PubMed line #5
+  nr_candidate_trials.csv               screened candidates (built by build_candidate_table.py)
+  ctgov_nr_registrations.csv            every ClinicalTrials.gov record found (query_ctgov.py)
+  ctgov_results_posted.csv              the subset with results posted
+  pooling_issues.txt                    pooling problems by outcome family, and kit settings
+
+
+1. Decisions the protocol needs before the search is final
+----------------------------------------------------------
+
+1.1 What counts as "NR"
+  Include NR and NR chloride under any name: nicotinamide riboside, nicotinamide
+  riboside chloride, nicotinamide beta-riboside, nicotinamide ribonucleoside,
+  ribosylnicotinamide, NR, NRCl, Niagen, Tru Niagen / TruNiagen.
+  CAS numbers (checked in PubChem 2026-11-02): NR 1341-23-7; NR chloride 23111-00-4.
+  MeSH has no descriptor for NR. It is a supplementary concept,
+  "nicotinamide-beta-riboside" (C018613). The PubMed tag [nm] searches it.
+  The tag "nicotinamide riboside"[nm] finds nothing; use "nicotinamide-beta-riboside"[nm].
+
+  "NR" alone is not searchable (nuclear receptor, not reported, and so on). Use it only
+  next to an NR-specific term.
+
+1.2 Combination products. Search for them; decide in the protocol how to analyse them.
+  - NRPT ("Basis", Elysium Health): NR plus pterostilbene. Also sold as EH301 for ALS.
+  - CMA ("combined metabolic activators"): L-serine, N-acetylcysteine, NR, L-carnitine.
+  - NR plus ketone salts (BREAK-AD), NR plus resveratrol (one arm of NICE).
+  In these trials the control arm gets neither component, so the contrast is
+  "mixture vs placebo" and the NR effect cannot be separated (Cochrane Handbook
+  chapter 3, on defining interventions and comparators and on which comparisons
+  will be made). Suggested rule: primary analysis = NR
+  alone vs placebo or no NR. Include a co-intervention only when both compared arms
+  get it (for example NR+exercise vs placebo+exercise). Report mixtures as a separate
+  comparison or a sensitivity analysis.
+  Searching matters here: EH301 (PMID 30668199) never says "nicotinamide riboside" in
+  its PubMed record, so it is found only by the product-name line.
+
+1.3 NMN and other NAD+ precursors: keep them as a separate comparison, not in the NR pool
+  Suggestion: do not search for NMN, nicotinamide, niacin, NRH or NAD+ infusions as
+  eligible interventions. Search for them only if the protocol adds a separate,
+  clearly labelled "other NAD+ precursors" comparison. Reasons:
+  a) They are different molecules, with different doses and different routes to
+     NAD+. In the one head-to-head human trial found (PMID 41540253, NR 1000 mg vs
+     NMN 1000 mg vs nicotinamide 500 mg for 14 days), NR and NMN raised whole-blood
+     NAD+ by similar amounts and nicotinamide did not. Pooling them would assume a
+     class effect that the question ("does NR work?") does not need and the data do
+     not support.
+  b) Niacin causes flushing and changes lipids at the doses used, which would bias
+     the lipid and blinding results of an "NAD+ precursor" pool.
+  c) Earlier meta-analyses already pooled NR with NMN and other precursors (examples
+     found in this search: PMID 35303905, glucose and lipids; PMID 37593976, blood
+     pressure, CRP and carotid IMT; PMID 40275690, muscle mass and function). An
+     NR-only review answers a different, narrower question. Use their reference
+     lists as a source of NR trials (section 7).
+  d) The Cochrane Handbook asks that the comparisons be defined in the protocol and
+     that interventions be grouped for synthesis only on stated grounds (chapter 3).
+  If NMN is added later, treat multi-arm trials with NR and NMN arms (PMID 41540253;
+  PMID 41858901 is non-randomized) with the kit's multi-arm settings
+  (multi_arm: split) so the shared placebo is not counted twice.
+
+1.4 Design filter. Include parallel, crossover, factorial and cluster randomized
+  trials. Non-randomized, single-arm and open-label pre/post studies are listed in
+  nr_candidate_trials.csv (status "nonrandomized") so the PRISMA flow can count
+  them, but they are not eligible for the RCT synthesis. Randomized trials with no
+  placebo or no-treatment arm (e.g. NR doses compared with each other, R057) carry
+  status "no_eligible_comparator" and are excluded for that reason.
+
+1.5 No date or language limits. No limit on population (healthy or disease).
+
+
+2. PubMed / MEDLINE (as run 2026-11-02 02:38 UTC)
+-------------------------------------------------
+
+#1 NR concept                                                     1,017
+"nicotinamide-beta-riboside"[nm] OR "nicotinamide riboside"[tiab]
+OR "nicotinamide riboside chloride"[tiab] OR "nicotinamide beta-riboside"[tiab]
+OR "nicotinamide ribonucleoside"[tiab] OR ribosylnicotinamide[tiab]
+OR "N-ribosylnicotinamide"[tiab] OR niagen[tiab] OR truniagen[tiab]
+OR "NR chloride"[tiab] OR NRCl[tiab] OR EH301[tiab]
+OR (NRPT[tiab] AND (pterostilbene[tiab] OR nicotinamide[tiab]))
+
+#2 Cochrane Highly Sensitive Search Strategy, sensitivity-maximizing  6,929,869
+   version (2008 revision), PubMed format
+randomized controlled trial[pt] OR controlled clinical trial[pt]
+OR randomized[tiab] OR placebo[tiab] OR drug therapy[sh] OR randomly[tiab]
+OR trial[tiab] OR groups[tiab]
+
+#3 Extra design terms (added for crossover, pilot and open-label)  1,607,419
+clinical trial[pt] OR randomised[tiab] OR crossover[tiab] OR "cross-over"[tiab]
+OR "cross over"[tiab] OR pilot[tiab] OR "open-label"[tiab] OR supplementation[tiab]
+
+#4 Animal-only records                                             5,514,096
+animals[mh] NOT humans[mh]
+
+#5 Final: (#1) AND ((#2) OR (#3)) NOT (#4)                           353
+
+How the counts relate: #2, #3 and #4 are whole-PubMed component sets and overlap
+each other; only their intersection with #1 matters. #5 is a subset of #1
+(1,017 NR records -> 353 kept; the other 664 are animal-only or carry no trial or
+supplementation term).
+
+Notes on PubMed
+  - "tru niagen"[tiab] and "EH-301"[tiab] are not in the PubMed phrase index (no
+    hits), so they are left out. truniagen and EH301 cover them.
+  - Source of #2: Lefebvre C, Glanville J, Briscoe S, et al. Technical Supplement to
+    Chapter 4: Searching for and selecting studies. In: Cochrane Handbook for
+    Systematic Reviews of Interventions, current version, section 3.6.1 (Cochrane
+    Highly Sensitive Search Strategies for identifying randomized trials in
+    MEDLINE). Check the box number and wording in the current supplement before
+    the final run.
+  - #3 was added on purpose. The twin study (PMID 36638183, non-randomized) and
+    several small open-label studies were missed by #2 alone. No randomized NR trial
+    was missed by #2: the 549 non-animal NR records outside #2 were checked by a
+    keyword screen of titles and abstracts, and the flagged records were read by hand.
+  - Screening done here: all 193 records of an earlier, narrower run were screened by
+    title and abstract. The 160 records added by the final lines were screened by the
+    keyword screen above, with flagged records read in full. Two people still need
+    to screen all 353 independently, in duplicate (Handbook chapter 4).
+  - Recall check against the registry: every PubMed record that a ClinicalTrials.gov
+    NR record lists as a trial report is in #5, except two. PMID 34694070 (CMA in
+    NAFLD) never names NR in its PubMed record. PMID 40473693 reports muscle biology
+    from an NRPT trial, not an NR comparison. If CMA trials are eligible, add this
+    line to #1 (115 non-animal records on 2026-11-02, including PMID 34694070):
+      "combined metabolic activator"[tiab] OR "combined metabolic activators"[tiab]
+      OR "metabolic cofactors"[tiab]
+    ("metabolic cofactor supplementation" is not in the PubMed phrase index.)
+
+Rerun: paste #5 into PubMed, or run
+  https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=<#5>&retmax=3000
+Record the date and count. The PMIDs from this run are in
+pubmed_retrieved_pmids_2026-11-02.txt for deduplication.
+
+
+3. Embase (Ovid syntax). Not run; check each line in Ovid before use
+--------------------------------------------------------------------
+
+1  nicotinamide riboside/
+     (Check in the Emtree browser that this heading exists and see what it maps to.
+      If there is no Emtree heading, drop line 1; lines 2-5 carry the concept.)
+2  (nicotinamide adj2 ribosid*).ti,ab,kw,tn.
+3  (nicotinamide beta riboside* or nicotinamide ribonucleosid* or ribosylnicotinamide
+    or n-ribosylnicotinamide).ti,ab,kw,tn.
+4  (niagen or truniagen or tru niagen or nrcl or nr chloride or eh301 or eh 301).ti,ab,kw,tn.
+5  (1341-23-7 or 23111-00-4).rn.
+6  (nrpt and (pterostilbene or nicotinamide)).ti,ab,kw.
+7  or/1-6
+8  randomized controlled trial/ or controlled clinical trial/ or crossover procedure/
+   or double blind procedure/ or single blind procedure/ or randomization/ or placebo/
+9  (random* or factorial* or crossover* or cross over* or cross-over* or placebo*
+    or (doubl* adj blind*) or (singl* adj blind*) or assign* or allocat* or volunteer*
+    or trial* or pilot* or open label*).ti,ab,kw.
+10 8 or 9
+11 (exp animal/ or exp invertebrate/ or animal experiment/ or animal model/
+    or animal tissue/ or animal cell/ or nonhuman/) not (human/ or normal human/
+    or human cell/)
+12 (7 and 10) not 11
+
+Notes on Embase
+  - Lines 8-9 follow the pattern of the Cochrane Embase RCT filter, extended with
+    pilot and open-label terms. Take the exact current filter wording from the
+    Technical Supplement to Chapter 4 (section on search filters) and replace lines
+    8-9 with it if it differs.
+  - The NR literature is small. Expect line 7 NOT 11 to return a few thousand
+    records at most. If it does, screen all of it and skip the filter (lines 8-10).
+    The filter is a fallback if the yield is too big.
+  - Keep conference abstracts (do not add "not conference abstract.pt."). For a
+    supplement this small they often flag trials that were never published in full
+    (Handbook chapter 4 on grey literature; chapter 13 on missing results).
+  - Field tags: tn = drug trade name, rn = CAS registry number, kw = author keywords.
+
+
+4. Cochrane CENTRAL (Cochrane Library advanced search). Not run
+---------------------------------------------------------------
+
+#1 ("nicotinamide riboside*" OR "nicotinamide beta-riboside" OR "nicotinamide ribonucleoside"
+    OR ribosylnicotinamide OR "N-ribosylnicotinamide"):ti,ab,kw
+#2 (niagen OR truniagen OR "tru niagen" OR NRCl OR "NR chloride" OR EH301 OR "EH 301"):ti,ab,kw
+#3 (NRPT AND (pterostilbene OR nicotinamide)):ti,ab,kw
+#4 #1 OR #2 OR #3          then limit to the Trials tab
+
+Notes on CENTRAL
+  - No RCT filter is needed: CENTRAL already holds trial reports.
+  - MeSH search in CENTRAL does not reach supplementary concepts, so there is no MeSH line.
+  - CENTRAL takes in ClinicalTrials.gov and ICTRP records. Deduplicate against the
+    registry searches below by registration ID.
+
+
+5. ClinicalTrials.gov (API v2, as run 2026-11-02 UTC)
+-----------------------------------------------------
+
+Query A (intervention field):
+  query.intr = nicotinamide riboside OR Niagen OR "NR chloride" OR EH301 OR NRPT OR "Tru Niagen"
+  -> 128 studies, 17 with results posted
+Query B (all fields):
+  query.term = "nicotinamide riboside"
+  -> adds 5 studies; one is relevant (NCT07802548, sirtuin activators including NR
+     plus diet, randomized, completed, 45 enrolled)
+Union: 133 records (ctgov_nr_registrations.csv). 17 have results posted
+(ctgov_results_posted.csv).
+Script: .venv/bin/python examples/nicotinamide-riboside/scout/query_ctgov.py
+
+Web form equivalent: "Intervention/treatment" box with the query A string; then a
+second search with "nicotinamide riboside" in "Other terms".
+
+What the registry search adds
+  - 102 of the 133 registrations are randomized. Only 24 of those 102 have a stated
+    link to a PubMed record in nr_candidate_trials.csv (NCT ID in the abstract or the
+    PubMed DataBank field); 10 more have only a probable link, matched by the screener
+    on title, design, n or population, which is not evidence that the trial was
+    published (column link_status in ctgov_nr_registrations.csv; registration_link in
+    nr_candidate_trials.csv). Several completed randomized trials have no publication
+    linked: NIRVANA (NCT04818216, results posted), N-DOSE (NCT05589766), N-DOSE AD
+    (NCT05617508), Slow Age (NCT05593939), the long-COVID factorial trial
+    (NCT05703074, 310 enrolled), the ketone salts + NR chloride crossover in long-chain
+    fatty acid oxidation disorders (NCT05411835, 5 enrolled) and others. They are rows
+    R071-R092 of nr_candidate_trials.csv. Use posted results where they exist and
+    contact the investigators. This matters for the risk of bias due to missing
+    results (Handbook chapter 13).
+  - Some PubMed articles do not state their registration, and the link is only
+    probable. These are marked UNVERIFIED in nr_candidate_trials.csv, and their
+    ctgov_check says the registry record was fetched but the trial identity is not
+    verified. Confirm each one from the full text or with the authors before it is
+    used to count a registered trial as published.
+
+Also tested (2026-11-02) and judged not worth adding as standing queries:
+  query.intr = pterostilbene (7 extra, none with NR); "NAD+ precursor" (8 extra: NMN,
+  niacin and MIB-626 trials, plus NCT03310034 "NAD-precursors", terminated,
+  randomized, n = 14, precursor not named; worth one look); "combined metabolic
+  activator" (CMA trials NCT07062198 and NCT07889284 do not name NR in the record).
+  If CMA trials are eligible, also search "combined metabolic activator*" and
+  "metabolic cofactor*".
+
+
+6. WHO ICTRP (trialsearch.who.int). Not run
+-------------------------------------------
+
+Advanced search, Intervention field, one term per run (ICTRP handles long boolean
+strings poorly; check the current help page):
+  nicotinamide riboside
+  Niagen
+  NR chloride
+  EH301
+  NRPT
+  ribosylnicotinamide
+Also run "nicotinamide riboside" in the title field.
+Select "with results" in a second pass if the portal offers that option.
+ICTRP covers registries that ClinicalTrials.gov does not, for example ChiCTR (the
+glaucoma protocol PMID 35039056 is registered only as ChiCTR1900021998), jRCT and
+UMIN in Japan (the Werner syndrome trial PMID 40459998 states no registration in its
+abstract), ANZCTR, ISRCTN, EU CTR / CTIS and DRKS.
+
+
+7. Other sources (not run)
+--------------------------
+  - Reference lists of included trials and of the earlier reviews found in this
+    search: PMID 35303905, 37593976, 40275690, 41655607 (NAD+ supplementation,
+    preclinical and clinical), 37478182 (narrative review of NR in humans).
+  - Forward citation search (Web of Science or Scopus) on the earliest NR trials:
+    PMID 27721479, 29599478, 29992272.
+  - Regulatory dossiers: the EFSA novel-food opinion on NR chloride (PMID 32626405)
+    and its extension (PMID 34804232) may describe unpublished human studies.
+  - Manufacturers (ChromaDex for Niagen; Elysium Health for Basis/NRPT/EH301): ask
+    for a list of sponsored or supplied trials.
+  - Bioarxiv, medRxiv: at least one NR trial report appeared first as a preprint
+    (PMID 39228730).
+
+
+8. Reporting
+------------
+Report the search with PRISMA-S: Rethlefsen ML, Kirtley S, Waffenschmidt S, et al.
+PRISMA-S: an extension to the PRISMA Statement for Reporting Literature Searches in
+Systematic Reviews. Syst Rev 2021;10:39.
+Before the final run, have an information specialist peer review the strategy
+(PRESS: McGowan J, Sampson M, Salzwedel DM, Cogo E, Foerster V, Lefebvre C. PRESS
+Peer Review of Electronic Search Strategies: 2015 Guideline Statement. J Clin
+Epidemiol 2016;75:40-46).
+Count reports and studies separately. Several trials here have two to four reports
+(trial_key in nr_candidate_trials.csv). The study, not the report, is the unit of
+analysis (Handbook chapter 5, section 5.2.1).

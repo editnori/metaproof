@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.pyc
+.Rhistory
+out/
+reference_r/lib/
+# A reviewer's own data, written at the kit root by the README Run commands; never commit it
+/sheet.xlsx
+/extraction.csv
+/config.yaml
+/out_py/
+/out_r/
+/my_review/

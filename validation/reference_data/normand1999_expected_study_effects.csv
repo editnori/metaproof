@@ -1,0 +1,19 @@
+"dataset","outcome","measure","study_id","yi","vi","sei"
+"dat.normand1999","los_days_md","MD","normand_1_Edinburgh",-20,40.5080231596361,6.36459135841698
+"dat.normand1999","los_days_md","MD","normand_2_OrpingtonMild",-2,2.08064516129032,1.44244416227815
+"dat.normand1999","los_days_md","MD","normand_3_OrpingtonModerate",-55,15.6984037558685,3.96212111827346
+"dat.normand1999","los_days_md","MD","normand_4_OrpingtonSevere",-71,150.222222222222,12.2565175405668
+"dat.normand1999","los_days_md","MD","normand_5_MontrealHome",-4,17.3076923076923,4.16025147168922
+"dat.normand1999","los_days_md","MD","normand_6_MontrealTransfer",1,1.16734143049933,1.08043575954303
+"dat.normand1999","los_days_md","MD","normand_7_Newcastle",11,94.5891265597148,9.72569414282162
+"dat.normand1999","los_days_md","MD","normand_8_Umea",-10,6.31087928464978,2.51214635016549
+"dat.normand1999","los_days_md","MD","normand_9_Uppsala",7,19.8423076923077,4.4544705288404
+"dat.normand1999","los_days_smd","SMD (Hedges g, exact J, vtype LS)","normand_1_Edinburgh",-0.355169640940107,0.0130646755415297,0.114300811639855
+"dat.normand1999","los_days_smd","SMD (Hedges g, exact J, vtype LS)","normand_2_OrpingtonMild",-0.347940022739103,0.0644688760988567,0.253907219469744
+"dat.normand1999","los_days_smd","SMD (Hedges g, exact J, vtype LS)","normand_3_OrpingtonModerate",-2.31756916016386,0.0458121102801849,0.214037637531778
+"dat.normand1999","los_days_smd","SMD (Hedges g, exact J, vtype LS)","normand_4_OrpingtonSevere",-1.88798225293685,0.160617735936173,0.400771426047533
+"dat.normand1999","los_days_smd","SMD (Hedges g, exact J, vtype LS)","normand_5_MontrealHome",-0.383964141169701,0.205433278392224,0.453247480293299
+"dat.normand1999","los_days_smd","SMD (Hedges g, exact J, vtype LS)","normand_6_MontrealTransfer",0.172148669069591,0.0369105700003619,0.192121237765016
+"dat.normand1999","los_days_smd","SMD (Hedges g, exact J, vtype LS)","normand_7_Newcastle",0.272052073852928,0.0602671258364327,0.245493637058952
+"dat.normand1999","los_days_smd","SMD (Hedges g, exact J, vtype LS)","normand_8_Umea",-0.424596271894213,0.0148630384193326,0.121914061614453
+"dat.normand1999","los_days_smd","SMD (Hedges g, exact J, vtype LS)","normand_9_Uppsala",0.289556230080755,0.0362717341580545,0.1904513957892

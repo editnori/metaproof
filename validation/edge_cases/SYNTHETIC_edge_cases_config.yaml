@@ -1,0 +1,75 @@
+# SYNTHETIC edge-case config for validation/crosscheck.py (regenerated on every run).
+# Every row of SYNTHETIC_edge_cases_extraction.csv is invented; none is trial data.
+defaults:
+  estimator: REML
+  hksj: true
+  prediction_interval: true
+  level: 0.95
+  median_method: luo
+  multi_arm: split
+  timepoint: last
+  corr_prepost: 0.5
+  corr_prepost_sensitivity: [0.2, 0.8]
+  corr_within: 0.5
+  corr_within_sensitivity: [0.2, 0.8]
+outcomes:
+  # protocol defaults: min_k_pool 3 (k = 2 is not pooled), hksj_rule revman
+  SYNTHETIC_edge_k2: {measure: MD}
+  SYNTHETIC_edge_k2_pool2: {outcome: SYNTHETIC_edge_k2, measure: MD, min_k_pool: 2}
+  SYNTHETIC_edge_k2_pool2_always: {outcome: SYNTHETIC_edge_k2, measure: MD, min_k_pool: 2, hksj_rule: always}
+  SYNTHETIC_edge_k2_nohksj: {outcome: SYNTHETIC_edge_k2, measure: MD, hksj: false, min_k_pool: 2}
+  SYNTHETIC_edge_k3: {measure: MD, subgroups: [population], moderators: [dose_mg_day]}
+  SYNTHETIC_edge_k3_gates_off: {outcome: SYNTHETIC_edge_k3, measure: MD, subgroups: [population], moderators: [dose_mg_day], subgroup_min_k: 0, subgroup_min_per_level: 0, metareg_min_k: 0, metareg_allow_small_k: true, hksj_rule: always}
+  SYNTHETIC_edge_k3_separate: {outcome: SYNTHETIC_edge_k3, measure: MD, subgroups: [population], subgroup_method: separate, subgroup_min_k: 0, subgroup_min_per_level: 0, hksj_rule: always}
+  SYNTHETIC_edge_k3_truncated: {outcome: SYNTHETIC_edge_k3, measure: MD, hksj_rule: truncated}
+  SYNTHETIC_edge_k3_ml_nohksj: {outcome: SYNTHETIC_edge_k3, measure: MD, estimator: ML, hksj: false}
+  SYNTHETIC_edge_k3_pi_metafor: {outcome: SYNTHETIC_edge_k3, measure: MD, pi_type: metafor}
+  SYNTHETIC_edge_k3_pi_revman: {outcome: SYNTHETIC_edge_k3, measure: MD, pi_type: revman}
+  SYNTHETIC_edge_dominant_pi_revman: {outcome: SYNTHETIC_edge_dominant, measure: MD, pi_type: revman}
+  SYNTHETIC_edge_k3_smd_ub: {outcome: SYNTHETIC_edge_k3, measure: SMD, smd_variance: UB}
+  SYNTHETIC_edge_k3_smd_ls2: {outcome: SYNTHETIC_edge_k3, measure: SMD, smd_variance: LS2}
+  SYNTHETIC_edge_k3_rom_bc: {outcome: SYNTHETIC_edge_k3, measure: ROM, rom_bias_correction: true}
+  SYNTHETIC_edge_tau2_zero: {measure: MD}
+  SYNTHETIC_edge_tau2_zero_always: {outcome: SYNTHETIC_edge_tau2_zero, measure: MD, hksj_rule: always}
+  SYNTHETIC_edge_tau2_zero_dl: {outcome: SYNTHETIC_edge_tau2_zero, measure: MD, estimator: DL}
+  SYNTHETIC_edge_dominant: {measure: MD, subgroups: [population], moderators: [dose_mg_day]}
+  SYNTHETIC_edge_dominant_gates_off: {outcome: SYNTHETIC_edge_dominant, measure: MD, subgroups: [population], moderators: [dose_mg_day], subgroup_min_k: 0, metareg_min_k: 0, metareg_allow_small_k: true}
+  SYNTHETIC_edge_dominant_separate: {outcome: SYNTHETIC_edge_dominant, measure: MD, subgroups: [population], subgroup_method: separate, subgroup_min_k: 0}
+  SYNTHETIC_edge_dominant_truncated: {outcome: SYNTHETIC_edge_dominant, measure: MD, hksj_rule: truncated}
+  SYNTHETIC_edge_dominant_pm: {outcome: SYNTHETIC_edge_dominant, measure: MD, estimator: PM}
+  SYNTHETIC_edge_dominant_fe: {outcome: SYNTHETIC_edge_dominant, measure: MD, estimator: FE}
+  SYNTHETIC_edge_identical: {measure: MD}
+  SYNTHETIC_edge_identical_always: {outcome: SYNTHETIC_edge_identical, measure: MD, hksj_rule: always}
+  SYNTHETIC_edge_crossover_md: {measure: MD}
+  SYNTHETIC_edge_crossover_smd: {measure: SMD}
+  SYNTHETIC_edge_crossover_smd_noj: {outcome: SYNTHETIC_edge_crossover_smd, measure: SMD, crossover_smd_j: false}
+  SYNTHETIC_edge_crossover_rom: {measure: ROM}
+  SYNTHETIC_edge_crossover_rom_bc: {outcome: SYNTHETIC_edge_crossover_rom, measure: ROM, rom_bias_correction: true}
+  SYNTHETIC_edge_smd_mixed_auto: {outcome: SYNTHETIC_edge_smd_mixed, measure: SMD}
+  SYNTHETIC_edge_smd_mixed_change: {outcome: SYNTHETIC_edge_smd_mixed, measure: SMD, data_basis: change}
+  SYNTHETIC_edge_adjusted_md: {measure: MD}
+  SYNTHETIC_edge_range_unused: {measure: MD}
+  SYNTHETIC_edge_change_r02: {outcome: SYNTHETIC_edge_change, measure: MD, data_basis: change, corr_prepost: 0.2}
+  SYNTHETIC_edge_change_r05: {outcome: SYNTHETIC_edge_change, measure: MD, data_basis: change, corr_prepost: 0.5}
+  SYNTHETIC_edge_change_r08: {outcome: SYNTHETIC_edge_change, measure: MD, data_basis: change, corr_prepost: 0.8}
+  SYNTHETIC_edge_change_auto: {outcome: SYNTHETIC_edge_change, measure: MD, data_basis: auto}
+  SYNTHETIC_edge_change_smd: {outcome: SYNTHETIC_edge_change, measure: SMD, data_basis: change, min_k_pool: 2}
+  SYNTHETIC_edge_three_arm: {measure: MD, moderators: [dose_mg_day], metareg_min_k: 0, metareg_allow_small_k: true}
+  SYNTHETIC_edge_three_arm_combine: {outcome: SYNTHETIC_edge_three_arm, measure: MD, multi_arm: combine}
+  SYNTHETIC_edge_three_arm_combine_dose: {outcome: SYNTHETIC_edge_three_arm, measure: MD, multi_arm: combine, moderators: [dose_mg_day], metareg_min_k: 0, metareg_allow_small_k: true}
+  SYNTHETIC_edge_crossover_change_only: {measure: MD}
+  SYNTHETIC_edge_const_dose: {outcome: SYNTHETIC_edge_tau2_zero, measure: MD, moderators: [dose_mg_day], metareg_min_k: 0, metareg_allow_small_k: true}
+  SYNTHETIC_edge_three_arm_smd: {outcome: SYNTHETIC_edge_three_arm, measure: SMD}
+  SYNTHETIC_edge_three_arm_rom: {outcome: SYNTHETIC_edge_three_arm, measure: ROM}
+  SYNTHETIC_edge_paired_multi_split: {outcome: SYNTHETIC_edge_paired_multi, measure: MD}
+  SYNTHETIC_edge_paired_multi_combine: {outcome: SYNTHETIC_edge_paired_multi, measure: MD, multi_arm: combine}
+  SYNTHETIC_edge_two_timepoints: {measure: MD, timepoint: [wk6, wk12]}
+  SYNTHETIC_edge_tp_units_last: {outcome: SYNTHETIC_edge_tp_units, measure: MD, timepoint: last}
+  SYNTHETIC_edge_tp_units_wk6: {outcome: SYNTHETIC_edge_tp_units, measure: MD, timepoint: wk6, min_k_pool: 2}
+  SYNTHETIC_edge_geary_flag: {outcome: SYNTHETIC_edge_geary, measure: ROM}
+  SYNTHETIC_edge_geary_exclude: {outcome: SYNTHETIC_edge_geary, measure: ROM, rom_geary: exclude}
+  SYNTHETIC_edge_median: {measure: MD, median_method: luo, allow_range_only: true}
+  SYNTHETIC_edge_median_strict: {outcome: SYNTHETIC_edge_median, measure: MD, median_method: luo}
+  SYNTHETIC_edge_median_wan: {outcome: SYNTHETIC_edge_median, measure: MD, median_method: wan, allow_range_only: true}
+  SYNTHETIC_edge_k9: {measure: MD}
+  SYNTHETIC_edge_k10: {measure: MD}

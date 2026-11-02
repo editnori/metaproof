@@ -1,0 +1,74 @@
+# SYNTHETIC example config for examples/nicotinamide-riboside/SYNTHETIC_nr_like_extraction.csv.
+# Every number in that CSV is invented. The file shows the shapes real NR trials take
+# (crossover, change scores, median/IQR, a three-arm dose trial, two timepoints,
+# a co-intervention trial). It is not a summary of real NR results.
+#
+# Run:
+#   .venv/bin/python -m metaproof run examples/nicotinamide-riboside/SYNTHETIC_nr_like_extraction.csv \
+#       --config examples/nicotinamide-riboside/SYNTHETIC_nr_like_config.yaml --out out/SYNTHETIC_nr_like
+#
+# The correlations below are placeholders for the example. In the real review, take
+# them from trials that report baseline, final and change SDs (Handbook 6.5.2.8), or
+# from paired crossover results, and keep the sensitivity runs.
+
+defaults:
+  estimator: REML
+  hksj: true                    # small k; see pooling_issues.txt section A5
+  hksj_rule: revman             # HKSJ only when tau2 > 0 and k >= 3, else Wald (F01)
+  min_k_pool: 3                 # protocol F: no pooled estimate from 2 studies
+  prediction_interval: true
+  level: 0.95
+  median_method: luo            # Luo 2018 mean + Wan 2014 SD
+  allow_range_only: false       # median + range without IQR is excluded (Handbook 6.5.2.6)
+  multi_arm: combine            # protocol H: NR dose arms combined, control counted once
+  timepoint: last               # one timepoint per study; the latest, in weeks
+  corr_prepost: 0.5
+  corr_prepost_sensitivity: [0.2, 0.8]
+  corr_within: 0.5
+  corr_within_sensitivity: [0.2, 0.8]
+  egger_min_k: 10
+
+outcomes:
+  # Blood NAD+: big relative effects, different assays and baselines -> ratio of means.
+  # ROM uses final values only. Median/IQR rows are converted before the log ratio.
+  SYNTHETIC_whole_blood_nad:
+    measure: ROM
+    data_basis: final
+    subgroups: [design]
+    moderators: [dose_mg_day]
+
+  # Same outcome at the earliest timepoint per study (S01 has wk4 and wk12). A sensitivity
+  # analysis, so not primary: it would not enter a BH family (bh is off by default).
+  SYNTHETIC_whole_blood_nad_earliest:
+    outcome: SYNTHETIC_whole_blood_nad
+    measure: ROM
+    data_basis: final
+    timepoint: first
+    primary: false
+
+  # Dose analysis (protocol I): NR arms kept separate, shared placebo n split. Not a
+  # primary analysis; with fewer than 10 studies the meta-regression is reported as not run.
+  SYNTHETIC_whole_blood_nad_by_dose:
+    outcome: SYNTHETIC_whole_blood_nad
+    measure: ROM
+    data_basis: final
+    multi_arm: split
+    moderators: [dose_mg_day]
+    primary: false
+
+  # SBP in mmHg, analysed as change from baseline. S06 has no change SD, so it is imputed
+  # from corr_prepost (Handbook 6.5.2.8); the sensitivity rows move it. Under data_basis: auto
+  # both engines would instead use S06's final values (MD may mix change and final values,
+  # Handbook 10.5.2), and nothing would be imputed.
+  SYNTHETIC_sbp:
+    measure: MD
+    data_basis: change
+    corr_prepost: 0.6
+    corr_prepost_sensitivity: [0.4, 0.8]
+
+  # Cognitive scores on different scales: SMD, final values only (do not mix change and
+  # final under SMD).
+  SYNTHETIC_cognitive_score:
+    measure: SMD
+    smd_variance: LS
+    data_basis: final

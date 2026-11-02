@@ -1,0 +1,2 @@
+model,k,p,note
+dose_mg_day,6,2,not run: 5 studies < metareg_min_k = 10 (Handbook 10.11.5.1: about ten studies per characteristic; protocol I)

@@ -1,0 +1,12 @@
+study_id,outcome,timepoint,design,arm,is_control,n,mean,sd,se,median,q1,q3,min,max,mean_change,sd_change,baseline_mean,baseline_sd,corr_prepost,corr_within,paired_md,paired_se,dose_mg_day,duration_weeks,population,risk_of_bias,notes
+SYNTHETIC-A,synthetic_outcome_x,wk12,parallel,SYNTHETIC NR 1000 mg/day,0,20,48.0,9.0,,,,,,,,,40.0,8.5,,,,,1000,12,SYNTHETIC,low,SYNTHETIC example row; invented numbers; not real trial data
+SYNTHETIC-A,synthetic_outcome_x,wk12,parallel,SYNTHETIC placebo,1,21,41.0,8.0,,,,,,,,,40.5,8.0,,,,,0,12,SYNTHETIC,low,SYNTHETIC example row; invented numbers; not real trial data
+SYNTHETIC-B,synthetic_outcome_x,wk8,parallel,SYNTHETIC NR 500 mg/day,0,15,,,,,,,,,4.0,6.0,,,,,,,500,8,SYNTHETIC,some concerns,SYNTHETIC example row (three-arm trial; change scores); invented numbers; not real trial data
+SYNTHETIC-B,synthetic_outcome_x,wk8,parallel,SYNTHETIC NR 1000 mg/day,0,14,,,,,,,,,6.5,6.5,,,,,,,1000,8,SYNTHETIC,some concerns,SYNTHETIC example row (three-arm trial; change scores); invented numbers; not real trial data
+SYNTHETIC-B,synthetic_outcome_x,wk8,parallel,SYNTHETIC placebo,1,15,,,,,,,,,0.5,6.0,,,,,,,0,8,SYNTHETIC,some concerns,SYNTHETIC example row (three-arm trial; change scores); invented numbers; not real trial data
+SYNTHETIC-C,synthetic_outcome_x,wk12,parallel,SYNTHETIC NR 2000 mg/day,0,25,,,,46.0,40.0,55.0,,,,,,,,,,,2000,12,SYNTHETIC,high,SYNTHETIC example row (median and IQR only); invented numbers; not real trial data
+SYNTHETIC-C,synthetic_outcome_x,wk12,parallel,SYNTHETIC placebo,1,24,,,,42.0,36.0,49.0,,,,,,,,,,,0,12,SYNTHETIC,high,SYNTHETIC example row (median and IQR only); invented numbers; not real trial data
+SYNTHETIC-D,synthetic_outcome_x,end,crossover,SYNTHETIC NR period,0,12,47.0,10.0,,,,,,,,,,,,,3.5,1.6,1000,6,SYNTHETIC,some concerns,SYNTHETIC example row (crossover; paired MD reported); invented numbers; not real trial data
+SYNTHETIC-D,synthetic_outcome_x,end,crossover,SYNTHETIC placebo period,1,12,43.5,9.5,,,,,,,,,,,,,,,0,6,SYNTHETIC,some concerns,SYNTHETIC example row (crossover; paired MD reported); invented numbers; not real trial data
+SYNTHETIC-E,synthetic_outcome_x,end,crossover,SYNTHETIC NR period,0,18,45.0,,2.1,,,,,,,,,,,0.6,,,1000,6,SYNTHETIC,low,SYNTHETIC example row (crossover; arm means only; corr_within given); invented numbers; not real trial data
+SYNTHETIC-E,synthetic_outcome_x,end,crossover,SYNTHETIC placebo period,1,18,42.0,,2.0,,,,,,,,,,,0.6,,,0,6,SYNTHETIC,low,SYNTHETIC example row (crossover; arm means only; corr_within given); invented numbers; not real trial data

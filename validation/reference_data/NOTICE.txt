@@ -1,0 +1,11 @@
+The CSVs in this folder are exported from published datasets in the metadat R package
+(Viechtbauer W, White T, Noble D, Senior A, Hamilton WK. metadat: meta-analysis datasets,
+version 1.6-0, CRAN, doi:10.32614/CRAN.package.metadat), which is licensed GPL (>= 2).
+They are included only to check the engines against metafor's published results.
+
+  dat.bcg          Colditz GA et al. JAMA 1994;271(9):698-702 (BCG vaccine trials)
+  dat.normand1999  Normand SLT. Stat Med 1999;18(3):321-59 (stroke rehabilitation)
+  dat.curtis1998   Hedges LV, Gurevitch J, Curtis PS. Ecology 1999;80(4):1150-6 (plant mass under CO2)
+
+The expected values come from metafor 5.2-1 (reference_r/make_reference_data.R).
+None of these are nicotinamide riboside data.

@@ -1,0 +1,32 @@
+# SYNTHETIC example config for reference_r/run_meta.R.
+# Runs the three SYNTHETIC outcomes in SYNTHETIC_example_extraction.csv.
+# Keys and defaults are documented in reference_r/METHODS.txt (section 2).
+defaults:
+  estimator: REML          # REML | DL | PM | ML | FE
+  hksj: true               # Hartung-Knapp-Sidik-Jonkman (metafor test = "knha") ...
+  hksj_rule: revman        # ... only when tau2 > 0 and k >= 3, else Wald (Handbook v6.5 10.10.4.4)
+  prediction_interval: true
+  pi_type: riley           # riley: t with k-2 df; metafor: metafor default
+  basis: auto              # auto | final | change
+  corr_prepost: 0.5
+  corr_prepost_sensitivity: [0.2, 0.8]
+  corr_within: 0.5
+  corr_within_sensitivity: [0.2, 0.8]
+  median_method: wan2014   # wan2014 | luo2018 (Luo mean, Wan SD)
+  allow_range_only: true   # the default is false; on here so the Wan C1 path (S04) is exercised
+  multi_arm: split_control # the default is combine_treatments; split here to exercise S08
+  timepoint: latest
+  report_estimators: [REML, DL, PM, ML, FE]
+outcomes:
+  SYNTHETIC_outcome_MD:
+    measure: MD
+    subgroups: [population, risk_of_bias]
+    moderators: [dose_mg_day, duration_weeks]
+  SYNTHETIC_outcome_SMD:
+    measure: SMD
+    median_method: luo2018
+    subgroups: [population]
+    moderators: [dose_mg_day]
+  SYNTHETIC_outcome_ROM:
+    measure: ROM
+    moderators: [duration_weeks]

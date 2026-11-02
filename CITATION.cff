@@ -1,0 +1,33 @@
+cff-version: 1.2.0
+message: "If you use metaproof, please cite it as below."
+title: "metaproof: meta-analysis you can check"
+type: software
+authors:
+  - family-names: Qassem
+    given-names: Layth
+    affiliation: "PharmD, MSACI"
+version: "1.0.0"
+date-released: "2026-11-02"
+license: MIT
+repository-code: "https://github.com/editnori/metaproof"
+url: "https://github.com/editnori/metaproof"
+keywords:
+  - meta-analysis
+  - systematic review
+  - random effects
+  - Cochrane
+  - PRISMA 2020
+  - metafor
+references:
+  - type: article
+    title: "Conducting meta-analyses in R with the metafor package"
+    authors:
+      - family-names: Viechtbauer
+        given-names: Wolfgang
+    journal: "Journal of Statistical Software"
+    year: 2010
+    volume: 36
+    issue: 3
+    start: 1
+    end: 48
+    doi: "10.18637/jss.v036.i03"

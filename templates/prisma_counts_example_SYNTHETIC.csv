@@ -1,0 +1,22 @@
+key,label,n
+# SYNTHETIC example counts for testing the drawing only; not real search results,,
+databases,SYNTHETIC databases,400
+registers,SYNTHETIC registers,60
+duplicates_removed,SYNTHETIC,120
+automation_ineligible,SYNTHETIC,0
+other_removed,SYNTHETIC,5
+records_screened,SYNTHETIC,335
+records_excluded,SYNTHETIC,290
+reports_sought,SYNTHETIC,45
+reports_not_retrieved,SYNTHETIC,3
+reports_assessed,SYNTHETIC,42
+reports_excluded_reason,SYNTHETIC reason A (not randomized),12
+reports_excluded_reason,SYNTHETIC reason B (NR not isolated from co-intervention),6
+reports_excluded_reason,SYNTHETIC reason C (no eligible outcome data),4
+studies_included,SYNTHETIC,18
+reports_included,SYNTHETIC,22
+other_source,SYNTHETIC citation searching,10
+other_reports_sought,SYNTHETIC,4
+other_reports_not_retrieved,SYNTHETIC,0
+other_reports_assessed,SYNTHETIC,4
+other_reports_excluded_reason,SYNTHETIC reason A (not randomized),2

@@ -1,0 +1,202 @@
+sympy receipt for validation/proofs/sympy_proofs.py
+date_utc: 2026-11-02T07:10:00Z
+python: 3.12.16  sympy: 1.14.0
+
+PROOFS: id | property | method | steps passed | result
+P01 | inverse-variance weights are positive and normalize to 1 (fixed and random effects) | sympy assumptions, k=2..8; general-k sum identity | 43/43 | PASS
+P02 | fixed-effect and random-effects pooled estimates lie in [min y_i, max y_i] | sympy assumptions, k=2..8 and general k (Sum over indexed v_i > 0, d_i >= 0) | 33/33 | PASS
+P03 | DL tau^2 >= 0 after truncation; tau^2 == 0 when Q <= k-1; C > 0; Q >= 0 | sympy identities and assumptions, k=2..8 for C and Q | 31/31 | PASS
+P04 | I^2 = max(0,(Q-df)/Q) lies in [0,1); equals (H^2-1)/H^2 and, at the DL tau2, tau2/(tau2+s^2) (the form the engine reports for random-effects rows; engine match: E02) | sympy identities and assumptions | 13/13 | PASS
+P05 | random-effects weights become more equal as tau^2 grows | sympy derivative signs and limits | 5/5 | PASS
+P06 | prediction interval mu +/- c_PI sqrt(tau2 + SE^2) contains the CI mu +/- c_CI SE when both use the same SE (Wald, or Hartung-Knapp-scaled under HKSJ) and c_PI >= c_CI (engine pairs: riley t_(k-2), revman t_(k-1), metafor = c_CI; CI t_(k-1) or z; engine check E06) | sympy for the half-widths; NUMERIC scan for the quantile order | 7/7 | PASS
+P07 | approximate Hedges J = 1 - 3/(4 df - 1) lies in (0,1) for df > 1 and increases with df (the engine uses the exact gamma form: NUMERIC steps here, engine match E03) | sympy assumptions; NUMERIC scan for the exact gamma form | 8/8 | PASS
+P08 | SD_change = sqrt(SDb^2 + SDf^2 - 2 r SDb SDf) is a valid SD for r in [-1,1] and falls as r rises | sympy identities and assumptions | 8/8 | PASS
+P09 | cross-over paired SE < parallel-design SE when within-person r > 0 | sympy assumptions | 5/5 | PASS
+P10 | splitting a shared control across k comparisons keeps total n (and the risk); split comparisons stay correlated, which a count cannot show (engine paths: E07) | sympy general k (the engine's real n/k split); the Bend2 split laws are an integer model the engine does not run | 3/3 | PASS
+
+MUTANTS: id | targets | wrong version | sympy proved it? | counterexample | result
+M01 | P01 | weights divided by sum of 1/SE instead of sum of 1/variance | no | SYNTHETIC v1=1.475, v2=0.2404 | REFUTED
+M02 | P01 | random-effects weight 1/(v - tau2) | no | SYNTHETIC v1=0.4001, tau2=0.6952 | REFUTED
+M03 | P02 | pooled = sum(w*y) without dividing by sum(w) | no | SYNTHETIC v1=0.739, v2=0.1246, y1=0.4547, y2=0.7256 | REFUTED
+M04 | P03 | tau2 = (Q - df)/C with no max(0, .) | no | SYNTHETIC Q=0.2987, df=1, C=0.5992 | REFUTED
+M05 | P03 | C = S1 - S2 (missing division by S1) | no | SYNTHETIC w1=36.84, w2=5.877 | REFUTED
+M06 | P04 | I2 = max(0, (Q - df)/df) (wrong denominator) | no | SYNTHETIC Q=29.48, df=2 | REFUTED
+M07 | P04 | I2 = (Q - df)/Q with no max(0, .) | no | SYNTHETIC Q=4.52, df=9 | REFUTED
+M08 | P05 | weight 1/(v*(1+tau2)): ratio does not move with tau2 | no | SYNTHETIC v_i=0.1, v_j=0.4: ratio 4 at tau2=0 and 4 at tau2=10 | REFUTED
+M09 | P06 | PI half-width z*sqrt(tau2), SE^2 left out | no | SYNTHETIC tau2=0.0197, SE=0.3628 | REFUTED
+M10 | P07 | J = 1 + 3/(4 df - 1) (sign flipped) | no | SYNTHETIC df=190 | REFUTED
+M11 | P07 | claim J in (0,1) for df >= 1 (boundary df = 1 included) | no | SYNTHETIC df=1: J = 1 - 3/3 = 0, not in (0,1) | REFUTED
+M12 | P08 | radicand SDb^2 + SDf^2 + 2 r SDb SDf (sign flipped) | no | SYNTHETIC a=2.341, b=0.7894 | REFUTED
+M13 | P08 | allow correlation up to 2 (domain check removed) | no | SYNTHETIC a=1, b=1, r=1.736 | REFUTED
+M14 | P09 | paired variance with + 2 r s1 s2 | no | SYNTHETIC s1=2.341, s2=0.7894, r=0.4047 | REFUTED
+M15 | P10 | shared control entered in full in each comparison | no | SYNTHETIC n=40, k=2: total = 80 != 40 | REFUTED
+
+STEPS
+P01 inverse-variance weights are positive and normalize to 1 (fixed and random effects)
+  [ok] FE w=1/v k=2: every w_i > 0
+  [ok] FE w=1/v k=2: sum_i w_i/W == 1
+  [ok] FE w=1/v k=2: 0 < w_i/W < 1
+  [ok] FE w=1/v k=3: every w_i > 0
+  [ok] FE w=1/v k=3: sum_i w_i/W == 1
+  [ok] FE w=1/v k=3: 0 < w_i/W < 1
+  [ok] FE w=1/v k=4: every w_i > 0
+  [ok] FE w=1/v k=4: sum_i w_i/W == 1
+  [ok] FE w=1/v k=4: 0 < w_i/W < 1
+  [ok] FE w=1/v k=5: every w_i > 0
+  [ok] FE w=1/v k=5: sum_i w_i/W == 1
+  [ok] FE w=1/v k=5: 0 < w_i/W < 1
+  [ok] FE w=1/v k=6: every w_i > 0
+  [ok] FE w=1/v k=6: sum_i w_i/W == 1
+  [ok] FE w=1/v k=6: 0 < w_i/W < 1
+  [ok] FE w=1/v k=7: every w_i > 0
+  [ok] FE w=1/v k=7: sum_i w_i/W == 1
+  [ok] FE w=1/v k=7: 0 < w_i/W < 1
+  [ok] FE w=1/v k=8: every w_i > 0
+  [ok] FE w=1/v k=8: sum_i w_i/W == 1
+  [ok] FE w=1/v k=8: 0 < w_i/W < 1
+  [ok] RE w=1/(v+tau2) k=2: every w_i > 0
+  [ok] RE w=1/(v+tau2) k=2: sum_i w_i/W == 1
+  [ok] RE w=1/(v+tau2) k=2: 0 < w_i/W < 1
+  [ok] RE w=1/(v+tau2) k=3: every w_i > 0
+  [ok] RE w=1/(v+tau2) k=3: sum_i w_i/W == 1
+  [ok] RE w=1/(v+tau2) k=3: 0 < w_i/W < 1
+  [ok] RE w=1/(v+tau2) k=4: every w_i > 0
+  [ok] RE w=1/(v+tau2) k=4: sum_i w_i/W == 1
+  [ok] RE w=1/(v+tau2) k=4: 0 < w_i/W < 1
+  [ok] RE w=1/(v+tau2) k=5: every w_i > 0
+  [ok] RE w=1/(v+tau2) k=5: sum_i w_i/W == 1
+  [ok] RE w=1/(v+tau2) k=5: 0 < w_i/W < 1
+  [ok] RE w=1/(v+tau2) k=6: every w_i > 0
+  [ok] RE w=1/(v+tau2) k=6: sum_i w_i/W == 1
+  [ok] RE w=1/(v+tau2) k=6: 0 < w_i/W < 1
+  [ok] RE w=1/(v+tau2) k=7: every w_i > 0
+  [ok] RE w=1/(v+tau2) k=7: sum_i w_i/W == 1
+  [ok] RE w=1/(v+tau2) k=7: 0 < w_i/W < 1
+  [ok] RE w=1/(v+tau2) k=8: every w_i > 0
+  [ok] RE w=1/(v+tau2) k=8: sum_i w_i/W == 1
+  [ok] RE w=1/(v+tau2) k=8: 0 < w_i/W < 1
+  [ok] general k: Sum_i w_i / Sum_j w_j == 1
+P02 fixed-effect and random-effects pooled estimates lie in [min y_i, max y_i]
+  [ok] FE k=2: pooled - min >= 0 (y_i = min + d_i, d_i >= 0)
+  [ok] FE k=2: max - pooled >= 0 (y_i = max - d_i, d_i >= 0)
+  [ok] FE k=3: pooled - min >= 0 (y_i = min + d_i, d_i >= 0)
+  [ok] FE k=3: max - pooled >= 0 (y_i = max - d_i, d_i >= 0)
+  [ok] FE k=4: pooled - min >= 0 (y_i = min + d_i, d_i >= 0)
+  [ok] FE k=4: max - pooled >= 0 (y_i = max - d_i, d_i >= 0)
+  [ok] FE k=5: pooled - min >= 0 (y_i = min + d_i, d_i >= 0)
+  [ok] FE k=5: max - pooled >= 0 (y_i = max - d_i, d_i >= 0)
+  [ok] FE k=6: pooled - min >= 0 (y_i = min + d_i, d_i >= 0)
+  [ok] FE k=6: max - pooled >= 0 (y_i = max - d_i, d_i >= 0)
+  [ok] FE k=7: pooled - min >= 0 (y_i = min + d_i, d_i >= 0)
+  [ok] FE k=7: max - pooled >= 0 (y_i = max - d_i, d_i >= 0)
+  [ok] FE k=8: pooled - min >= 0 (y_i = min + d_i, d_i >= 0)
+  [ok] FE k=8: max - pooled >= 0 (y_i = max - d_i, d_i >= 0)
+  [ok] RE k=2: pooled - min >= 0 (y_i = min + d_i, d_i >= 0)
+  [ok] RE k=2: max - pooled >= 0 (y_i = max - d_i, d_i >= 0)
+  [ok] RE k=3: pooled - min >= 0 (y_i = min + d_i, d_i >= 0)
+  [ok] RE k=3: max - pooled >= 0 (y_i = max - d_i, d_i >= 0)
+  [ok] RE k=4: pooled - min >= 0 (y_i = min + d_i, d_i >= 0)
+  [ok] RE k=4: max - pooled >= 0 (y_i = max - d_i, d_i >= 0)
+  [ok] RE k=5: pooled - min >= 0 (y_i = min + d_i, d_i >= 0)
+  [ok] RE k=5: max - pooled >= 0 (y_i = max - d_i, d_i >= 0)
+  [ok] RE k=6: pooled - min >= 0 (y_i = min + d_i, d_i >= 0)
+  [ok] RE k=6: max - pooled >= 0 (y_i = max - d_i, d_i >= 0)
+  [ok] RE k=7: pooled - min >= 0 (y_i = min + d_i, d_i >= 0)
+  [ok] RE k=7: max - pooled >= 0 (y_i = max - d_i, d_i >= 0)
+  [ok] RE k=8: pooled - min >= 0 (y_i = min + d_i, d_i >= 0)
+  [ok] RE k=8: max - pooled >= 0 (y_i = max - d_i, d_i >= 0)
+  [ok] general k: sum w_i y_i - m sum w_i == sum w_i (y_i - m)
+  [ok] general k, FE w = 1/v: y_i = min + d_i, d_i >= 0: pooled - min == sum w d / sum w >= 0
+  [ok] general k, FE w = 1/v: y_i = max - d_i, d_i >= 0: max - pooled == sum w d / sum w >= 0
+  [ok] general k, RE w = 1/(v + tau2): y_i = min + d_i, d_i >= 0: pooled - min == sum w d / sum w >= 0
+  [ok] general k, RE w = 1/(v + tau2): y_i = max - d_i, d_i >= 0: max - pooled == sum w d / sum w >= 0
+P03 DL tau^2 >= 0 after truncation; tau^2 == 0 when Q <= k-1; C > 0; Q >= 0
+  [ok] k=2: S1^2 - S2 == 2 sum_(i<j) w_i w_j
+  [ok] k=2: C = S1 - S2/S1 > 0
+  [ok] k=2: Q = sum w(y - pooled)^2 is >= 0
+  [ok] k=2: Q definition == computing form sum w y^2 - (sum w y)^2/S1
+  [ok] k=3: S1^2 - S2 == 2 sum_(i<j) w_i w_j
+  [ok] k=3: C = S1 - S2/S1 > 0
+  [ok] k=3: Q = sum w(y - pooled)^2 is >= 0
+  [ok] k=3: Q definition == computing form sum w y^2 - (sum w y)^2/S1
+  [ok] k=4: S1^2 - S2 == 2 sum_(i<j) w_i w_j
+  [ok] k=4: C = S1 - S2/S1 > 0
+  [ok] k=4: Q = sum w(y - pooled)^2 is >= 0
+  [ok] k=4: Q definition == computing form sum w y^2 - (sum w y)^2/S1
+  [ok] k=5: S1^2 - S2 == 2 sum_(i<j) w_i w_j
+  [ok] k=5: C = S1 - S2/S1 > 0
+  [ok] k=5: Q = sum w(y - pooled)^2 is >= 0
+  [ok] k=5: Q definition == computing form sum w y^2 - (sum w y)^2/S1
+  [ok] k=6: S1^2 - S2 == 2 sum_(i<j) w_i w_j
+  [ok] k=6: C = S1 - S2/S1 > 0
+  [ok] k=6: Q = sum w(y - pooled)^2 is >= 0
+  [ok] k=6: Q definition == computing form sum w y^2 - (sum w y)^2/S1
+  [ok] k=7: S1^2 - S2 == 2 sum_(i<j) w_i w_j
+  [ok] k=7: C = S1 - S2/S1 > 0
+  [ok] k=7: Q = sum w(y - pooled)^2 is >= 0
+  [ok] k=7: Q definition == computing form sum w y^2 - (sum w y)^2/S1
+  [ok] k=8: S1^2 - S2 == 2 sum_(i<j) w_i w_j
+  [ok] k=8: C = S1 - S2/S1 > 0
+  [ok] k=8: Q = sum w(y - pooled)^2 is >= 0
+  [ok] k=8: Q definition == computing form sum w y^2 - (sum w y)^2/S1
+  [ok] tau2 = max(0, (Q - df)/C) >= 0 for every Q
+  [ok] Q = df - s, s >= 0  =>  tau2 == 0
+  [ok] Q = df + s, s > 0  =>  tau2 == s/C (truncation inactive)
+P04 I^2 = max(0,(Q-df)/Q) lies in [0,1); equals (H^2-1)/H^2 and, at the DL tau2, tau2/(tau2+s^2) (the form the engine reports for random-effects rows; engine match: E02)
+  [ok] I2 >= 0
+  [ok] argument (Q-df)/Q < 1 since (Q-df)/Q - 1 = -df/Q < 0
+  [ok] I2 < 1: each branch of I2 written as a Piecewise (0, and (Q-df)/Q) is < 1
+  [ok] (H^2 - 1)/H^2 == (Q - df)/Q with H^2 = Q/df
+  [ok] Q = df + s: tau2/(tau2 + s^2) == (Q - df)/Q, s^2 = df/C
+  [ok] k=2: H&T typical variance (k-1) S1/(S1^2 - S2) == df/C
+  [ok] k=3: H&T typical variance (k-1) S1/(S1^2 - S2) == df/C
+  [ok] k=4: H&T typical variance (k-1) S1/(S1^2 - S2) == df/C
+  [ok] k=5: H&T typical variance (k-1) S1/(S1^2 - S2) == df/C
+  [ok] k=6: H&T typical variance (k-1) S1/(S1^2 - S2) == df/C
+  [ok] k=7: H&T typical variance (k-1) S1/(S1^2 - S2) == df/C
+  [ok] k=8: H&T typical variance (k-1) S1/(S1^2 - S2) == df/C
+  [ok] df = Q + s, s >= 0 (Q <= df)  =>  I2 == 0
+P05 random-effects weights become more equal as tau^2 grows
+  [ok] v_i < v_j: weight ratio w_i/w_j = (v_j+tau2)/(v_i+tau2) > 1
+  [ok] d(w_i/w_j)/d tau2 < 0 (ratio falls toward 1)
+  [ok] lim tau2->oo w_i/w_j == 1
+  [ok] k=2: normalized weight of the more precise study falls as tau2 grows
+  [ok] k=3: every normalized weight tends to 1/3 as tau2 -> oo
+P06 prediction interval mu +/- c_PI sqrt(tau2 + SE^2) contains the CI mu +/- c_CI SE when both use the same SE (Wald, or Hartung-Knapp-scaled under HKSJ) and c_PI >= c_CI (engine pairs: riley t_(k-2), revman t_(k-1), metafor = c_CI; CI t_(k-1) or z; engine check E06)
+  [ok] sqrt(tau2 + SE^2) is real and >= 0
+  [ok] sqrt(tau2 + SE^2)^2 - SE^2 == tau2 >= 0, so sqrt(tau2 + SE^2) >= SE
+  [ok] c_PI = c_CI + g, sqrt(tau2 + SE^2) = SE + h with g, h >= 0: c_PI*(SE + h) - c_CI*SE >= 0
+  [ok] CI half-width a, PI half-width a + c (c >= 0): PI lower <= CI lower and CI upper <= PI upper
+  [ok] NUMERIC: t_(0.975, df) > z_0.975 for df = 1..5000, 1e5, 1e7
+  [ok] NUMERIC: t_(0.975, df) decreasing in df for df = 1..2000 (so t_(k-2) > t_(k-1))
+  [ok] NUMERIC: engine pairs c_PI >= c_CI for k = 3..2000: riley t_(k-2) and revman t_(k-1) vs CI t_(k-1) (HKSJ) or z; metafor uses c_CI itself (g = 0)
+P07 approximate Hedges J = 1 - 3/(4 df - 1) lies in (0,1) for df > 1 and increases with df (the engine uses the exact gamma form: NUMERIC steps here, engine match E03)
+  [ok] df = 1 + e, e > 0: J > 0
+  [ok] df = 1 + e, e > 0: 1 - J > 0
+  [ok] dJ/d df = 12/(4 df - 1)^2 > 0 for df > 1
+  [ok] lim df->oo J == 1
+  [ok] boundary: J(df = 1) == 0, so (0,1) needs df > 1 (two-arm trial: n1 + n2 >= 4)
+  [ok] NUMERIC: exact J = G(df/2)/(sqrt(df/2) G((df-1)/2)) in (0,1) for df = 2..1000
+  [ok] NUMERIC: exact J increasing for df = 2..1000
+  [ok] NUMERIC: max |exact - approx| over df = 2..1000 is 0.00724 (< 0.01)
+P08 SD_change = sqrt(SDb^2 + SDf^2 - 2 r SDb SDf) is a valid SD for r in [-1,1] and falls as r rises
+  [ok] radicand - (SDb - SDf)^2 == 2 SDb SDf (1 - r)
+  [ok] r <= 1 (r = 1 - s): radicand - (SDb - SDf)^2 >= 0
+  [ok] so radicand >= (SDb - SDf)^2 >= 0 and the SD is real
+  [ok] r >= -1 (r = -1 + u): (SDb + SDf)^2 - radicand >= 0, so SD <= SDb + SDf
+  [ok] d radicand / dr = -2 SDb SDf < 0
+  [ok] d SD / dr = -SDb SDf / SD < 0 wherever SD > 0
+  [ok] r = 0 gives sqrt(SDb^2 + SDf^2)
+  [ok] edge: r = 1 and SDb = SDf gives SD 0 (degenerate, flag in the kit)
+P09 cross-over paired SE < parallel-design SE when within-person r > 0
+  [ok] SE_par^2 - SE_paired^2 == 2 r s1 s2 / n
+  [ok] r > 0: SE_par^2 - SE_paired^2 > 0
+  [ok] r < 1 (r = 1 - q): SE_paired^2 = ((s1 - s2)^2 + 2 q s1 s2)/n > 0, so both roots are real and SE_paired < SE_par
+  [ok] r = 0: the two SEs are equal
+  [ok] r < 0: paired SE is larger
+P10 splitting a shared control across k comparisons keeps total n (and the risk); split comparisons stay correlated, which a count cannot show (engine paths: E07)
+  [ok] Sum_(i=1..k) n/k == n
+  [ok] Sum_(i=1..k) events/k == events
+  [ok] each sub-arm keeps the risk: (e/k)/(n/k) == e/n
+
+overall: PASS

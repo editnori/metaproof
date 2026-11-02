@@ -1,0 +1,31 @@
+column,required,allowed_values,unit,definition
+study_id,always,text,,"Short stable study label, first author and year plus a letter if needed (e.g. Smith2021a). Same value on every row of the study. Use the same label in the RoB 2 and GRADE files."
+outcome,always,text,,"Outcome key from the protocol outcome list (lower_snake_case, e.g. whole_blood_nad, sbp, fasting_glucose). One key per construct and matrix; different assay matrices are different outcomes."
+timepoint,always,text,,"Timepoint label for this result (e.g. wk6, wk12, day 21). Every arm of one comparison must use the same label. Put a number and unit in the label; a label with no number (e.g. 'end') cannot be ordered, so fill timepoint_weeks for it. The protocol says which timepoint enters the primary analysis when a study reports several."
+design,always,parallel | crossover,,parallel or crossover. Same value on every row of the study.
+arm,always,text,,"Arm label as reported (e.g. NR 1000 mg/day, placebo). For a crossover trial the arm is the treatment condition (NR period or control period), not the sequence."
+is_control,always,0 | 1,,"1 for the comparator arm (placebo or no treatment), 0 for an NR arm. Exactly one control row per study x outcome x timepoint."
+n,always,"whole number, >= 1",participants,"Participants analysed for this outcome in this arm at this timepoint (not the number randomised, unless they are the same). Crossover: participants contributing data to the paired analysis; same n on both rows."
+mean,conditional,number,outcome unit,"Arm mean at the timepoint (final value, post-intervention)."
+sd,conditional,"number, >= 0",outcome unit,"SD of the final value. Leave blank if only an SE or CI is reported; do not hand-convert SE to SD here. Many NR papers report mean +/- SEM: check the table footnote and enter an SEM in se, never in sd. An SD of 0 is accepted only if another arm of the comparison has an SD above 0 (the comparison variance must be > 0); check that it was not rounded to 0."
+se,conditional,"number, >= 0",outcome unit,"SE of the arm mean when no SD is reported. If only a 95% CI for the arm mean is reported, enter se = (upper - lower) / (2 * t(0.975, n-1)) and record the original CI in notes (Cochrane Handbook 6.5.2.2)."
+median,conditional,number,outcome unit,"Arm median at the timepoint, when the mean is not reported."
+q1,conditional,number,outcome unit,First quartile (25th percentile) at the timepoint.
+q3,conditional,number,outcome unit,Third quartile (75th percentile) at the timepoint.
+min,conditional,number,outcome unit,Minimum at the timepoint.
+max,conditional,number,outcome unit,Maximum at the timepoint.
+mean_change,conditional,number,outcome unit,"Mean change from baseline (timepoint minus baseline), as reported. Sign convention: later minus earlier."
+sd_change,conditional,"number, >= 0",outcome unit,"SD of the change from baseline, as reported. If only the SE of the change is reported, leave this blank and fill se_change."
+baseline_mean,optional,number,outcome unit,Arm mean at baseline. Needed to impute an SD of change or to estimate corr_prepost from a study that reports all three SDs.
+baseline_sd,optional,"number, >= 0",outcome unit,Arm SD at baseline.
+corr_prepost,optional,"number, >= -1, <= 1",,"Baseline to follow-up correlation, only if the study reports it or it can be computed from baseline, final and change SDs. Blank means the config default (0.5) is used."
+corr_within,optional,"number, >= -1, <= 1",,"Crossover only: within-person correlation between the NR-period and control-period measurements, if reported or derivable. Blank means the config default (0.5) is used. Leave blank for parallel trials."
+paired_md,optional,number,outcome unit,"Reported NR-minus-control mean difference, entered on the NR row (is_control = 0), blank on the control row. Crossover: the within-person difference from a paired or period-adjusted analysis (preferred to period means). Parallel: a reported between-group MD (e.g. ANCOVA-adjusted), used as it stands for MD analyses only (generic inverse variance); then the control row may be omitted. At most one such parallel comparison per study: several MDs against one shared control cannot be entered (Handbook 23.3.4)."
+paired_se,optional,"number, > 0",outcome unit,"SE of paired_md, on the same row. From a 95% CI in a small trial use (upper - lower) / (2 t(0.975, df)) with the trial's df, not 3.92 (Handbook 6.5.2.3)."
+dose_mg_day,always,"number, >= 0",mg/day,"NR dose in mg per day for this arm (0 for the control arm), as reported by the trial. Most trials report NR chloride; record the salt form in notes."
+duration_weeks,always,"number, > 0",weeks,"Time from start of supplementation to this timepoint, in weeks (days / 7). Crossover: length of each treatment period."
+population,always,text,,"Population category from the protocol list (e.g. healthy_older, obesity_insulin_resistance, disease_<name>). Same value on every row of the study."
+risk_of_bias,always,low | some concerns | high,,"Overall RoB 2 judgement for this study result (this outcome and timepoint), copied from rob2_summary_template.csv after consensus."
+notes,optional,text,,"Source of each number (table, figure, page, digitised, author contact), unit conversions applied, CI or P values converted, and anything a second extractor needs to reproduce the row."
+se_change,optional,"number, >= 0",outcome unit,"SE of the change from baseline when no SD of change is reported. The engines convert it (SD = SE x sqrt(n), Handbook 6.5.2.2); do not hand-convert."
+timepoint_weeks,optional,"number, >= 0",weeks,"The timepoint in weeks, used by the engines to order timepoints instead of parsing the label. check_extraction.py --write-csv fills it from duration_weeks when blank."

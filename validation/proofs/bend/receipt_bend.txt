@@ -1,0 +1,121 @@
+Bend2 receipt for validation/proofs/bend (written by run_bend.py)
+date_utc: 2026-11-02T07:09:23Z
+host: remote Linux machine (Alpine, Bend2 2.0.20 in a glibc sandbox)
+bend: bend 2.0.20
+
+A mutant passes only if Bend reports a type error at the mutant's own law AND
+meta_laws.bend checks a refute_mutant_<X> law whose hypothesis is that law.
+
+file | sha256 | expected | observed | result
+meta_laws.bend | 3a0e7b7073d1a30e | CHECKS | CHECKS: All terms check. | PASS
+mutant_A_split_floor_twice.bend | f5e4b076f8eedbc2 | REJECTED at split_floor_twice_keeps_n | REJECTED: type error at split_floor_twice_keeps_n | refuted by refute_mutant_A | PASS
+mutant_B_full_n_each.bend | 5907a53c7df53916 | REJECTED at full_n_each_keeps_n | REJECTED: type error at full_n_each_keeps_n | refuted by refute_mutant_B | PASS
+mutant_C_swapped_numerator.bend | de253becea57ba70 | REJECTED at swapped_exact_above_df | REJECTED: type error at swapped_exact_above_df | refuted by refute_mutant_C | PASS
+mutant_D_i2_no_min.bend | 07188bec3ba88355 | REJECTED at i2_slack_no_min | REJECTED: type error at i2_slack_no_min | refuted by refute_mutant_D | PASS
+mutant_E_deal_drops_on_rotation.bend | c1446735660f41a1 | REJECTED at deal_keeps_n | REJECTED: type error at deal_keeps_n | refuted by refute_mutant_E | PASS
+
+static ties (mutant law == refute hypothesis; mutant defs == meta_laws defs):
+  all tie
+
+laws proven in meta_laws.bend:
+  add_zero_r
+  add_succ_r
+  succ_add_r
+  add_left_comm
+  split2_keeps_n
+  split2_balanced
+  total_snoc
+  deal_keeps_n
+  total_zeros
+  deal_from_empty_keeps_n
+  deal2_floor_ceil
+  deal2_from_empty
+  trunc_zero_when_q_le_df
+  trunc_exact_above_df
+  i2_slack
+  i2_strict_slack
+  i2_below_one
+  add_assoc
+  add_assoc_r
+  add_swap4
+  mul_add_l
+  mul_add_r
+  pooled_not_below_min
+  succ_ne_zero
+  refute_floor_twice
+  refute_full_n_twice
+  refute_swapped_numerator
+  refute_i2_no_min
+  refute_deal_drops
+  refute_mutant_A
+  refute_mutant_B
+  refute_mutant_C
+  refute_mutant_D
+  refute_mutant_E
+  synthetic_split2_n7
+  synthetic_halves_n7
+  synthetic_deal_n7_k3
+  synthetic_pooled_lower
+
+checker output:
+
+--- meta_laws.bend output (first 12 lines)
+All terms check.
+
+--- mutant_A_split_floor_twice.bend output (first 12 lines)
+Error:
+- expected : 0n
+- observed : 1n
+Location: split_floor_twice_keeps_n
+40 |         case 0n:
+41>|           {==}
+42 |         case 1n+q:
+
+--- mutant_B_full_n_each.bend output (first 12 lines)
+Error:
+- expected : 1n+Nat.add(p, 1n+p)
+- observed : 1n+Nat.add(p, p)
+Context:
+- p : Nat
+Location: full_n_each_keeps_n
+27 |       %full_n_each_keeps_n(p) : {1n+Nat.add(p, 1n+p) == 1n+_ : Nat}
+28>|       {==}
+29 |
+
+--- mutant_C_swapped_numerator.bend output (first 12 lines)
+Error:
+- expected : 0n
+- observed : 1n+sp
+Context:
+- sp : Nat
+Location: swapped_exact_above_df
+30 |         case 1n+sp:
+31>|           {==}
+32 |     case 1n+p:
+
+--- mutant_D_i2_no_min.bend output (first 12 lines)
+Error:
+- expected : 1n+dp
+- observed : 0n
+Context:
+- dp : Nat
+Location: i2_slack_no_min
+27 |     case 0n 1n+dp:
+28>|       {==}
+29 |     case 1n+qp 0n:
+
+--- mutant_E_deal_drops_on_rotation.bend output (first 12 lines)
+Error:
+- expected : {total(deal(p, h2, snoc(t2, h))) == Nat.add(p, Nat.add(h2, total(snoc(t2, 1n+h)))) : Nat}
+- observed : {total(deal(p, h2, snoc(t2, h))) == Nat.add(p, Nat.add(h2, total(snoc(t2, h)))) : Nat}
+Context:
+- p  : Nat
+- h  : Nat
+- h2 : Nat
+- t2 : List<&2, Nat>
+Location: deal_keeps_n
+103 |           %total_snoc(t2, 1n+h) : {total(deal(p, h2, snoc(t2, h))) == Nat.add(p, Nat.add(h2, _)) : Nat}
+104>|           deal_keeps_n(p, h2, snoc(t2, h))
+105 |
+
+overall: PASS

@@ -1,0 +1,10 @@
+extraction check of examples/nicotinamide-riboside/SYNTHETIC_nr_like_extraction.csv
+rules: templates/check_extraction.py, the checker extractors run; the run stops on the first group
+
+0 errors that stop the run (values that cannot be used as entered):
+
+0 other checker errors (the engine excludes the study with a reason in excluded.csv, or does not compute with the field):
+
+0 warnings:
+
+0 outcomes in the extraction file that no analysis uses:

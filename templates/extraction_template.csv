@@ -1,0 +1,1 @@
+study_id,outcome,timepoint,design,arm,is_control,n,mean,sd,se,median,q1,q3,min,max,mean_change,sd_change,baseline_mean,baseline_sd,corr_prepost,corr_within,paired_md,paired_se,dose_mg_day,duration_weeks,population,risk_of_bias,notes,se_change,timepoint_weeks

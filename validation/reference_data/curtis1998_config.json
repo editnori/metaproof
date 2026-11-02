@@ -1,0 +1,27 @@
+{
+  "defaults": {
+    "measure": "ROM",
+    "estimator": "REML",
+    "hksj": true,
+    "prediction_interval": true,
+    "pi_type": "riley",
+    "rom_bias_correction": false,
+    "hksj_rule": "always",
+    "subgroup_method": "separate",
+    "subgroup_min_k": 0,
+    "subgroup_min_per_level": 0,
+    "metareg_min_k": 0,
+    "metareg_allow_small_k": true,
+    "min_k_pool": 1
+  },
+  "outcomes": {
+    "biomass_rom": {
+      "moderators": [
+        "duration_weeks"
+      ],
+      "subgroups": [
+        "population"
+      ]
+    }
+  }
+}

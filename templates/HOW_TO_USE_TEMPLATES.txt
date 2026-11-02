@@ -1,0 +1,41 @@
+HOW TO USE THE REVIEW TEMPLATES
+
+All commands run from the repository root with the project Python:
+  PY=.venv/bin/python
+
+1. Protocol (protocol_template.txt)
+Part 1 has the PROSPERO fields in form order; paste each into the PROSPERO form and replace the [bracketed] text. Part 2 is the statistical analysis plan, lettered A to O. Each decision states a default, the reason, and the sensitivity analysis that tests it. Settle the bracketed items (primary outcomes, MIDs, subgroup cut-points, combination products) before screening starts, and log any later change in the amendments log with the date and whether pooled results had been seen.
+
+2. Extraction (extraction_sheet.xlsx)
+Each reviewer fills a separate copy of the 'extraction' sheet: one row per study arm x outcome x timepoint. The columns are the shared interface that both analysis engines read, so do not rename or reorder them. A subgroup or moderator that the analysis config names but that is not an interface column (e.g. baseline_bmi) may be added after notes and declared to the checker with --extra-columns baseline_bmi; any other added column is an error. Two optional extension columns follow notes: se_change (SE of a change from baseline, converted by the engines) and timepoint_weeks (filled from duration_weeks by the checker when blank, and used to order timepoints). The 'data_dictionary' sheet defines every column; 'data_patterns' lists the combinations of numbers that make a row usable; 'validation_rules' lists what the checker enforces. Excel blocks wrong values in the choice and number columns as you type. Leave a cell blank when a value is not reported. Put the source of each number (table, page, figure, author email) and any conversion in notes. Study-level details (registry ID, funding, co-interventions, washout) go on 'study_characteristics'.
+Crossover trials: two rows per outcome and timepoint, one for the NR period and one for the control period, with the same n. A reported paired difference goes in paired_md and paired_se on the NR row. Rows with only within-period change are rejected; enter period means and SDs or the paired estimate. Record washout, period length, sequence sizes and how the paired estimate was obtained on study_characteristics.
+Parallel trials reporting only a between-group MD (e.g. ANCOVA-adjusted): one NR row with paired_md and paired_se; the control row may be left out. That row is usable for MD analyses only, and at most one such comparison per study is allowed.
+SEM: many NR papers report mean +/- SEM. Enter an SEM in se (or se_change), never in sd. The checker warns when an SD looks too small for its mean compared with the other studies.
+Fold change or percent change from baseline is not a mean in the outcome unit. The checker warns when the notes mention one and a mean is filled, and rejects the rows only when the control mean is between 0.8 and 1.25 with no baseline in the outcome unit, which looks like a ratio to baseline. Values near 100 in their own unit (glucose in mg/dL, systolic BP) get a warning only.
+An SD of 0 in one arm (e.g. a placebo arm at the assay floor) gives a warning; it is an error only when every arm of the comparison has SD 0.
+Several eligible results for one outcome (matrix, assay, timepoint, adjusted or not): pick one with the protocol hierarchy (Part 2, section L) and record the choice in study_characteristics result_selection.
+Multi-arm trials: one row per arm, all arms entered; the engines combine NR arms for the main analysis and split the control only for dose analyses (protocol section H).
+Units: convert to the protocol unit at extraction with unit_conversions.csv and note the original value.
+
+Check and export:
+  $PY templates/check_extraction.py extraction_sheet.xlsx --write-csv extraction.csv
+Errors stop the export; warnings are worth a look. Add --extra-columns name1,name2 when the sheet carries declared subgroup or moderator columns. The written CSV is what the engines read. The same checker runs on a CSV directly:
+  $PY templates/check_extraction.py extraction.csv
+extraction_template.csv is the header row alone, for anyone extracting straight to CSV. extraction_data_dictionary.csv is the dictionary as a CSV. extraction_example_SYNTHETIC.csv shows each data pattern (final values, change scores, three-arm, median and IQR, crossover with and without a paired estimate); every number in it is invented and it must never be read as trial data.
+After changing extraction_schema.py, rebuild the workbook, dictionary and header with:
+  $PY templates/build_extraction_sheet.py
+
+3. Risk of bias (rob2_parallel_template.csv, rob2_crossover_template.csv, rob2_summary_template.csv)
+Copy the parallel or crossover question list once per study result (study x outcome x timepoint used in a meta-analysis). Each reviewer answers every signalling question (Y, PY, PN, N, NI; NA when the 'answer_only_if' condition is not met) with support from the report, then the pair agree a consensus. Domain judgements go in rob2_summary_template.csv, and the overall judgement in lower case goes into the risk_of_bias column of the extraction sheet. The crossover list adds domain S (period and carryover effects) and crossover notes on 1.3, 2.6, 3.1 and 5.3. Rows marked PARAPHRASE in wording_status must be checked against the official RoB 2 crossover template from riskofbias.info before first use; the guidance column summarises the judgement algorithms, and the official guidance document decides when they disagree.
+
+4. GRADE (grade_sof_template.csv, grade_downgrading_reasons.csv)
+One row per outcome in the summary-of-findings template. Fill the effect columns from the engine output for the primary analysis (pooled.csv gives the interval used in ci_method and the Wald and HKSJ intervals beside it; judge imprecision on the wider one, and do not read a prediction interval from fewer than 5 studies), then rate each GRADE domain with the criteria in grade_downgrading_reasons.csv and write one footnote per rating change naming the studies and numbers behind it. Delete the TEMPLATE row before use.
+
+5. PRISMA 2020
+Flow diagram: copy prisma_counts_template.csv, fill n for each key (one row per exclusion reason and per other source), and run
+  $PY templates/prisma_flow.py my_counts.csv --out prisma_flow.png
+The script prints a warning when the counts do not add up and draws the diagram anyway. A blank n prints as (n = ). The 'other methods' column appears when any other_* row is present; delete those rows if the review used databases and registers only. prisma_counts_example_SYNTHETIC.csv is an invented example for testing the drawing; pass --title "SYNTHETIC EXAMPLE" when rendering it so no one mistakes the figure.
+Checklists: fill location_reported_page in prisma2020_checklist.csv as the manuscript is written; the kit_file_or_note column says which template or protocol section supplies each item. prisma2020_abstract_checklist.csv covers the abstract. Check the item wording against the official checklist at prisma-statement.org before submission.
+
+6. Tests
+  $PY -m pytest templates/test_templates.py -q

@@ -1,0 +1,501 @@
+metaproof: Python engine for the NR meta-analysis kit
+===================================================
+
+metaproof pools continuous outcomes from an extraction CSV (one row per study arm per outcome per
+timepoint) and writes one folder of results per analysis. An independent R engine
+(reference_r/run_meta.R, on metafor) follows the same interface, so the two can be compared
+number by number (validation/crosscheck.py).
+
+This file describes the code as of 2026-11-02, after the methods review of 2026-11-01
+(findings F01-F20) and the second review (code review CR1-CR8 and a second model's findings
+1-27). Where a choice is a policy rather than a formula, the reason and the source are given.
+
+Run
+---
+  .venv/bin/python -m metaproof run <extraction.csv> --config <config.yaml> --out out/
+  .venv/bin/python -m pytest -q
+
+Exit status: 0 when the analyses ran; 2 for a problem in the inputs (missing or unreadable
+file, bad config value, a cell that cannot be used as entered, an outcome or column that is
+not in the CSV), printed as one line "metaproof: error: ..." without a traceback; 1 when the
+extraction file has no outcome to analyse. Checker notices go to stderr on success.
+
+The config may be YAML or JSON. Without --config every outcome in the CSV runs with the defaults
+below. PyYAML 6.0.3 was added to .venv for YAML configs.
+
+Worked SYNTHETIC examples: examples/nicotinamide-riboside/SYNTHETIC_nr_like_extraction.csv with
+examples/nicotinamide-riboside/SYNTHETIC_nr_like_config.yaml (output in examples/nicotinamide-riboside/out_SYNTHETIC/), and tests/data/.
+Every number in them is invented and every row is tagged SYNTHETIC; they are not trial results.
+
+Input
+-----
+The 30 columns of templates/extraction_data_dictionary.csv: 28 interface columns plus two
+optional extension columns that both engines read when present:
+  se_change        SE of the change from baseline; converted to an SD of change (SD = SE sqrt(n))
+  timepoint_weeks  the timepoint in weeks, used to order timepoints instead of the label
+Subgroup and moderator columns the config names may follow them.
+
+run() itself runs templates/check_extraction.py check() on the rows as the engine reads them,
+with the configured subgroup and moderator columns declared. Errors that make a value
+unusable as entered stop the run with the row and column named: a blank or unreadable
+study_id, outcome, design, arm, is_control or n; any "must be" error (not a number, out of
+range, not whole: n >= 1, SD/SE >= 0, paired_se > 0, correlations in [-1, 1]); and quartiles
+out of order. Every other checker finding (a study with no usable data pattern, a crossover
+with several periods or unequal n, and so on) is a study the engine excludes with a reason in
+excluded.csv, so it is written to out/extraction_check.txt and the run goes on. CSV outcomes no
+analysis uses are listed there too. coerce_extraction and the per-row checks in effects.py
+repeat the cell checks for callers that bypass run().
+
+Config
+------
+  defaults:            applied to every analysis
+  outcomes:
+    <analysis_name>:   folder name under out/; overrides any default
+      outcome:         rows to use (defaults to <analysis_name>), so one outcome can be run at
+                       two timepoints, or split and combined, under two names
+
+Keys and defaults (metaproof/config.py DEFAULTS):
+  measure: MD                    MD, SMD (Hedges g), ROM (log ratio of means)
+  smd_variance: LS               LS, LS2 or UB (formulas below)
+  estimator: REML                REML, DL, PM, ML, FE
+  hksj: true                     Hartung-Knapp-Sidik-Jonkman for random-effects fits ...
+  hksj_rule: revman              ... applied only when tau2 > 0 and k - p >= 2 (revman);
+                                 always = every random-effects fit (metafor test = "knha");
+                                 truncated = always, scale floored at 1 (metafor "adhoc")
+  min_k_pool: 3                  no pooled estimate from fewer studies (protocol F)
+  prediction_interval: true
+  pi_type: riley                 riley = t(k-2); revman = t(k-1) whatever the CI method;
+                                 metafor = the CI's multiplier, t(k-1) under HKSJ, z otherwise
+                                 (metafor predict() default; what RevMan prints)
+  level: 0.95                    95 is read as 0.95
+  data_basis: auto               auto, change or final (see "Final or change values")
+  corr_prepost: 0.5              used only where a row has no corr_prepost
+  corr_prepost_sensitivity: [0.2, 0.8]
+  corr_within: 0.5               crossover within-person correlation, same rule
+  corr_within_sensitivity: auto  auto (null): rerun at r = 0.2 and 0.8 whenever a crossover
+                                 comparison used the assumed corr_within (Handbook 23.2.7); a
+                                 list is always run; [] turns it off and log.txt warns
+  median_method: luo             luo = Luo 2018 mean with Wan 2014 SD; wan = Wan 2014 both
+                                 (run_meta.R has the same default, luo2018)
+  allow_range_only: false        a mean or SD from a range alone (Wan scenario S1) excludes
+                                 the study when that value feeds the effect; true adds it (run
+                                 automatically as a sensitivity)
+  multi_arm: combine             combine the NR arms of a multi-arm trial (main analysis), or
+                                 split the shared control (prespecified dose analyses only)
+  combine_arms: {}               {study_id: {new_arm: [arm_a, arm_b]}}, e.g. arms reported by sex
+  timepoint: last                last or first (in weeks), an exact label (a bare number
+                                 matches that many weeks), or a list of labels in priority order
+  crossover_smd_j: true          Hedges J on N - 1 df for crossover SMD
+  rom_geary: flag                flag or exclude ROM comparisons failing Geary's check
+  rom_bias_correction: false     true = Lajeunesse 2015 bias-corrected log ratio (the other
+                                 setting always runs as a sensitivity analysis)
+  subgroups: []                  e.g. [population, risk_of_bias]
+  subgroup_method: common        common tau2 (one mixed model) or separate tau2 per subgroup
+  subgroup_min_k: 10             subgroup test only with >= 10 studies ...
+  subgroup_min_per_level: 2      ... and >= 2 studies in every subgroup (protocol I)
+  moderators: []                 e.g. [dose_mg_day, duration_weeks]; text columns become dummies
+  metareg_joint: false           also fit one model with all moderators
+  metareg_min_k: 10              studies per moderator: a joint model of m moderators needs
+                                 metareg_min_k x m studies (Handbook 10.11.5.1)
+  metareg_allow_small_k: false   metareg_min_k below 10 is refused unless this is true
+  metareg_permutations: 0        > 0 adds a permutation P value (Higgins & Thompson 2004)
+  egger_min_k: 10                values below 10 are refused ...
+  egger_allow_small_k: false     ... unless this is true
+  bh: false                      Benjamini-Hochberg across primary analyses (opt-in)
+  bh_alpha: 0.05
+  primary: true                  the analysis belongs to the BH family when bh is on
+  report_estimators: [REML, DL, PM, ML, FE]   rows of pooled.csv; the primary one comes first
+  hksj_adhoc: false              R-engine spelling of hksj_rule: truncated; together with an
+                                 explicit different hksj_rule it is refused as a contradiction
+Unknown keys and invalid choices stop the run with an error. Whole-number keys must be whole.
+Booleans must be true/false, 0/1 or the strings "true"/"false" in any case (so a quoted
+"false" is false and "maybe" is an error). Numbers that cannot be parsed, correlations and
+sensitivity values outside [-1, 1], bh_alpha outside (0, 1), outcome under defaults, bh or
+bh_alpha under an outcome, outcomes given as a list, a malformed combine_arms, and measure ROM
+with data_basis change are refused. A configured outcome that is not in the CSV stops the run
+with a "did you mean" suggestion, and so does a subgroup or moderator column that is missing.
+Analysis names whose folder would be hidden ('.', '..', a leading dot), take the name of a run
+file, or be shared with another analysis (ignoring case: 'SBP' and 'sbp', 'a/b' and 'a b')
+are refused before anything is written.
+
+The R engine's vocabulary is also accepted, so one config file drives both engines:
+basis -> data_basis; wan2014 / luo2018 / luo2018_wan2014 -> wan / luo; split_control /
+combine_treatments -> split / combine; latest / earliest -> last / first (any case); knha / adhoc ->
+always / truncated; EE, CE -> FE; effect_measure, tau2_estimator, method, hartung_knapp,
+knha, median_conversion and the other R aliases.
+
+Order of operations for each analysis
+-------------------------------------
+1. Rows of the configured outcome; one timepoint per study (below). A study the rule cannot
+   place goes to excluded.csv with the reason.
+2. Per arm: SD = SE sqrt(n) when SD is missing (and SD of change from se_change); mean and SD
+   from median with IQR and/or range when the mean or SD is missing; change mean = final -
+   baseline when not reported; change SD imputed from baseline SD, final SD and a correlation
+   when not reported.
+3. A study whose arm labels repeat (two timepoints, or duplicate rows) is refused (Handbook
+   6.2.4: results from more than one timepoint cannot be combined without a unit-of-analysis
+   error).
+4. Merge arms named in combine_arms, then merge multiple control arms (Table 6.5.a). Both
+   apply to parallel trials only: crossover periods are the same people.
+5. Multi-arm (more than one NR arm):
+   combine (default): the NR arms are merged with Table 6.5.a into one comparison, so the
+     control is counted once (Handbook 23.3.4: combining is the recommended approach).
+   split: one comparison per NR arm, labelled study_id|arm, with control n divided by the
+     number of comparisons and control mean and SD unchanged. The comparisons still share
+     control participants and are correlated (Handbook 23.3.4, 23.3.5).
+   A multi-period crossover (more than one NR or placebo period in the same people) is
+   excluded under both settings: the contrasts share participants and their covariance is
+   not available from summary data, so the periods can be neither combined with Table 6.5.a
+   (which is for separate groups) nor entered as separate comparisons; splitting N does not
+   supply the covariance (Handbook 23.2.7, 23.3.4). Keep one prespecified NR-vs-placebo pair
+   of rows, or one paired estimate the trial reports.
+6. Effect = experimental minus control (ROM: log(experimental / control)).
+A study that cannot be computed is listed with its reason in excluded.csv and log.txt.
+
+k and studies. pooled.csv reports k (comparisons) and k_studies (distinct source studies).
+min_k_pool, the PI and tau2 flags, the subgroup and meta-regression gates and the Egger gate
+all count studies. Leave-one-out drops one study with all its comparisons. The HKSJ and PI
+degrees of freedom still count comparisons (as metafor does); a split analysis carries a note
+saying so, which is why split is for secondary dose analyses only. A model for dependent
+effects (multilevel or robust variance estimation; Hedges LV, Tipton E, Johnson MC. Res Synth
+Methods 2010;1(1):39-65) would handle split arms properly; it is not implemented.
+
+Moderators. Any column of the extraction CSV may be a moderator or subgroup. Arm-level
+moderators (dose_mg_day) are taken from the experimental rows of each comparison only, never
+from the control row. A combined comparison whose NR arms differ in dose has a blank
+dose_mg_day (dose_min and dose_max are written), so it drops out of dose models; log.txt
+lists every comparison left out of a moderator model and why.
+
+Reported between-group MD (generic inverse variance). For MD, paired_md and paired_se on a
+parallel NR row are used as the study's effect and SE (Handbook 6.3 and 10.5.2; for example an
+ANCOVA- or MMRM-adjusted MD). The control row may then be omitted. Only one such comparison per
+study is accepted. The reported MD is used whatever the control row holds (arm summaries are
+needed only for effects computed from them). paired_md or paired_se on a control row exclude
+the study: they belong on the NR row. Several reported MDs against one shared control are
+refused, because their
+SEs cannot be split or combined and entering each would count the control more than once
+(Handbook 23.3.4). Under combine, when every NR arm also has arm-level mean and SD, the arms
+are combined from those instead. SMD and ROM cannot use a reported MD.
+
+Timepoints. Labels are read as a number with a unit and converted to weeks ('day 21' = 3,
+'wk6' = 6, '3 months' = 13.0, '12-month' = 52.2, 'Wk-12' = 12, a bare number = weeks; a hyphen
+next to the number is a separator, never a minus sign); timepoint_weeks wins when filled, for
+the last/first rules and for a numeric rule alike. A study whose rows for one label give more
+than one timepoint_weeks is excluded with a reason, and log.txt notes a label whose own weeks
+differ from timepoint_weeks by more than 0.5.
+last / first keep the latest / earliest timepoint of each study. A study with a label that has
+no number and no timepoint_weeks (e.g. 'end'), or two labels at the same number of weeks, is
+excluded with the reason instead of stopping the run. An exact label keeps that label (a bare
+number matches labels at that many weeks). A list keeps, for each study, the first label in
+list order that it reports. Studies without a match are written to excluded.csv (PRISMA 2020
+item 13a: Page MJ et al. BMJ 2021;372:n71).
+
+Final or change values (data_basis), decided per parallel study over all its arms:
+  final  : final values.
+  change : change from baseline; a missing change SD is imputed (Handbook 6.5.2.8). Under SMD
+           a reported SD of change is required in every arm: an imputed change SD would be the
+           standardiser, so the assumed r would move g itself (Handbook 23.2.7.2).
+  auto   : MD - change if every arm reports a change SD (sd_change or se_change); otherwise
+           final values if every arm has them; otherwise change with an imputed SD. Nothing is
+           imputed when the study gives an assumption-free choice. MD may mix change and final
+           values across studies (Handbook 10.5.2).
+           SMD - final values only; change and final values should not be combined as SMDs
+           (Handbook 10.5.2).
+  ROM always uses final values (a ratio of change scores is not defined).
+  study_effects.csv records each SMD's standardiser in smd_standardiser: sd_final (final
+  values, and crossover SMDs, which divide by the between-person SD of the period
+  measurements) or sd_change. SMDs on different standardisers are not pooled (Handbook
+  10.5.2): a crossover SMD under data_basis: change is excluded with that reason (Handbook
+  23.2.7.2), and an analysis whose rows still carry two standardisers stops.
+  To make the corr_prepost sensitivity runs act on studies that report baseline and final
+  values only, use data_basis: change (MD).
+
+Formulas and sources
+--------------------
+Cochrane Handbook = Higgins JPT, Thomas J, et al. (eds). Cochrane Handbook for Systematic Reviews
+of Interventions, version 6.5, 2024. Section numbers below refer to that edition.
+
+SD from SE of a mean: SD = SE sqrt(N). Handbook 6.5.2.2.
+
+Change-from-baseline SD: SD_change = sqrt(SD_b^2 + SD_f^2 - 2 r SD_b SD_f). Handbook 6.5.2.8.
+The same section gives r = (SD_b^2 + SD_f^2 - SD_change^2) / (2 SD_b SD_f) for studies that
+report all three SDs (conversions.corr_from_sds); put that value in the corr_prepost column.
+
+Combining two groups: N = N1 + N2; M = (N1 M1 + N2 M2)/N;
+SD = sqrt(((N1-1)SD1^2 + (N2-1)SD2^2 + N1 N2/N (M1 - M2)^2) / (N - 1)).
+Handbook Table 6.5.a, applied repeatedly for three or more groups. (M1 - M2)^2 and a centred
+mean update are used instead of the expanded form, so a common shift of the means (e.g. 1e8)
+cannot cancel the SD away.
+
+Median to mean and SD (Wan X, Wang W, Liu J, Tong T. BMC Med Res Methodol 2014;14:135;
+Luo D, Wan X, Liu J, Tong T. Stat Methods Med Res 2018;27(6):1785-1805):
+  S1 (min, median, max):   Wan mean (a + 2m + b)/4;  SD (b - a)/xi(n)
+  S2 (q1, median, q3):     Wan mean (q1 + m + q3)/3; SD (q3 - q1)/eta(n)
+  S3 (all five):           Wan mean (a + 2q1 + 2m + 2q3 + b)/8;
+                           SD (b - a)/(2 xi(n)) + (q3 - q1)/(2 eta(n))
+  xi(n) = 2 Phi^-1((n - 0.375)/(n + 0.25)),  eta(n) = 2 Phi^-1((0.75n - 0.125)/(n + 0.25))
+  Luo weights: S1 w = 4/(4 + n^0.75); S2 w = 0.7 + 0.39/n;
+               S3 w1 = 2.2/(2.2 + n^0.75), w2 = 0.7 - 0.72/n^0.55.
+  When the mean is reported but the SD is not, the Wan SD formulas need only n and the
+  quartiles or range.
+Limits. The methods assume roughly normal data, and medians are usually reported because the
+data are skewed; with skew an SD cannot be estimated from an IQR (Handbook 6.5.2.5), and an SD
+from a range is very unstable (6.5.2.6). So: S1 (range only) is excluded unless
+allow_range_only is true, but only when a range-derived mean or SD feeds the chosen effect
+(an unused median/range next to reported change statistics or a reported MD is ignored);
+conversion notes name what was converted ('mean from median (S1): Luo 2018', 'SD from IQR
+(S2): Wan 2014'); study_effects.csv carries converted_from_median, sd_from_range_only (set only
+when the SD itself came from a range)
+and median_asymmetry (the larger in absolute value of the Bowley quartile skewness
+(q1 + q3 - 2m)/(q3 - q1) and its range analogue). median_asymmetry is a pointer to skew, not
+the skewness test of Shi J et al. (Stat Methods Med Res 2023;32(7):1338-1360), which the kit
+does not implement. Protocol sensitivities K5 run automatically (below).
+
+MD: M1 - M2, Var = SD1^2/N1 + SD2^2/N2. Handbook 6.5.1.
+
+SMD (Hedges LV. J Educ Stat 1981;6(2):107-128): S_pooled = sqrt(((n1-1)SD1^2 + (n2-1)SD2^2)/m),
+m = n1 + n2 - 2, d = (M1 - M2)/S_pooled, g = J(m) d with the exact
+J(m) = Gamma(m/2) / (sqrt(m/2) Gamma((m-1)/2)). Variance:
+  LS  (default, same as metafor escalc vtype "LS"): 1/n1 + 1/n2 + g^2/(2(n1 + n2))
+  LS2 (Borenstein et al. 2009):                    J^2 (1/n1 + 1/n2 + d^2/(2(n1 + n2)))
+  UB  (unbiased):                                  1/n1 + 1/n2 + (1 - (m - 2)/(m J^2)) g^2
+
+ROM (Hedges LV, Gurevitch J, Curtis PS. Ecology 1999;80(4):1150-1156):
+ln(M1/M2), Var = SD1^2/(N1 M1^2) + SD2^2/(N2 M2^2). Means must be positive.
+  Geary's check (same source): the log ratio and its delta-method variance are reliable only
+  when mean sqrt(n) / SD >= 3 in each arm. Failing comparisons are flagged in method_notes and
+  geary_ok (rom_geary: flag) or excluded (rom_geary: exclude).
+  rom_bias_correction adds (SD1^2/(N1 M1^2) - SD2^2/(N2 M2^2))/2 to the estimate and leaves
+  the variance unchanged (Lajeunesse MJ. Ecology 2015;96(8):2056-2063; metafor escalc
+  correct = TRUE). The opposite setting always runs as a sensitivity analysis.
+
+Crossover trials (Elbourne DR, Altman DG, Higgins JPT, et al. Int J Epidemiol 2002;31(1):140-149;
+Handbook 23.2). Rows: two arms (treatment conditions), design = crossover, n = participants.
+  N is the number of complete pairs. When the two rows give different n that number is not
+  known, so the study is excluded unless a paired MD and SE are reported (MD only; that route
+  needs no N). min(n_e, n_c) is not used: the smaller marginal sample is not necessarily the
+  people measured in both periods. More than one NR or placebo period: excluded (above).
+  MD: paired_md and paired_se as reported when present; otherwise MD = Me - Mc and
+      Var = (SDe^2 + SDc^2 - 2 r SDe SDc)/N with r = corr_within, or the r implied by a
+      reported paired_se (below), so that Var = paired_se^2. MD from the period-condition
+      means assumes no period effect (balanced sequences); method_notes says so (Handbook
+      23.2.5). A row with only within-period change is excluded with a reason.
+  SMD: g = J(N - 1) MD / sqrt((SDe^2 + SDc^2)/2); Var = (1/N + g^2/(2N)) 2(1 - r)
+       (Handbook 23.2.7.2). J on N - 1 df puts crossover and parallel rows on the same
+       small-sample footing (crossover_smd_j: false gives the uncorrected d, for sensitivity).
+       When paired_se and both SDs are given and the row has no corr_within, r is derived:
+       r = (SDe^2 + SDc^2 - N paired_se^2)/(2 SDe SDc).
+  ROM: delta method, Var = (SDe^2/Me^2 + SDc^2/Mc^2 - 2 r SDe SDc/(Me Mc))/N. With
+       rom_bias_correction the Lajeunesse 2015 term for each period mean is added,
+       (SDe^2/(N Me^2) - SDc^2/(N Mc^2))/2; E[ln Xbar] does not depend on r, so the term
+       has the parallel form (checked by simulation in tests/test_effects.py).
+  First-period-only data, if the protocol plans them, are entered as a parallel trial.
+
+Pooling. One weighted least squares routine (X = intercept for pooling, intercept plus moderators
+for meta-regression), W = diag(1/(v_i + tau2)). beta is solved by least squares on the
+sqrt(W)-scaled system, and Q, the HKSJ scale, the REML score and the log-likelihood are
+computed from weighted residuals, with the median of y subtracted first when the model has an
+intercept (or one dummy per subgroup) and added back to the estimate, as metafor centres y.
+Results are then unchanged by a common offset of the effects (tested at 1e4 to 1e8).
+  FE: tau2 = 0.
+  DL: tau2 = max(0, (Q - (k - p))/tr(P0)). DerSimonian R, Laird N. Control Clin Trials
+      1986;7(3):177-188.
+  PM: root of sum w_i (y_i - x_i b)^2 = k - p (Brent's method), 0 when Q(0) < k - p.
+      Paule RC, Mandel J. J Res Natl Bur Stand 1982;87(5):377-385.
+  ML and REML: Fisher scoring from the DL value, step halving if the likelihood falls, stop when
+      the tau2 change < 1e-10, then check the score condition (score = 0 inside, score <= 0 at
+      tau2 = 0). If the check fails a bounded optimiser is used and log.txt says so. The
+      likelihood can have more than one local maximum (for example with one very precise
+      study), so the solution is then compared with a grid that includes tau2 = 0, and the
+      global maximum is used; log.txt says when this moves tau2. Viechtbauer W. J Educ Behav
+      Stat 2005;30(3):261-293.
+  HKSJ: Var(b) = s2 (X'WX)^-1, s2 = sum w_i r_i^2/(k - p), t on k - p df. Hartung J, Knapp G.
+      Stat Med 2001;20(24):3875-3889; Sidik K, Jonkman JN. Stat Med 2002;21(21):3153-3159.
+      When it is used (hksj_rule):
+        revman (default): only when tau2 > 0 and k - p >= 2; otherwise the Wald z interval.
+          Handbook 10.10.4.4 notes that HKSJ can be overly wide with very few studies and
+          narrower than the fixed-effect interval when tau2 is estimated as 0, and that
+          RevMan offers HKSJ only when tau2 > 0 and k > 2. Example (SYNTHETIC; tests):
+          y = 0.50, 0.51, v = 0.04, 0.04 gives the Wald interval 0.228 to 0.782, while
+          untruncated HKSJ gives about 0.44 to 0.57, about four times narrower.
+        always: every random-effects fit (metafor test = "knha").
+        truncated: always, with s2 replaced by max(1, s2) (Knapp G, Hartung J. Stat Med
+          2003;22(17):2693-2710; metafor test = "adhoc").
+      Also: Röver C, Knapp G, Friede T. BMC Med Res Methodol 2015;15:99; Jackson D, Law M,
+      Rücker G, Schwarzer G. Stat Med 2017;36(25):3923-3934. FE rows never use HKSJ.
+      pooled.csv always writes the Wald, HKSJ and truncated-HKSJ intervals side by side
+      (wald_ci_*, hksj_ci_*, hksj_trunc_ci_*) and names the interval in ci_lb/ci_ub in
+      ci_method, so protocol K6 and "report both when HKSJ is narrower" need one run.
+  Minimum k: below min_k_pool studies (default 3) pooled.csv rows are blank with a note, the
+      forest plot has no diamond and no weights, leave-one-out, influence and sensitivity
+      analyses are not run, and the analysis stays out of any BH family. study_effects.csv is
+      still written. Protocol F; Handbook 10.10.4.5; Bender R et al. Res Synth Methods
+      2018;9(3):382-392.
+  Q: Cochran's Q with fixed-effect weights, chi2 on k - 1 df.
+  I2, H2 (Higgins JPT, Thompson SG. Stat Med 2002;21(11):1539-1558): random-effects rows use
+      I2 = tau2/(tau2 + s2) and H2 = (tau2 + s2)/s2 with s2 = (k - 1) sum w / ((sum w)^2 - sum w^2);
+      FE rows use (Q - df)/Q and Q/df. For DL the two agree (validation/proofs, P04 and E02).
+  tau2 CI: Q-profile, solving Q_gen(tau2) = chi2 quantiles 0.975 (lower) and 0.025 (upper).
+      Viechtbauer W. Stat Med 2007;26(1):37-52. Flagged as uninformative below 5 studies.
+  Prediction interval: mu +/- crit sqrt(tau2 + SE(mu)^2), SE(mu) the one used for the CI.
+      pi_type riley: crit = t(k-2), blank when k < 3 (Higgins JPT, Thompson SG, Spiegelhalter
+      DJ. J R Stat Soc A 2009;172(1):137-159; Riley RD, Higgins JPT, Deeks JJ. BMJ
+      2011;342:d549; Partlett C, Riley RD. Stat Med 2017;36(2):301-317). pi_type revman:
+      t(k-1) whatever the CI method, the formula of Handbook v6.5 10.10.4.3 ("t_{k-1} is the
+      97.5th percentile of a t-distribution with k-1 degrees of freedom"). pi_type metafor:
+      the CI's own multiplier, t(k-1) under HKSJ and z otherwise; Handbook 10.10.4.4 says this
+      is what RevMan does ("the same multiplier is used in the calculation of both
+      intervals"), so with hksj_rule revman it reproduces RevMan's printed PI, and pi_type
+      revman matches RevMan only when the HKSJ interval is used. Blank for FE. Below 5 studies pooled.csv flags the PI as not interpretable
+      (Handbook 10.10.4.3: prediction intervals can be very problematic with few studies);
+      the GRADE template then judges inconsistency on CI overlap and tau instead.
+
+Leave-one-out: the primary model refitted without each study (all its comparisons), with the
+same estimator and hksj_rule; needs at least 3 studies and a pooled analysis.
+
+Influence (Viechtbauer W, Cheung MW-L. Res Synth Methods 2010;1(2):112-125), computed as metafor
+5.2 influence.rma.uni does. The full model uses hksj_rule; every deleted fit then uses the same
+test as the full model. With s2 the Knapp-Hartung scale of that refit (1 without HKSJ) and
+Var() the variance used for inference:
+  rstudent = (y_i - mu_(-i)) / sqrt(s2 (v_i + tau2_(-i)) + Var(mu_(-i)))
+  DFFITS   = (mu - mu_(-i)) / sqrt(s2 h_i (v_i + tau2_(-i)))
+  Cook's D = (mu - mu_(-i))^2 / Var(mu);  COVRATIO = Var(mu_(-i)) / Var(mu)
+  DFBETAS  = (mu - mu_(-i)) / sqrt(s2 / sum_j 1/(v_j + tau2_(-i))), the sum over all k studies
+plus tau2 and Q after deletion, hat values and weights. The "influential" column flags
+|DFFITS| > 3 sqrt(p/(k-p)), Cook's distance above the chi2_p median, hat > 3p/k or |DFBETAS| > 1.
+These are rules of thumb for inspection, not tests. With identical estimates under HKSJ (scale
+0) the measures are undefined and influence.csv says so. Needs k >= 3 comparisons.
+
+Subgroups (protocol I; Handbook 10.11.3.1). Not run, with a 'not run' row, below
+subgroup_min_k studies or when any subgroup has fewer than subgroup_min_per_level studies.
+  common (default): one mixed-effects model with a dummy per subgroup and no intercept, so all
+    subgroups share tau2; the test for differences is the omnibus moderator test of the same
+    model with an intercept (F with Knapp-Hartung, chi2 otherwise), as metafor
+    rma(mods = ~ factor) reports it.
+  separate: a model per subgroup (own tau2). Q_between = sum w_j (mu_j - mu_bar)^2 with
+    w_j = 1/SE_j^2 using the model-based (non-HKSJ) SE of each subgroup estimate, chi2 on J - 1
+    df (Borenstein M, Hedges LV, Higgins JPT, Rothstein HR. Introduction to Meta-Analysis.
+    Wiley; 2009). A single-study subgroup reports the study's estimate with a z CI; its tau2,
+    I2, H2 and Q are blank (not estimable).
+  Studies with a missing moderator value are dropped from that analysis (and listed in log.txt).
+
+Meta-regression: mixed-effects model with the configured estimator and hksj_rule. Not run below
+metareg_min_k studies per moderator (Handbook 10.11.5.1: about ten studies for each
+characteristic modelled), so a joint model of m moderators needs metareg_min_k x m studies; a
+categorical moderator counts once however many levels it has. metareg.csv gives n_moderators,
+k_per_param (studies per non-intercept coefficient) and min_level_k (fewest studies in any
+category); the note flags fewer than 10 studies per moderator and a category with one study.
+A moderator with fewer than 2 distinct values after missing values are dropped gives a note
+row, not a fit. Levels of a text moderator are sorted in code-point order (run_meta.R uses the
+same order), so the reference level is the same in both engines.
+Omnibus test of the moderators: F = QM/m on (m, k - p) with KH, chi2_m without. Pseudo-R2 =
+(tau2 without moderators - tau2 with) / tau2 without, floored at 0, on the same studies, and 0
+when tau2 without moderators is 0 (below pooling.TAU2_ZERO x mean(v)), as metafor reports it. With
+metareg_permutations = B, the moderator rows are permuted against (y, v) B times and
+p = (1 + #{QM_perm >= QM}) / (1 + B) (Higgins JPT, Thompson SG. Stat Med 2004;23(11):1663-1682).
+
+Egger test (Egger M, Davey Smith G, Schneider M, Minder C. BMJ 1997;315(7109):629-634): OLS of
+y/SE on 1/SE; the intercept is tested with t on k - 2 df. Run only with at least egger_min_k
+studies (studies, not comparisons; Sterne JAC, Sutton AJ, Ioannidis JPA, et al. BMJ
+2011;343:d4002; Handbook 13.3.4.4). For SMD the precision term is sqrt(1/n1 + 1/n2), which does
+not depend on g (Pustejovsky JE, Rodgers MA. Res Synth Methods 2019;10(1):57-71). A note is
+written when the SEs span less than a two-fold range (studies of similar size: the test is not
+advised), when the classic test is run on SMD or ROM, and when comparisons outnumber studies.
+The test is flagged, not skipped, for similar-size studies, because no published threshold
+defines "similar". When every study has the same precision (or the same arm sizes, for the
+modified SMD test), with fewer than 3 studies, or with zero residual variance, the intercept
+is not estimable and small_study.csv gives a NaN row with that note (metafor regtest() stops
+with an error there). For a crossover SMD the precision term is sqrt(2(1 - r)/N), the g-free
+part of its variance, recovered as sqrt(vi / (1 + g^2/2)) with the r the effect used.
+
+Funnel plot: contour-enhanced (Peters JL, Sutton AJ, Jones DR, Abrams KR, Rushton L. J Clin
+Epidemiol 2008;61(10):991-996), shading where a study's own two-sided p is 0.10-0.05, 0.05-0.01
+and < 0.01, with pseudo-confidence limits about the pooled estimate when there is one.
+
+Sensitivity analyses written to sensitivity.csv (only for pooled analyses). Every requested
+scenario is kept, including one that leaves too few studies to pool (k_studies says how many
+are left), and its note lists the studies it drops or adds compared with the main analysis:
+  corr_prepost and corr_within at the configured value and each sensitivity value (K3, K4);
+    corr_within at 0.2 and 0.8 is added automatically when a crossover used the assumed r.
+  median_method: the other method; exclude_converted_from_median (K5), when any row was
+    converted.
+  exclude_imputed_or_digitised (K7): drops comparisons with an imputed change SD, an assumed
+    crossover r, digitised values (notes mention 'digitised', 'from figure' and the like) or a
+    range-only SD.
+  allow_range_only: true, when range-only studies were excluded.
+  rom_bias_correction: the opposite setting, for ROM analyses.
+  Estimators DL, PM, ML, FE and the three intervals (K6) are in pooled.csv.
+
+Benjamini-Hochberg (Benjamini Y, Hochberg Y. J R Stat Soc B 1995;57(1):289-300): off by default,
+because protocol L prespecifies no adjustment for multiple outcomes. With bh: true the family is
+the pooled analyses marked primary; two primary analyses of one outcome stop the run. The file
+has p_bh and bh_alpha but no significance flag.
+
+Output
+------
+Each analysis is written in full to a staging folder (out/.metaproof-staging-*). Only after every
+analysis has finished does each staging folder replace the analysis folder of the earlier run,
+so no file from an earlier run survives and a failure part-way leaves the earlier run whole.
+Every folder metaproof writes holds the marker .metaproof_analysis; only marked folders of analyses
+no longer in the config are removed, and other folders are left alone. An analysis with no
+analysable study still writes pooled.csv ("no analysable studies") and a summary row.
+
+out/summary_across_analyses.csv  one row per analysis: k, k_studies, pooled or not, ci_method,
+                                 primary estimate, CI, p (and p_bh under bh)
+out/bh_across_outcomes.csv       only when bh: true
+out/extraction_check.txt         the checker's findings the run did not stop on, and CSV
+                                 outcomes no analysis uses
+out/run_manifest.json            metaproof version, run time, SHA-256 of the extraction and config,
+                                 each analysis's folder, k and pooled status, removed folders
+out/<analysis>/
+  study_effects.csv   study_id, yi, vi, sei, method_notes, then source_study, arm_e, arm_c, n_e,
+                      n_c, design, data_basis, smd_standardiser, sd_change_imputed,
+                      corr_within_assumed,
+                      converted_from_median, sd_from_range_only, median_asymmetry, digitised,
+                      imputed_any, geary_min, geary_ok, dose_min, dose_max, moderator columns
+  pooled.csv          estimator, k, estimate, se, ci_lb, ci_ub, pi_lb, pi_ub, tau2, tau2_ci_lb,
+                      tau2_ci_ub, I2, H2, Q, Q_p (the interface columns), then k_studies,
+                      ci_method, df, wald_ci_lb/ub, hksj_ci_lb/ub, hksj_trunc_ci_lb/ub, note.
+                      The configured estimator is the first row. Effects are on the analysis
+                      scale (log for ROM).
+  pooled_tests.csv    test statistic, df, p, convergence and iterations per estimator
+  leave1out.csv       primary model refit without each study, or a 'not run' note
+  influence.csv       diagnostics above, or a 'not run' note
+  subgroups.csv       one row per subgroup level, the test for differences on each row
+  metareg.csv         one row per term; model-level tau2, R2, QM, QE, perm_p, n_moderators,
+                      k_per_param and min_level_k repeated
+  small_study.csv     Egger test, or a "not run" row
+  sensitivity.csv     the rows above, or a note when none apply
+  excluded.csv        studies that could not be computed or placed, and why
+  forest.png          study CIs use the normal quantile; the pooled diamond uses the model's CI;
+                      below 5 studies the PI is not drawn and the footer says why (pooled.csv
+                      keeps it with its caveat)
+  funnel.png          contour-enhanced funnel plot
+  log.txt             config used, timepoint choices, exclusions, blank moderators, warnings
+
+Validation
+----------
+tests/ checks every formula above against numbers worked by hand, checks pooling,
+meta-regression, the Q-profile CI and the influence measures against the metafor expected
+values in validation/reference_data/ (real published methods datasets: dat.bcg, Colditz GA et
+al. JAMA 1994;271(9):698-702; dat.normand1999; dat.curtis1998; they are not NR data), and
+tests/test_review_fixes.py covers each finding of the 2026-11-01 review.
+
+validation/crosscheck.py compares this engine with reference_r/run_meta.R on those datasets,
+on examples/nicotinamide-riboside/SYNTHETIC_nr_like_extraction.csv and on constructed SYNTHETIC edge cases, and
+writes validation/crosscheck_report.txt with passed, failed and skipped counts (a SKIP is never
+a pass; each SKIP line gives its reason). It compares the CSV outputs both engines write,
+under a relative tolerance with a floor per quantity; plots are checked for existence only,
+and Python-only sensitivity rows other than K5b and K7 (which it re-pools) are not compared.
+Rerun it after any change to either engine:
+  .venv/bin/python validation/crosscheck.py
+
+validation/proofs/ holds formula proofs (sympy, Bend2) and engine_conformance.py, which checks
+that the engine functions compute the proven formulas and that every multi-arm path counts the
+control participants once.
+
+Still different between the engines by design: egger_rma (R only); combine_arms, bh and
+metareg_permutations (Python only: run_meta.R stops when one of them is set to a value that
+would act, so a shared config cannot change one engine silently; bh_alpha and primary are
+accepted while bh is false); the study_effects.csv flag columns, pooled_tests.csv, log.txt,
+extraction_check.txt and run_manifest.json (Python only).

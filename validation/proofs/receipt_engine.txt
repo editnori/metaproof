@@ -1,0 +1,16 @@
+engine conformance receipt for validation/proofs/engine_conformance.py
+date_utc: 2026-11-02T07:10:17Z
+python: 3.12.16  sympy: 1.14.0  numpy: 2.5.4
+Inputs: random SYNTHETIC values from a fixed seed; not trial data.
+
+id | property | engine function | comparisons | max scaled diff | result
+E01 | pooled estimate and model variance = sum(w y)/sum(w), 1/sum(w) | pooling.fit | 1176 | 6.15e-16 | PASS
+E02 | DL tau2, Q, I2 (Q form for FE and DL rows; tau2/(tau2+s2) for REML) | pooling.fit | 980 | 6.59e-15 | PASS
+E03 | Hedges J exact gamma form (engine) = sympy gamma form | effects.hedges_j | 201 | 2.38e-13 | PASS | max |exact - approx| = 0.00724; P07's approximate form is within 0.01
+E04 | imputed change SD | conversions.sd_change_imputed | 200 | 3.19e-16 | PASS
+E05 | crossover paired MD variance | effects.crossover_md | 200 | 4.64e-16 | PASS
+E06 | prediction interval (riley t(k-2), revman t(k-1), metafor = CI crit; DL/REML x HKSJ off and every hksj_rule); PI contains CI; NaN for FE and riley k=2 | pooling.prediction_interval | 4800 | 4.44e-16 | PASS
+E07 | control participants counted once on every arm-level path; yi and vi equal the independent formula at the split n; dose from the comparison's own experimental arm(s) | effects.study_effects | 540 | 2.89e-14 | PASS
+E08 | one timepoint per study; unplaced studies listed in excluded | pipeline.select_timepoint | 5 | 0.00e+00 | PASS
+
+overall: PASS

@@ -1,0 +1,979 @@
+metaproof (Python) vs run_meta.R (R/metafor) cross-check
+=====================================================
+run 2026-11-02 02:55 by validation/crosscheck.py
+Python 3.12.16 | numpy 2.5.4 | scipy 1.18.1 | pandas 3.1.0
+R version 4.6.2 (2026-10-29) | metafor 5.2.1
+environment matches requirements-lock.txt and reference_r/R_PACKAGES_LOCK.txt
+Tolerance |a - b| <= tol * |reference| + floor. tol 1e-6 for estimates, SEs and tau2,
+1e-4 for CIs, prediction intervals, Q-profile limits, influence measures and all other
+statistics. Floor: none for study vi and sei; tol x the row's largest |location| or
+SE for locations; tol x smallest vi for tau2; 1e-30 for p-values; 1e-5 points for I2,
+R2 and weights; 1e-8 for other unit-free statistics (see crosscheck.py). k, df, flags
+exact. 'max diff/allowed' is the largest |a - b| / allowed in a check (<= 1 passes).
+A SKIP line is a comparison that did not run, with its reason; it never counts as a
+pass. Plots are checked for existence only. Reference data: real published metafor/
+metadat datasets (methods benchmarks, not NR data). Example and edge-case data are
+SYNTHETIC.
+
+A1/A2 bcg: Python (direct calls) and run_meta.R against metafor expected values
+-------------------------------------------------------------------------------
+PASS  A1 bcg tb_log_rr: study effects (python)                              39 values  max diff/allowed 4.2e-09
+PASS  A2 bcg tb_log_rr: study effects (R engine)                            39 values  max diff/allowed 5.0e-09
+PASS  A1 bcg tb_log_rr: pooled REML/z                                       17 values  max diff/allowed 1.3e-06
+PASS  A1 bcg tb_log_rr: pooled DL/z                                         17 values  max diff/allowed 1.2e-09
+PASS  A1 bcg tb_log_rr: pooled PM/z                                         17 values  max diff/allowed 1.6e-09
+PASS  A1 bcg tb_log_rr: pooled ML/z                                         17 values  max diff/allowed 1.2e-06
+PASS  A1 bcg tb_log_rr: pooled FE/z                                         17 values  max diff/allowed 9.6e-10
+PASS  A1 bcg tb_log_rr: pooled REML/knha                                    17 values  max diff/allowed 1.3e-06
+PASS  A1 bcg tb_log_rr: pooled DL/knha                                      17 values  max diff/allowed 1.3e-09
+PASS  A1 bcg tb_log_rr: pooled PM/knha                                      17 values  max diff/allowed 1.7e-09
+PASS  A1 bcg tb_log_rr: pooled ML/knha                                      17 values  max diff/allowed 1.2e-06
+PASS  A2 bcg tb_log_rr: pooled.csv (R engine, HKSJ config)                  70 values  max diff/allowed 4.1e-09
+PASS  A1 bcg tb_log_rr: metareg ~ablat REML/z                               32 values  max diff/allowed 1.3e-03
+PASS  A1 bcg tb_log_rr: metareg ~ablat DL/z                                 32 values  max diff/allowed 1.0e-08
+PASS  A1 bcg tb_log_rr: metareg ~ablat PM/z                                 32 values  max diff/allowed 2.5e-08
+PASS  A1 bcg tb_log_rr: metareg ~ablat ML/z                                 32 values  max diff/allowed 3.9e-04
+PASS  A1 bcg tb_log_rr: metareg ~ablat REML/knha                            32 values  max diff/allowed 1.3e-03
+PASS  A1 bcg tb_log_rr: metareg ~ablat DL/knha                              32 values  max diff/allowed 1.0e-08
+PASS  A1 bcg tb_log_rr: metareg ~ablat PM/knha                              32 values  max diff/allowed 2.5e-08
+PASS  A1 bcg tb_log_rr: metareg ~ablat ML/knha                              32 values  max diff/allowed 3.9e-04
+PASS  A2 bcg tb_log_rr: metareg.csv (R engine)                              32 values  max diff/allowed 2.9e-09
+      metareg I2 is not compared: metaproof does not report a residual I2.
+PASS  A1 bcg tb_log_rr: Egger regression test                                7 values  max diff/allowed 1.5e-09
+PASS  A2 bcg tb_log_rr: small_study.csv Egger (R engine)                     9 values  max diff/allowed 0.0e+00
+      egger_rma rows (regtest with model = 'rma') are R-only; metaproof implements the classic Egger 1997 test.
+PASS  A1 bcg tb_log_rr: leave1out REML/knha                                143 values  max diff/allowed 6.7e-05
+PASS  A2 bcg tb_log_rr: leave1out.csv (R engine)                           143 values  max diff/allowed 4.1e-09
+PASS  A1 bcg tb_log_rr: influence REML/knha                                130 values  max diff/allowed 1.2e-06
+PASS  A2 bcg tb_log_rr: influence.csv (R engine)                           130 values  max diff/allowed 3.4e-09
+PASS  A1 bcg tb_log_rr: subgroups per level                                 33 values  max diff/allowed 4.7e-05
+PASS  A1 bcg tb_log_rr: subgroups Q_between (model-based SEs)                3 values  max diff/allowed 8.2e-08
+PASS  A1 bcg tb_log_rr: subgroup test with common tau2 (QM)                  7 values  max diff/allowed 4.2e-05
+PASS  A2 bcg tb_log_rr: subgroups.csv (R engine)                            75 values  max diff/allowed 7.4e-09
+
+A3 bcg: Python CLI against R CLI, the CSV outputs both engines write
+--------------------------------------------------------------------
+PASS  A3 tb_log_rr: excluded studies                                         1 values  max diff/allowed -
+PASS  A3 tb_log_rr: study_effects                                           39 values  max diff/allowed 2.1e-09
+PASS  A3 tb_log_rr: pooled (all estimators)                                 70 values  max diff/allowed 1.3e-06
+PASS  A3 tb_log_rr: pooled Wald/HKSJ/truncated-HKSJ intervals and rule      45 values  max diff/allowed 2.0e-09
+PASS  A3 tb_log_rr: pooled test statistic and p (hksj_rule always)          10 values  max diff/allowed 8.4e-10
+PASS  A3 tb_log_rr: leave1out                                              143 values  max diff/allowed 6.7e-05
+PASS  A3 tb_log_rr: influence                                              130 values  max diff/allowed 1.2e-06
+PASS  A3 tb_log_rr: subgroups (per level)                                   33 values  max diff/allowed 4.7e-05
+PASS  A3 tb_log_rr: subgroups test for differences (Q_between_separate_tau2)     3 values  max diff/allowed 8.3e-08
+PASS  A3 tb_log_rr: metareg                                                 32 values  max diff/allowed 1.3e-03
+PASS  A3 tb_log_rr: Egger (k >= egger_min_k)                                 8 values  max diff/allowed 1.5e-09
+PASS  A3 tb_log_rr: sensitivity (imputed correlations)                      24 values  max diff/allowed 1.3e-06
+
+A1/A2 normand1999: Python (direct calls) and run_meta.R against metafor expected values
+---------------------------------------------------------------------------------------
+PASS  A1 normand1999 los_days_md: study effects (python)                    27 values  max diff/allowed 4.0e-09
+PASS  A2 normand1999 los_days_md: study effects (R engine)                  27 values  max diff/allowed 0.0e+00
+PASS  A1 normand1999 los_days_md: pooled REML/z                             17 values  max diff/allowed 2.5e-06
+PASS  A1 normand1999 los_days_md: pooled DL/z                               17 values  max diff/allowed 1.2e-09
+PASS  A1 normand1999 los_days_md: pooled PM/z                               17 values  max diff/allowed 7.8e-10
+PASS  A1 normand1999 los_days_md: pooled ML/z                               17 values  max diff/allowed 7.9e-06
+PASS  A1 normand1999 los_days_md: pooled FE/z                               17 values  max diff/allowed 7.2e-10
+PASS  A1 normand1999 los_days_md: pooled REML/knha                          17 values  max diff/allowed 2.5e-06
+PASS  A1 normand1999 los_days_md: pooled DL/knha                            17 values  max diff/allowed 1.2e-09
+PASS  A1 normand1999 los_days_md: pooled PM/knha                            17 values  max diff/allowed 7.8e-10
+PASS  A1 normand1999 los_days_md: pooled ML/knha                            17 values  max diff/allowed 7.9e-06
+PASS  A2 normand1999 los_days_md: pooled.csv (R engine, HKSJ config)        70 values  max diff/allowed 0.0e+00
+SKIP  A1/A2 normand1999 los_days_md: metareg                                 0 values  no metafor expected values for this dataset
+SKIP  A1/A2 normand1999 los_days_md: Egger                                   0 values  no metafor expected values for this dataset
+SKIP  A1/A2 normand1999 los_days_md: leave1out                               0 values  no metafor expected values for this dataset
+SKIP  A1/A2 normand1999 los_days_md: influence                               0 values  no metafor expected values for this dataset
+SKIP  A1/A2 normand1999 los_days_md: subgroups                               0 values  no metafor expected values for this dataset
+PASS  A1 normand1999 los_days_smd: study effects (python)                   27 values  max diff/allowed 1.1e-07
+PASS  A2 normand1999 los_days_smd: study effects (R engine)                 27 values  max diff/allowed 0.0e+00
+PASS  A1 normand1999 los_days_smd: pooled REML/z                            17 values  max diff/allowed 2.0e-06
+PASS  A1 normand1999 los_days_smd: pooled DL/z                              17 values  max diff/allowed 3.7e-08
+PASS  A1 normand1999 los_days_smd: pooled PM/z                              17 values  max diff/allowed 3.7e-08
+PASS  A1 normand1999 los_days_smd: pooled ML/z                              17 values  max diff/allowed 1.4e-06
+PASS  A1 normand1999 los_days_smd: pooled FE/z                              17 values  max diff/allowed 1.9e-08
+PASS  A1 normand1999 los_days_smd: pooled REML/knha                         17 values  max diff/allowed 2.0e-06
+PASS  A1 normand1999 los_days_smd: pooled DL/knha                           17 values  max diff/allowed 3.7e-08
+PASS  A1 normand1999 los_days_smd: pooled PM/knha                           17 values  max diff/allowed 3.7e-08
+PASS  A1 normand1999 los_days_smd: pooled ML/knha                           17 values  max diff/allowed 1.4e-06
+PASS  A2 normand1999 los_days_smd: pooled.csv (R engine, HKSJ config)       70 values  max diff/allowed 0.0e+00
+SKIP  A1/A2 normand1999 los_days_smd: metareg                                0 values  no metafor expected values for this dataset
+SKIP  A1/A2 normand1999 los_days_smd: Egger                                  0 values  no metafor expected values for this dataset
+SKIP  A1/A2 normand1999 los_days_smd: leave1out                              0 values  no metafor expected values for this dataset
+SKIP  A1/A2 normand1999 los_days_smd: influence                              0 values  no metafor expected values for this dataset
+SKIP  A1/A2 normand1999 los_days_smd: subgroups                              0 values  no metafor expected values for this dataset
+
+A3 normand1999: Python CLI against R CLI, the CSV outputs both engines write
+----------------------------------------------------------------------------
+PASS  A3 los_days_md: excluded studies                                       1 values  max diff/allowed -
+PASS  A3 los_days_md: study_effects                                         27 values  max diff/allowed 4.0e-09
+PASS  A3 los_days_md: pooled (all estimators)                               70 values  max diff/allowed 7.9e-06
+PASS  A3 los_days_md: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 1.9e-08
+PASS  A3 los_days_md: pooled test statistic and p (hksj_rule always)        10 values  max diff/allowed 3.3e-09
+PASS  A3 los_days_md: leave1out                                             99 values  max diff/allowed 1.2e-05
+PASS  A3 los_days_md: influence                                             90 values  max diff/allowed 1.2e-07
+SKIP  A3 los_days_md: subgroups                                              0 values  no subgroups configured (checked in the config)
+SKIP  A3 los_days_md: metareg                                                0 values  no moderators configured (checked in the config)
+SKIP  A3 los_days_md: Egger                                                  0 values  not run by either engine; checked: k_studies = 9 < egger_min_k = 10
+PASS  A3 los_days_md: sensitivity (imputed correlations)                    24 values  max diff/allowed 2.5e-06
+PASS  A3 los_days_smd: excluded studies                                      1 values  max diff/allowed -
+PASS  A3 los_days_smd: study_effects                                        27 values  max diff/allowed 1.1e-07
+PASS  A3 los_days_smd: pooled (all estimators)                              70 values  max diff/allowed 2.0e-06
+PASS  A3 los_days_smd: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 4.8e-09
+PASS  A3 los_days_smd: pooled test statistic and p (hksj_rule always)       10 values  max diff/allowed 1.1e-08
+PASS  A3 los_days_smd: leave1out                                            99 values  max diff/allowed 1.3e-04
+PASS  A3 los_days_smd: influence                                            90 values  max diff/allowed 1.3e-06
+SKIP  A3 los_days_smd: subgroups                                             0 values  no subgroups configured (checked in the config)
+SKIP  A3 los_days_smd: metareg                                               0 values  no moderators configured (checked in the config)
+SKIP  A3 los_days_smd: Egger                                                 0 values  not run by either engine; checked: k_studies = 9 < egger_min_k = 10
+PASS  A3 los_days_smd: sensitivity (imputed correlations)                   24 values  max diff/allowed 2.0e-06
+
+A1/A2 curtis1998: Python (direct calls) and run_meta.R against metafor expected values
+--------------------------------------------------------------------------------------
+PASS  A1 curtis1998 biomass_rom: study effects (python)                    306 values  max diff/allowed 4.4e-09
+PASS  A2 curtis1998 biomass_rom: study effects (R engine)                  306 values  max diff/allowed 2.5e-09
+PASS  A1 curtis1998 biomass_rom: pooled REML/z                              17 values  max diff/allowed 9.9e-04
+PASS  A1 curtis1998 biomass_rom: pooled DL/z                                17 values  max diff/allowed 6.7e-08
+PASS  A1 curtis1998 biomass_rom: pooled PM/z                                17 values  max diff/allowed 6.7e-08
+PASS  A1 curtis1998 biomass_rom: pooled ML/z                                17 values  max diff/allowed 1.1e-03
+PASS  A1 curtis1998 biomass_rom: pooled FE/z                                17 values  max diff/allowed 8.9e-10
+PASS  A1 curtis1998 biomass_rom: pooled REML/knha                           17 values  max diff/allowed 9.9e-04
+PASS  A1 curtis1998 biomass_rom: pooled DL/knha                             17 values  max diff/allowed 6.7e-08
+PASS  A1 curtis1998 biomass_rom: pooled PM/knha                             17 values  max diff/allowed 6.7e-08
+PASS  A1 curtis1998 biomass_rom: pooled ML/knha                             17 values  max diff/allowed 1.1e-03
+PASS  A2 curtis1998 biomass_rom: pooled.csv (R engine, HKSJ config)         70 values  max diff/allowed 4.7e-11
+PASS  A1 curtis1998 biomass_rom: metareg ~duration_weeks REML/z             32 values  max diff/allowed 1.6e-03
+PASS  A1 curtis1998 biomass_rom: metareg ~duration_weeks DL/z               32 values  max diff/allowed 1.3e-09
+PASS  A1 curtis1998 biomass_rom: metareg ~duration_weeks PM/z               32 values  max diff/allowed 5.0e-08
+PASS  A1 curtis1998 biomass_rom: metareg ~duration_weeks ML/z               32 values  max diff/allowed 7.7e-04
+PASS  A1 curtis1998 biomass_rom: metareg ~duration_weeks REML/knha          32 values  max diff/allowed 1.6e-03
+PASS  A1 curtis1998 biomass_rom: metareg ~duration_weeks DL/knha            32 values  max diff/allowed 1.2e-09
+PASS  A1 curtis1998 biomass_rom: metareg ~duration_weeks PM/knha            32 values  max diff/allowed 5.0e-08
+PASS  A1 curtis1998 biomass_rom: metareg ~duration_weeks ML/knha            32 values  max diff/allowed 7.7e-04
+PASS  A2 curtis1998 biomass_rom: metareg.csv (R engine)                     32 values  max diff/allowed 7.9e-10
+      metareg I2 is not compared: metaproof does not report a residual I2.
+PASS  A1 curtis1998 biomass_rom: Egger regression test                       7 values  max diff/allowed 2.5e-09
+PASS  A2 curtis1998 biomass_rom: small_study.csv Egger (R engine)            9 values  max diff/allowed 0.0e+00
+      egger_rma rows (regtest with model = 'rma') are R-only; metaproof implements the classic Egger 1997 test.
+PASS  A1 curtis1998 biomass_rom: leave1out REML/knha                      1122 values  max diff/allowed 1.8e-03
+PASS  A2 curtis1998 biomass_rom: leave1out.csv (R engine)                 1122 values  max diff/allowed 3.8e-09
+PASS  A1 curtis1998 biomass_rom: influence REML/knha                      1020 values  max diff/allowed 2.6e-03
+PASS  A2 curtis1998 biomass_rom: influence.csv (R engine)                 1020 values  max diff/allowed 3.3e-08
+PASS  A1 curtis1998 biomass_rom: subgroups per level                        33 values  max diff/allowed 1.9e-03
+PASS  A1 curtis1998 biomass_rom: subgroups Q_between (model-based SEs)       3 values  max diff/allowed 1.2e-05
+PASS  A1 curtis1998 biomass_rom: subgroup test with common tau2 (QM)         7 values  max diff/allowed 1.0e-03
+PASS  A2 curtis1998 biomass_rom: subgroups.csv (R engine)                   75 values  max diff/allowed 5.8e-11
+
+A3 curtis1998: Python CLI against R CLI, the CSV outputs both engines write
+---------------------------------------------------------------------------
+PASS  A3 biomass_rom: excluded studies                                       1 values  max diff/allowed -
+PASS  A3 biomass_rom: study_effects                                        306 values  max diff/allowed 4.4e-09
+PASS  A3 biomass_rom: Geary min mean sqrt(n)/SD                            102 values  max diff/allowed 3.8e-11
+PASS  A3 biomass_rom: pooled (all estimators)                               70 values  max diff/allowed 1.1e-03
+PASS  A3 biomass_rom: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 1.0e-06
+PASS  A3 biomass_rom: pooled test statistic and p (hksj_rule always)        10 values  max diff/allowed 2.8e-05
+PASS  A3 biomass_rom: leave1out                                           1122 values  max diff/allowed 1.8e-03
+PASS  A3 biomass_rom: influence                                           1020 values  max diff/allowed 2.6e-03
+PASS  A3 biomass_rom: subgroups (per level)                                 33 values  max diff/allowed 1.9e-03
+PASS  A3 biomass_rom: subgroups test for differences (Q_between_separate_tau2)     3 values  max diff/allowed 1.2e-05
+PASS  A3 biomass_rom: metareg                                               32 values  max diff/allowed 1.6e-03
+PASS  A3 biomass_rom: Egger (k >= egger_min_k)                               8 values  max diff/allowed 2.5e-09
+PASS  A3 biomass_rom: sensitivity (imputed correlations)                    24 values  max diff/allowed 9.9e-04
+SKIP  A3 biomass_rom: sensitivity rom_bias_correction (Python only)          0 values  no R counterpart and no independent re-pool
+
+B  examples/nicotinamide-riboside/SYNTHETIC_nr_like_extraction.csv (SYNTHETIC data): Python CLI against R CLI
+-------------------------------------------------------------------------------------------------------------
+PASS  B SYNTHETIC_whole_blood_nad: excluded studies                          1 values  max diff/allowed -
+PASS  B SYNTHETIC_whole_blood_nad: study_effects                            15 values  max diff/allowed 3.4e-09
+PASS  B SYNTHETIC_whole_blood_nad: Geary min mean sqrt(n)/SD                 5 values  max diff/allowed 3.1e-11
+PASS  B SYNTHETIC_whole_blood_nad: pooled (all estimators)                  70 values  max diff/allowed 1.5e-03
+PASS  B SYNTHETIC_whole_blood_nad: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 1.2e-06
+PASS  B SYNTHETIC_whole_blood_nad: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 3.2e-06
+PASS  B SYNTHETIC_whole_blood_nad: leave1out                                55 values  max diff/allowed 1.9e-02
+PASS  B SYNTHETIC_whole_blood_nad: influence                                50 values  max diff/allowed 2.1e-02
+SKIP  B SYNTHETIC_whole_blood_nad: subgroups                                 0 values  not run by either engine (protocol gate); checked: design: 5 studies (subgroup_min_k 10), smallest level 2 (min 2)
+SKIP  B SYNTHETIC_whole_blood_nad: metareg                                   0 values  not fitted by either engine; checked: dose_mg_day: 4 studies < 10
+SKIP  B SYNTHETIC_whole_blood_nad: Egger                                     0 values  not run by either engine; checked: k_studies = 5 < egger_min_k = 10
+PASS  B SYNTHETIC_whole_blood_nad: sensitivity (imputed correlations)       48 values  max diff/allowed 1.5e-03
+SKIP  B SYNTHETIC_whole_blood_nad: sensitivity median_method (Python only)     0 values  no R counterpart and no independent re-pool
+PASS  B SYNTHETIC_whole_blood_nad: sensitivity exclude_converted_from_median: re-pooled here from the unflagged studies     8 values  max diff/allowed 0.0e+00
+PASS  B SYNTHETIC_whole_blood_nad: sensitivity exclude_imputed_or_digitised: re-pooled here from the unflagged studies     8 values  max diff/allowed 0.0e+00
+SKIP  B SYNTHETIC_whole_blood_nad: sensitivity rom_bias_correction (Python only)     0 values  no R counterpart and no independent re-pool
+PASS  B SYNTHETIC_whole_blood_nad_earliest: excluded studies                 1 values  max diff/allowed -
+PASS  B SYNTHETIC_whole_blood_nad_earliest: study_effects                   15 values  max diff/allowed 3.4e-09
+PASS  B SYNTHETIC_whole_blood_nad_earliest: Geary min mean sqrt(n)/SD        5 values  max diff/allowed 3.1e-11
+PASS  B SYNTHETIC_whole_blood_nad_earliest: pooled (all estimators)         70 values  max diff/allowed 2.6e-03
+PASS  B SYNTHETIC_whole_blood_nad_earliest: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 2.0e-06
+PASS  B SYNTHETIC_whole_blood_nad_earliest: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 1.0e-05
+PASS  B SYNTHETIC_whole_blood_nad_earliest: leave1out                       55 values  max diff/allowed 2.1e-03
+PASS  B SYNTHETIC_whole_blood_nad_earliest: influence                       50 values  max diff/allowed 2.1e-05
+SKIP  B SYNTHETIC_whole_blood_nad_earliest: subgroups                        0 values  no subgroups configured (checked in the config)
+SKIP  B SYNTHETIC_whole_blood_nad_earliest: metareg                          0 values  no moderators configured (checked in the config)
+SKIP  B SYNTHETIC_whole_blood_nad_earliest: Egger                            0 values  not run by either engine; checked: k_studies = 5 < egger_min_k = 10
+PASS  B SYNTHETIC_whole_blood_nad_earliest: sensitivity (imputed correlations)    48 values  max diff/allowed 1.8e-03
+SKIP  B SYNTHETIC_whole_blood_nad_earliest: sensitivity median_method (Python only)     0 values  no R counterpart and no independent re-pool
+PASS  B SYNTHETIC_whole_blood_nad_earliest: sensitivity exclude_converted_from_median: re-pooled here from the unflagged studies     8 values  max diff/allowed 0.0e+00
+PASS  B SYNTHETIC_whole_blood_nad_earliest: sensitivity exclude_imputed_or_digitised: re-pooled here from the unflagged studies     8 values  max diff/allowed 0.0e+00
+SKIP  B SYNTHETIC_whole_blood_nad_earliest: sensitivity rom_bias_correction (Python only)     0 values  no R counterpart and no independent re-pool
+PASS  B SYNTHETIC_whole_blood_nad_by_dose: excluded studies                  1 values  max diff/allowed -
+PASS  B SYNTHETIC_whole_blood_nad_by_dose: study_effects                    18 values  max diff/allowed 3.4e-09
+PASS  B SYNTHETIC_whole_blood_nad_by_dose: Geary min mean sqrt(n)/SD         6 values  max diff/allowed 3.1e-11
+PASS  B SYNTHETIC_whole_blood_nad_by_dose: pooled (all estimators)          70 values  max diff/allowed 1.0e-03
+PASS  B SYNTHETIC_whole_blood_nad_by_dose: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 9.5e-07
+PASS  B SYNTHETIC_whole_blood_nad_by_dose: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 9.4e-07
+PASS  B SYNTHETIC_whole_blood_nad_by_dose: leave1out                        55 values  max diff/allowed 2.7e-03
+PASS  B SYNTHETIC_whole_blood_nad_by_dose: influence                        60 values  max diff/allowed 1.9e-04
+SKIP  B SYNTHETIC_whole_blood_nad_by_dose: subgroups                         0 values  no subgroups configured (checked in the config)
+SKIP  B SYNTHETIC_whole_blood_nad_by_dose: metareg                           0 values  not fitted by either engine; checked: dose_mg_day: 5 studies < 10
+SKIP  B SYNTHETIC_whole_blood_nad_by_dose: Egger                             0 values  not run by either engine; checked: k_studies = 5 < egger_min_k = 10
+PASS  B SYNTHETIC_whole_blood_nad_by_dose: sensitivity (imputed correlations)    48 values  max diff/allowed 1.0e-03
+SKIP  B SYNTHETIC_whole_blood_nad_by_dose: sensitivity median_method (Python only)     0 values  no R counterpart and no independent re-pool
+PASS  B SYNTHETIC_whole_blood_nad_by_dose: sensitivity exclude_converted_from_median: re-pooled here from the unflagged studies     8 values  max diff/allowed 0.0e+00
+PASS  B SYNTHETIC_whole_blood_nad_by_dose: sensitivity exclude_imputed_or_digitised: re-pooled here from the unflagged studies     8 values  max diff/allowed 0.0e+00
+SKIP  B SYNTHETIC_whole_blood_nad_by_dose: sensitivity rom_bias_correction (Python only)     0 values  no R counterpart and no independent re-pool
+PASS  B SYNTHETIC_sbp: excluded studies                                      1 values  max diff/allowed -
+PASS  B SYNTHETIC_sbp: study_effects                                        12 values  max diff/allowed 2.3e-09
+PASS  B SYNTHETIC_sbp: pooled (all estimators)                              70 values  max diff/allowed 1.5e-09
+PASS  B SYNTHETIC_sbp: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 5.2e-12
+PASS  B SYNTHETIC_sbp: pooled test statistic and p (hksj_rule revman)       10 values  max diff/allowed 2.8e-11
+PASS  B SYNTHETIC_sbp: leave1out                                            44 values  max diff/allowed 1.2e-09
+PASS  B SYNTHETIC_sbp: influence                                            40 values  max diff/allowed 1.4e-09
+SKIP  B SYNTHETIC_sbp: subgroups                                             0 values  no subgroups configured (checked in the config)
+SKIP  B SYNTHETIC_sbp: metareg                                               0 values  no moderators configured (checked in the config)
+SKIP  B SYNTHETIC_sbp: Egger                                                 0 values  not run by either engine; checked: k_studies = 4 < egger_min_k = 10
+PASS  B SYNTHETIC_sbp: sensitivity (imputed correlations)                   48 values  max diff/allowed 1.5e-09
+PASS  B SYNTHETIC_sbp: sensitivity exclude_imputed_or_digitised: re-pooled here from the unflagged studies     8 values  max diff/allowed 0.0e+00
+PASS  B SYNTHETIC_cognitive_score: excluded studies                          1 values  max diff/allowed -
+PASS  B SYNTHETIC_cognitive_score: study_effects                            12 values  max diff/allowed 2.5e-09
+PASS  B SYNTHETIC_cognitive_score: pooled (all estimators)                  70 values  max diff/allowed 3.8e-10
+PASS  B SYNTHETIC_cognitive_score: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 1.5e-11
+PASS  B SYNTHETIC_cognitive_score: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 1.4e-11
+PASS  B SYNTHETIC_cognitive_score: leave1out                                44 values  max diff/allowed 1.4e-09
+PASS  B SYNTHETIC_cognitive_score: influence                                40 values  max diff/allowed 4.6e-10
+SKIP  B SYNTHETIC_cognitive_score: subgroups                                 0 values  no subgroups configured (checked in the config)
+SKIP  B SYNTHETIC_cognitive_score: metareg                                   0 values  no moderators configured (checked in the config)
+SKIP  B SYNTHETIC_cognitive_score: Egger                                     0 values  not run by either engine; checked: k_studies = 4 < egger_min_k = 10
+PASS  B SYNTHETIC_cognitive_score: sensitivity (imputed correlations)       48 values  max diff/allowed 3.8e-10
+
+C  constructed SYNTHETIC edge cases (validation/edge_cases/): Python CLI against R CLI
+--------------------------------------------------------------------------------------
+PASS  C SYNTHETIC_edge_k2: excluded studies                                  1 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_k2: study_effects                                     6 values  max diff/allowed 4.7e-10
+PASS  C SYNTHETIC_edge_k2: pooled (all estimators)                          70 values  max diff/allowed 0.0e+00
+PASS  C SYNTHETIC_edge_k2: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 0.0e+00
+SKIP  C SYNTHETIC_edge_k2: pooled test statistic and p (hksj_rule revman)     0 values  not pooled (k_studies < min_k_pool, checked in pooled.csv)
+SKIP  C SYNTHETIC_edge_k2: leave1out                                         0 values  not run by either engine; checked: k_studies = 2, pooled = False (runs only when pooled and k >= 3)
+SKIP  C SYNTHETIC_edge_k2: influence                                         0 values  not computed by either engine; checked: k = 2, pooled = False (runs only when pooled and k >= 3)
+SKIP  C SYNTHETIC_edge_k2: subgroups                                         0 values  no subgroups configured (checked in the config)
+SKIP  C SYNTHETIC_edge_k2: metareg                                           0 values  no moderators configured (checked in the config)
+SKIP  C SYNTHETIC_edge_k2: Egger                                             0 values  not run by either engine; checked: k_studies = 2 < egger_min_k = 10
+SKIP  C SYNTHETIC_edge_k2: sensitivity (imputed correlations)                0 values  none in either engine; checked: not pooled
+PASS  C SYNTHETIC_edge_k2_pool2: excluded studies                            1 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_k2_pool2: study_effects                               6 values  max diff/allowed 4.7e-10
+PASS  C SYNTHETIC_edge_k2_pool2: pooled (all estimators)                    70 values  max diff/allowed 2.4e-04
+PASS  C SYNTHETIC_edge_k2_pool2: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 1.5e-08
+PASS  C SYNTHETIC_edge_k2_pool2: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 4.7e-07
+SKIP  C SYNTHETIC_edge_k2_pool2: leave1out                                   0 values  not run by either engine; checked: k_studies = 2, pooled = True (runs only when pooled and k >= 3)
+SKIP  C SYNTHETIC_edge_k2_pool2: influence                                   0 values  not computed by either engine; checked: k = 2, pooled = True (runs only when pooled and k >= 3)
+SKIP  C SYNTHETIC_edge_k2_pool2: subgroups                                   0 values  no subgroups configured (checked in the config)
+SKIP  C SYNTHETIC_edge_k2_pool2: metareg                                     0 values  no moderators configured (checked in the config)
+SKIP  C SYNTHETIC_edge_k2_pool2: Egger                                       0 values  not run by either engine; checked: k_studies = 2 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_k2_pool2: sensitivity (imputed correlations)         48 values  max diff/allowed 6.5e-10
+PASS  C SYNTHETIC_edge_k2_pool2_always: excluded studies                     1 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_k2_pool2_always: study_effects                        6 values  max diff/allowed 4.7e-10
+PASS  C SYNTHETIC_edge_k2_pool2_always: pooled (all estimators)             70 values  max diff/allowed 2.4e-04
+PASS  C SYNTHETIC_edge_k2_pool2_always: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 1.5e-08
+PASS  C SYNTHETIC_edge_k2_pool2_always: pooled test statistic and p (hksj_rule always)    10 values  max diff/allowed 7.7e-10
+SKIP  C SYNTHETIC_edge_k2_pool2_always: leave1out                            0 values  not run by either engine; checked: k_studies = 2, pooled = True (runs only when pooled and k >= 3)
+SKIP  C SYNTHETIC_edge_k2_pool2_always: influence                            0 values  not computed by either engine; checked: k = 2, pooled = True (runs only when pooled and k >= 3)
+SKIP  C SYNTHETIC_edge_k2_pool2_always: subgroups                            0 values  no subgroups configured (checked in the config)
+SKIP  C SYNTHETIC_edge_k2_pool2_always: metareg                              0 values  no moderators configured (checked in the config)
+SKIP  C SYNTHETIC_edge_k2_pool2_always: Egger                                0 values  not run by either engine; checked: k_studies = 2 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_k2_pool2_always: sensitivity (imputed correlations)    48 values  max diff/allowed 1.6e-10
+PASS  C SYNTHETIC_edge_k2_nohksj: excluded studies                           1 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_k2_nohksj: study_effects                              6 values  max diff/allowed 4.7e-10
+PASS  C SYNTHETIC_edge_k2_nohksj: pooled (all estimators)                   70 values  max diff/allowed 2.4e-04
+PASS  C SYNTHETIC_edge_k2_nohksj: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 1.5e-08
+PASS  C SYNTHETIC_edge_k2_nohksj: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 4.7e-07
+SKIP  C SYNTHETIC_edge_k2_nohksj: leave1out                                  0 values  not run by either engine; checked: k_studies = 2, pooled = True (runs only when pooled and k >= 3)
+SKIP  C SYNTHETIC_edge_k2_nohksj: influence                                  0 values  not computed by either engine; checked: k = 2, pooled = True (runs only when pooled and k >= 3)
+SKIP  C SYNTHETIC_edge_k2_nohksj: subgroups                                  0 values  no subgroups configured (checked in the config)
+SKIP  C SYNTHETIC_edge_k2_nohksj: metareg                                    0 values  no moderators configured (checked in the config)
+SKIP  C SYNTHETIC_edge_k2_nohksj: Egger                                      0 values  not run by either engine; checked: k_studies = 2 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_k2_nohksj: sensitivity (imputed correlations)        48 values  max diff/allowed 6.5e-10
+PASS  C SYNTHETIC_edge_k3: excluded studies                                  1 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_k3: study_effects                                     9 values  max diff/allowed 3.1e-09
+PASS  C SYNTHETIC_edge_k3: pooled (all estimators)                          70 values  max diff/allowed 2.1e-07
+PASS  C SYNTHETIC_edge_k3: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 2.8e-10
+PASS  C SYNTHETIC_edge_k3: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 1.7e-10
+PASS  C SYNTHETIC_edge_k3: leave1out                                        33 values  max diff/allowed 2.5e-09
+PASS  C SYNTHETIC_edge_k3: influence                                        30 values  max diff/allowed 4.5e-10
+SKIP  C SYNTHETIC_edge_k3: subgroups                                         0 values  not run by either engine (protocol gate); checked: population: 3 studies (subgroup_min_k 10), smallest level 1 (min 2)
+SKIP  C SYNTHETIC_edge_k3: metareg                                           0 values  not fitted by either engine; checked: dose_mg_day: 3 studies < 10
+SKIP  C SYNTHETIC_edge_k3: Egger                                             0 values  not run by either engine; checked: k_studies = 3 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_k3: sensitivity (imputed correlations)               48 values  max diff/allowed 3.0e-09
+PASS  C SYNTHETIC_edge_k3_gates_off: excluded studies                        1 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_k3_gates_off: study_effects                           9 values  max diff/allowed 3.1e-09
+PASS  C SYNTHETIC_edge_k3_gates_off: pooled (all estimators)                70 values  max diff/allowed 2.1e-07
+PASS  C SYNTHETIC_edge_k3_gates_off: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 2.8e-10
+PASS  C SYNTHETIC_edge_k3_gates_off: pooled test statistic and p (hksj_rule always)    10 values  max diff/allowed 1.7e-10
+PASS  C SYNTHETIC_edge_k3_gates_off: leave1out                              33 values  max diff/allowed 2.5e-09
+PASS  C SYNTHETIC_edge_k3_gates_off: influence                              30 values  max diff/allowed 4.5e-10
+PASS  C SYNTHETIC_edge_k3_gates_off: subgroups (per level)                  22 values  max diff/allowed 1.3e-09
+PASS  C SYNTHETIC_edge_k3_gates_off: subgroups test for differences (QM_common_tau2)     4 values  max diff/allowed 2.7e-11
+PASS  C SYNTHETIC_edge_k3_gates_off: metareg                                32 values  max diff/allowed 1.8e-09
+SKIP  C SYNTHETIC_edge_k3_gates_off: Egger                                   0 values  not run by either engine; checked: k_studies = 3 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_k3_gates_off: sensitivity (imputed correlations)     48 values  max diff/allowed 3.0e-09
+PASS  C SYNTHETIC_edge_k3_separate: excluded studies                         1 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_k3_separate: study_effects                            9 values  max diff/allowed 3.1e-09
+PASS  C SYNTHETIC_edge_k3_separate: pooled (all estimators)                 70 values  max diff/allowed 2.1e-07
+PASS  C SYNTHETIC_edge_k3_separate: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 2.8e-10
+PASS  C SYNTHETIC_edge_k3_separate: pooled test statistic and p (hksj_rule always)    10 values  max diff/allowed 1.7e-10
+PASS  C SYNTHETIC_edge_k3_separate: leave1out                               33 values  max diff/allowed 2.5e-09
+PASS  C SYNTHETIC_edge_k3_separate: influence                               30 values  max diff/allowed 4.5e-10
+PASS  C SYNTHETIC_edge_k3_separate: subgroups (per level)                   22 values  max diff/allowed 8.5e-10
+PASS  C SYNTHETIC_edge_k3_separate: subgroups test for differences (Q_between_separate_tau2)     3 values  max diff/allowed 5.7e-11
+SKIP  C SYNTHETIC_edge_k3_separate: metareg                                  0 values  no moderators configured (checked in the config)
+SKIP  C SYNTHETIC_edge_k3_separate: Egger                                    0 values  not run by either engine; checked: k_studies = 3 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_k3_separate: sensitivity (imputed correlations)      48 values  max diff/allowed 3.0e-09
+PASS  C SYNTHETIC_edge_k3_truncated: excluded studies                        1 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_k3_truncated: study_effects                           9 values  max diff/allowed 3.1e-09
+PASS  C SYNTHETIC_edge_k3_truncated: pooled (all estimators)                70 values  max diff/allowed 2.1e-07
+PASS  C SYNTHETIC_edge_k3_truncated: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 2.8e-10
+PASS  C SYNTHETIC_edge_k3_truncated: pooled test statistic and p (hksj_rule truncated)    10 values  max diff/allowed 1.7e-10
+PASS  C SYNTHETIC_edge_k3_truncated: leave1out                              33 values  max diff/allowed 2.5e-09
+PASS  C SYNTHETIC_edge_k3_truncated: influence                              30 values  max diff/allowed 4.8e-10
+SKIP  C SYNTHETIC_edge_k3_truncated: subgroups                               0 values  no subgroups configured (checked in the config)
+SKIP  C SYNTHETIC_edge_k3_truncated: metareg                                 0 values  no moderators configured (checked in the config)
+SKIP  C SYNTHETIC_edge_k3_truncated: Egger                                   0 values  not run by either engine; checked: k_studies = 3 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_k3_truncated: sensitivity (imputed correlations)     48 values  max diff/allowed 3.0e-09
+PASS  C SYNTHETIC_edge_k3_ml_nohksj: excluded studies                        1 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_k3_ml_nohksj: study_effects                           9 values  max diff/allowed 3.1e-09
+PASS  C SYNTHETIC_edge_k3_ml_nohksj: pooled (all estimators)                70 values  max diff/allowed 2.1e-07
+PASS  C SYNTHETIC_edge_k3_ml_nohksj: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 2.8e-10
+PASS  C SYNTHETIC_edge_k3_ml_nohksj: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 5.7e-09
+PASS  C SYNTHETIC_edge_k3_ml_nohksj: leave1out                              33 values  max diff/allowed 2.1e-05
+PASS  C SYNTHETIC_edge_k3_ml_nohksj: influence                              30 values  max diff/allowed 4.1e-08
+SKIP  C SYNTHETIC_edge_k3_ml_nohksj: subgroups                               0 values  no subgroups configured (checked in the config)
+SKIP  C SYNTHETIC_edge_k3_ml_nohksj: metareg                                 0 values  no moderators configured (checked in the config)
+SKIP  C SYNTHETIC_edge_k3_ml_nohksj: Egger                                   0 values  not run by either engine; checked: k_studies = 3 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_k3_ml_nohksj: sensitivity (imputed correlations)     48 values  max diff/allowed 2.1e-07
+PASS  C SYNTHETIC_edge_k3_pi_metafor: excluded studies                       1 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_k3_pi_metafor: study_effects                          9 values  max diff/allowed 3.1e-09
+PASS  C SYNTHETIC_edge_k3_pi_metafor: pooled (all estimators)               70 values  max diff/allowed 2.1e-07
+PASS  C SYNTHETIC_edge_k3_pi_metafor: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 2.8e-10
+PASS  C SYNTHETIC_edge_k3_pi_metafor: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 1.7e-10
+PASS  C SYNTHETIC_edge_k3_pi_metafor: leave1out                             33 values  max diff/allowed 2.5e-09
+PASS  C SYNTHETIC_edge_k3_pi_metafor: influence                             30 values  max diff/allowed 4.5e-10
+SKIP  C SYNTHETIC_edge_k3_pi_metafor: subgroups                              0 values  no subgroups configured (checked in the config)
+SKIP  C SYNTHETIC_edge_k3_pi_metafor: metareg                                0 values  no moderators configured (checked in the config)
+SKIP  C SYNTHETIC_edge_k3_pi_metafor: Egger                                  0 values  not run by either engine; checked: k_studies = 3 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_k3_pi_metafor: sensitivity (imputed correlations)    48 values  max diff/allowed 3.0e-09
+PASS  C SYNTHETIC_edge_k3_pi_revman: excluded studies                        1 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_k3_pi_revman: study_effects                           9 values  max diff/allowed 3.1e-09
+PASS  C SYNTHETIC_edge_k3_pi_revman: pooled (all estimators)                70 values  max diff/allowed 2.1e-07
+PASS  C SYNTHETIC_edge_k3_pi_revman: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 2.8e-10
+PASS  C SYNTHETIC_edge_k3_pi_revman: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 1.7e-10
+PASS  C SYNTHETIC_edge_k3_pi_revman: leave1out                              33 values  max diff/allowed 2.5e-09
+PASS  C SYNTHETIC_edge_k3_pi_revman: influence                              30 values  max diff/allowed 4.5e-10
+SKIP  C SYNTHETIC_edge_k3_pi_revman: subgroups                               0 values  no subgroups configured (checked in the config)
+SKIP  C SYNTHETIC_edge_k3_pi_revman: metareg                                 0 values  no moderators configured (checked in the config)
+SKIP  C SYNTHETIC_edge_k3_pi_revman: Egger                                   0 values  not run by either engine; checked: k_studies = 3 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_k3_pi_revman: sensitivity (imputed correlations)     48 values  max diff/allowed 3.0e-09
+PASS  C SYNTHETIC_edge_dominant_pi_revman: excluded studies                  1 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_dominant_pi_revman: study_effects                    15 values  max diff/allowed 2.5e-09
+PASS  C SYNTHETIC_edge_dominant_pi_revman: pooled (all estimators)          70 values  max diff/allowed 3.8e-05
+PASS  C SYNTHETIC_edge_dominant_pi_revman: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 6.2e-08
+PASS  C SYNTHETIC_edge_dominant_pi_revman: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 4.2e-09
+PASS  C SYNTHETIC_edge_dominant_pi_revman: leave1out                        55 values  max diff/allowed 3.3e-05
+PASS  C SYNTHETIC_edge_dominant_pi_revman: influence                        50 values  max diff/allowed 3.9e-07
+SKIP  C SYNTHETIC_edge_dominant_pi_revman: subgroups                         0 values  no subgroups configured (checked in the config)
+SKIP  C SYNTHETIC_edge_dominant_pi_revman: metareg                           0 values  no moderators configured (checked in the config)
+SKIP  C SYNTHETIC_edge_dominant_pi_revman: Egger                             0 values  not run by either engine; checked: k_studies = 5 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_dominant_pi_revman: sensitivity (imputed correlations)    48 values  max diff/allowed 3.8e-05
+PASS  C SYNTHETIC_edge_k3_smd_ub: excluded studies                           1 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_k3_smd_ub: study_effects                              9 values  max diff/allowed 3.5e-09
+PASS  C SYNTHETIC_edge_k3_smd_ub: pooled (all estimators)                   70 values  max diff/allowed 4.0e-06
+PASS  C SYNTHETIC_edge_k3_smd_ub: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 1.3e-08
+PASS  C SYNTHETIC_edge_k3_smd_ub: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 3.4e-09
+PASS  C SYNTHETIC_edge_k3_smd_ub: leave1out                                 33 values  max diff/allowed 2.4e-09
+PASS  C SYNTHETIC_edge_k3_smd_ub: influence                                 30 values  max diff/allowed 4.4e-08
+SKIP  C SYNTHETIC_edge_k3_smd_ub: subgroups                                  0 values  no subgroups configured (checked in the config)
+SKIP  C SYNTHETIC_edge_k3_smd_ub: metareg                                    0 values  no moderators configured (checked in the config)
+SKIP  C SYNTHETIC_edge_k3_smd_ub: Egger                                      0 values  not run by either engine; checked: k_studies = 3 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_k3_smd_ub: sensitivity (imputed correlations)        48 values  max diff/allowed 4.0e-06
+PASS  C SYNTHETIC_edge_k3_smd_ls2: excluded studies                          1 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_k3_smd_ls2: study_effects                             9 values  max diff/allowed 3.5e-09
+PASS  C SYNTHETIC_edge_k3_smd_ls2: pooled (all estimators)                  70 values  max diff/allowed 2.4e-06
+PASS  C SYNTHETIC_edge_k3_smd_ls2: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 7.8e-09
+PASS  C SYNTHETIC_edge_k3_smd_ls2: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 1.9e-09
+PASS  C SYNTHETIC_edge_k3_smd_ls2: leave1out                                33 values  max diff/allowed 1.2e-09
+PASS  C SYNTHETIC_edge_k3_smd_ls2: influence                                30 values  max diff/allowed 2.5e-08
+SKIP  C SYNTHETIC_edge_k3_smd_ls2: subgroups                                 0 values  no subgroups configured (checked in the config)
+SKIP  C SYNTHETIC_edge_k3_smd_ls2: metareg                                   0 values  no moderators configured (checked in the config)
+SKIP  C SYNTHETIC_edge_k3_smd_ls2: Egger                                     0 values  not run by either engine; checked: k_studies = 3 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_k3_smd_ls2: sensitivity (imputed correlations)       48 values  max diff/allowed 2.4e-06
+PASS  C SYNTHETIC_edge_k3_rom_bc: excluded studies                           1 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_k3_rom_bc: study_effects                              9 values  max diff/allowed 4.0e-09
+PASS  C SYNTHETIC_edge_k3_rom_bc: Geary min mean sqrt(n)/SD                  3 values  max diff/allowed 3.5e-11
+PASS  C SYNTHETIC_edge_k3_rom_bc: pooled (all estimators)                   70 values  max diff/allowed 3.2e-05
+PASS  C SYNTHETIC_edge_k3_rom_bc: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 1.0e-07
+PASS  C SYNTHETIC_edge_k3_rom_bc: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 1.5e-08
+PASS  C SYNTHETIC_edge_k3_rom_bc: leave1out                                 33 values  max diff/allowed 1.1e-09
+PASS  C SYNTHETIC_edge_k3_rom_bc: influence                                 30 values  max diff/allowed 2.2e-07
+SKIP  C SYNTHETIC_edge_k3_rom_bc: subgroups                                  0 values  no subgroups configured (checked in the config)
+SKIP  C SYNTHETIC_edge_k3_rom_bc: metareg                                    0 values  no moderators configured (checked in the config)
+SKIP  C SYNTHETIC_edge_k3_rom_bc: Egger                                      0 values  not run by either engine; checked: k_studies = 3 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_k3_rom_bc: sensitivity (imputed correlations)        48 values  max diff/allowed 3.2e-05
+SKIP  C SYNTHETIC_edge_k3_rom_bc: sensitivity rom_bias_correction (Python only)     0 values  no R counterpart and no independent re-pool
+PASS  C SYNTHETIC_edge_tau2_zero: excluded studies                           1 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_tau2_zero: study_effects                             12 values  max diff/allowed 3.5e-09
+PASS  C SYNTHETIC_edge_tau2_zero: pooled (all estimators)                   70 values  max diff/allowed 6.5e-10
+PASS  C SYNTHETIC_edge_tau2_zero: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 6.2e-12
+PASS  C SYNTHETIC_edge_tau2_zero: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 1.6e-11
+PASS  C SYNTHETIC_edge_tau2_zero: leave1out                                 44 values  max diff/allowed 1.3e-09
+PASS  C SYNTHETIC_edge_tau2_zero: influence                                 40 values  max diff/allowed 2.0e-09
+SKIP  C SYNTHETIC_edge_tau2_zero: subgroups                                  0 values  no subgroups configured (checked in the config)
+SKIP  C SYNTHETIC_edge_tau2_zero: metareg                                    0 values  no moderators configured (checked in the config)
+SKIP  C SYNTHETIC_edge_tau2_zero: Egger                                      0 values  not run by either engine; checked: k_studies = 4 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_tau2_zero: sensitivity (imputed correlations)        48 values  max diff/allowed 4.4e-10
+PASS  C SYNTHETIC_edge_tau2_zero_always: excluded studies                    1 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_tau2_zero_always: study_effects                      12 values  max diff/allowed 3.5e-09
+PASS  C SYNTHETIC_edge_tau2_zero_always: pooled (all estimators)            70 values  max diff/allowed 1.1e-09
+PASS  C SYNTHETIC_edge_tau2_zero_always: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 6.2e-12
+PASS  C SYNTHETIC_edge_tau2_zero_always: pooled test statistic and p (hksj_rule always)    10 values  max diff/allowed 1.6e-11
+PASS  C SYNTHETIC_edge_tau2_zero_always: leave1out                          44 values  max diff/allowed 2.3e-09
+PASS  C SYNTHETIC_edge_tau2_zero_always: influence                          40 values  max diff/allowed 4.1e-09
+SKIP  C SYNTHETIC_edge_tau2_zero_always: subgroups                           0 values  no subgroups configured (checked in the config)
+SKIP  C SYNTHETIC_edge_tau2_zero_always: metareg                             0 values  no moderators configured (checked in the config)
+SKIP  C SYNTHETIC_edge_tau2_zero_always: Egger                               0 values  not run by either engine; checked: k_studies = 4 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_tau2_zero_always: sensitivity (imputed correlations)    48 values  max diff/allowed 1.1e-09
+PASS  C SYNTHETIC_edge_tau2_zero_dl: excluded studies                        1 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_tau2_zero_dl: study_effects                          12 values  max diff/allowed 3.5e-09
+PASS  C SYNTHETIC_edge_tau2_zero_dl: pooled (all estimators)                70 values  max diff/allowed 6.5e-10
+PASS  C SYNTHETIC_edge_tau2_zero_dl: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 6.2e-12
+PASS  C SYNTHETIC_edge_tau2_zero_dl: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 1.6e-11
+PASS  C SYNTHETIC_edge_tau2_zero_dl: leave1out                              44 values  max diff/allowed 1.3e-09
+PASS  C SYNTHETIC_edge_tau2_zero_dl: influence                              40 values  max diff/allowed 2.0e-09
+SKIP  C SYNTHETIC_edge_tau2_zero_dl: subgroups                               0 values  no subgroups configured (checked in the config)
+SKIP  C SYNTHETIC_edge_tau2_zero_dl: metareg                                 0 values  no moderators configured (checked in the config)
+SKIP  C SYNTHETIC_edge_tau2_zero_dl: Egger                                   0 values  not run by either engine; checked: k_studies = 4 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_tau2_zero_dl: sensitivity (imputed correlations)     48 values  max diff/allowed 4.4e-10
+PASS  C SYNTHETIC_edge_dominant: excluded studies                            1 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_dominant: study_effects                              15 values  max diff/allowed 2.5e-09
+PASS  C SYNTHETIC_edge_dominant: pooled (all estimators)                    70 values  max diff/allowed 3.8e-05
+PASS  C SYNTHETIC_edge_dominant: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 6.2e-08
+PASS  C SYNTHETIC_edge_dominant: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 4.2e-09
+PASS  C SYNTHETIC_edge_dominant: leave1out                                  55 values  max diff/allowed 3.3e-05
+PASS  C SYNTHETIC_edge_dominant: influence                                  50 values  max diff/allowed 3.9e-07
+SKIP  C SYNTHETIC_edge_dominant: subgroups                                   0 values  not run by either engine (protocol gate); checked: population: 5 studies (subgroup_min_k 10), smallest level 2 (min 2)
+SKIP  C SYNTHETIC_edge_dominant: metareg                                     0 values  not fitted by either engine; checked: dose_mg_day: 5 studies < 10
+SKIP  C SYNTHETIC_edge_dominant: Egger                                       0 values  not run by either engine; checked: k_studies = 5 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_dominant: sensitivity (imputed correlations)         48 values  max diff/allowed 3.8e-05
+PASS  C SYNTHETIC_edge_dominant_gates_off: excluded studies                  1 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_dominant_gates_off: study_effects                    15 values  max diff/allowed 2.5e-09
+PASS  C SYNTHETIC_edge_dominant_gates_off: pooled (all estimators)          70 values  max diff/allowed 3.8e-05
+PASS  C SYNTHETIC_edge_dominant_gates_off: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 6.2e-08
+PASS  C SYNTHETIC_edge_dominant_gates_off: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 4.2e-09
+PASS  C SYNTHETIC_edge_dominant_gates_off: leave1out                        55 values  max diff/allowed 3.3e-05
+PASS  C SYNTHETIC_edge_dominant_gates_off: influence                        50 values  max diff/allowed 3.9e-07
+PASS  C SYNTHETIC_edge_dominant_gates_off: subgroups (per level)            22 values  max diff/allowed 8.3e-05
+PASS  C SYNTHETIC_edge_dominant_gates_off: subgroups test for differences (QM_common_tau2)     4 values  max diff/allowed 1.7e-07
+PASS  C SYNTHETIC_edge_dominant_gates_off: metareg                          32 values  max diff/allowed 2.7e-05
+SKIP  C SYNTHETIC_edge_dominant_gates_off: Egger                             0 values  not run by either engine; checked: k_studies = 5 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_dominant_gates_off: sensitivity (imputed correlations)    48 values  max diff/allowed 3.8e-05
+PASS  C SYNTHETIC_edge_dominant_separate: excluded studies                   1 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_dominant_separate: study_effects                     15 values  max diff/allowed 2.5e-09
+PASS  C SYNTHETIC_edge_dominant_separate: pooled (all estimators)           70 values  max diff/allowed 3.8e-05
+PASS  C SYNTHETIC_edge_dominant_separate: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 6.2e-08
+PASS  C SYNTHETIC_edge_dominant_separate: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 4.2e-09
+PASS  C SYNTHETIC_edge_dominant_separate: leave1out                         55 values  max diff/allowed 3.3e-05
+PASS  C SYNTHETIC_edge_dominant_separate: influence                         50 values  max diff/allowed 3.9e-07
+PASS  C SYNTHETIC_edge_dominant_separate: subgroups (per level)             22 values  max diff/allowed 4.0e-05
+PASS  C SYNTHETIC_edge_dominant_separate: subgroups test for differences (Q_between_separate_tau2)     3 values  max diff/allowed 2.2e-07
+SKIP  C SYNTHETIC_edge_dominant_separate: metareg                            0 values  no moderators configured (checked in the config)
+SKIP  C SYNTHETIC_edge_dominant_separate: Egger                              0 values  not run by either engine; checked: k_studies = 5 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_dominant_separate: sensitivity (imputed correlations)    48 values  max diff/allowed 3.8e-05
+PASS  C SYNTHETIC_edge_dominant_truncated: excluded studies                  1 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_dominant_truncated: study_effects                    15 values  max diff/allowed 2.5e-09
+PASS  C SYNTHETIC_edge_dominant_truncated: pooled (all estimators)          70 values  max diff/allowed 3.8e-05
+PASS  C SYNTHETIC_edge_dominant_truncated: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 6.2e-08
+PASS  C SYNTHETIC_edge_dominant_truncated: pooled test statistic and p (hksj_rule truncated)    10 values  max diff/allowed 4.2e-09
+PASS  C SYNTHETIC_edge_dominant_truncated: leave1out                        55 values  max diff/allowed 3.3e-05
+PASS  C SYNTHETIC_edge_dominant_truncated: influence                        50 values  max diff/allowed 3.9e-07
+SKIP  C SYNTHETIC_edge_dominant_truncated: subgroups                         0 values  no subgroups configured (checked in the config)
+SKIP  C SYNTHETIC_edge_dominant_truncated: metareg                           0 values  no moderators configured (checked in the config)
+SKIP  C SYNTHETIC_edge_dominant_truncated: Egger                             0 values  not run by either engine; checked: k_studies = 5 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_dominant_truncated: sensitivity (imputed correlations)    48 values  max diff/allowed 3.8e-05
+PASS  C SYNTHETIC_edge_dominant_pm: excluded studies                         1 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_dominant_pm: study_effects                           15 values  max diff/allowed 2.5e-09
+PASS  C SYNTHETIC_edge_dominant_pm: pooled (all estimators)                 70 values  max diff/allowed 3.8e-05
+PASS  C SYNTHETIC_edge_dominant_pm: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 6.2e-08
+PASS  C SYNTHETIC_edge_dominant_pm: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 4.2e-09
+PASS  C SYNTHETIC_edge_dominant_pm: leave1out                               55 values  max diff/allowed 2.4e-09
+PASS  C SYNTHETIC_edge_dominant_pm: influence                               50 values  max diff/allowed 9.2e-10
+SKIP  C SYNTHETIC_edge_dominant_pm: subgroups                                0 values  no subgroups configured (checked in the config)
+SKIP  C SYNTHETIC_edge_dominant_pm: metareg                                  0 values  no moderators configured (checked in the config)
+SKIP  C SYNTHETIC_edge_dominant_pm: Egger                                    0 values  not run by either engine; checked: k_studies = 5 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_dominant_pm: sensitivity (imputed correlations)      48 values  max diff/allowed 1.6e-09
+PASS  C SYNTHETIC_edge_dominant_fe: excluded studies                         1 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_dominant_fe: study_effects                           15 values  max diff/allowed 2.5e-09
+PASS  C SYNTHETIC_edge_dominant_fe: pooled (all estimators)                 70 values  max diff/allowed 3.8e-05
+PASS  C SYNTHETIC_edge_dominant_fe: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 6.2e-08
+PASS  C SYNTHETIC_edge_dominant_fe: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 4.2e-09
+PASS  C SYNTHETIC_edge_dominant_fe: leave1out                               55 values  max diff/allowed 1.7e-09
+PASS  C SYNTHETIC_edge_dominant_fe: influence                               50 values  max diff/allowed 9.9e-10
+SKIP  C SYNTHETIC_edge_dominant_fe: subgroups                                0 values  no subgroups configured (checked in the config)
+SKIP  C SYNTHETIC_edge_dominant_fe: metareg                                  0 values  no moderators configured (checked in the config)
+SKIP  C SYNTHETIC_edge_dominant_fe: Egger                                    0 values  not run by either engine; checked: k_studies = 5 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_dominant_fe: sensitivity (imputed correlations)      48 values  max diff/allowed 8.2e-10
+PASS  C SYNTHETIC_edge_identical: excluded studies                           1 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_identical: study_effects                             12 values  max diff/allowed 2.0e-09
+PASS  C SYNTHETIC_edge_identical: pooled (all estimators)                   70 values  max diff/allowed 6.1e-11
+PASS  C SYNTHETIC_edge_identical: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 7.1e-12
+PASS  C SYNTHETIC_edge_identical: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 4.8e-11
+PASS  C SYNTHETIC_edge_identical: leave1out                                 44 values  max diff/allowed 5.4e-10
+PASS  C SYNTHETIC_edge_identical: influence                                 40 values  max diff/allowed 2.5e-07
+SKIP  C SYNTHETIC_edge_identical: subgroups                                  0 values  no subgroups configured (checked in the config)
+SKIP  C SYNTHETIC_edge_identical: metareg                                    0 values  no moderators configured (checked in the config)
+SKIP  C SYNTHETIC_edge_identical: Egger                                      0 values  not run by either engine; checked: k_studies = 4 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_identical: sensitivity (imputed correlations)        48 values  max diff/allowed 6.1e-11
+PASS  C SYNTHETIC_edge_identical_always: excluded studies                    1 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_identical_always: study_effects                      12 values  max diff/allowed 2.0e-09
+PASS  C SYNTHETIC_edge_identical_always: pooled (all estimators)            70 values  max diff/allowed 6.1e-11
+PASS  C SYNTHETIC_edge_identical_always: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 7.1e-12
+PASS  C SYNTHETIC_edge_identical_always: pooled test statistic and p (hksj_rule always)    10 values  max diff/allowed 4.8e-11
+PASS  C SYNTHETIC_edge_identical_always: leave1out                          44 values  max diff/allowed 0.0e+00
+SKIP  C SYNTHETIC_edge_identical_always: influence                           0 values  not computed by either engine; checked: HKSJ scale s2 = 0 (Q = 0)
+SKIP  C SYNTHETIC_edge_identical_always: subgroups                           0 values  no subgroups configured (checked in the config)
+SKIP  C SYNTHETIC_edge_identical_always: metareg                             0 values  no moderators configured (checked in the config)
+SKIP  C SYNTHETIC_edge_identical_always: Egger                               0 values  not run by either engine; checked: k_studies = 4 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_identical_always: sensitivity (imputed correlations)    48 values  max diff/allowed 0.0e+00
+PASS  C SYNTHETIC_edge_crossover_md: excluded studies                        2 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_crossover_md: study_effects                          12 values  max diff/allowed 1.3e-09
+PASS  C SYNTHETIC_edge_crossover_md: pooled (all estimators)                70 values  max diff/allowed 2.7e-10
+PASS  C SYNTHETIC_edge_crossover_md: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 2.8e-11
+PASS  C SYNTHETIC_edge_crossover_md: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 4.6e-11
+PASS  C SYNTHETIC_edge_crossover_md: leave1out                              44 values  max diff/allowed 4.1e-05
+PASS  C SYNTHETIC_edge_crossover_md: influence                              40 values  max diff/allowed 5.4e-08
+SKIP  C SYNTHETIC_edge_crossover_md: subgroups                               0 values  no subgroups configured (checked in the config)
+SKIP  C SYNTHETIC_edge_crossover_md: metareg                                 0 values  no moderators configured (checked in the config)
+SKIP  C SYNTHETIC_edge_crossover_md: Egger                                   0 values  not run by either engine; checked: k_studies = 4 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_crossover_md: sensitivity (imputed correlations)     48 values  max diff/allowed 8.4e-06
+PASS  C SYNTHETIC_edge_crossover_md: sensitivity exclude_imputed_or_digitised: re-pooled here from the unflagged studies     8 values  max diff/allowed 0.0e+00
+PASS  C SYNTHETIC_edge_crossover_smd: excluded studies                       2 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_crossover_smd: study_effects                         12 values  max diff/allowed 2.6e-09
+PASS  C SYNTHETIC_edge_crossover_smd: pooled (all estimators)               70 values  max diff/allowed 1.2e-09
+PASS  C SYNTHETIC_edge_crossover_smd: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 4.3e-12
+PASS  C SYNTHETIC_edge_crossover_smd: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 1.0e-11
+PASS  C SYNTHETIC_edge_crossover_smd: leave1out                             44 values  max diff/allowed 9.9e-10
+PASS  C SYNTHETIC_edge_crossover_smd: influence                             40 values  max diff/allowed 2.6e-10
+SKIP  C SYNTHETIC_edge_crossover_smd: subgroups                              0 values  no subgroups configured (checked in the config)
+SKIP  C SYNTHETIC_edge_crossover_smd: metareg                                0 values  no moderators configured (checked in the config)
+SKIP  C SYNTHETIC_edge_crossover_smd: Egger                                  0 values  not run by either engine; checked: k_studies = 4 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_crossover_smd: sensitivity (imputed correlations)    48 values  max diff/allowed 7.7e-10
+PASS  C SYNTHETIC_edge_crossover_smd: sensitivity exclude_imputed_or_digitised: re-pooled here from the unflagged studies     8 values  max diff/allowed 0.0e+00
+PASS  C SYNTHETIC_edge_crossover_smd_noj: excluded studies                   2 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_crossover_smd_noj: study_effects                     12 values  max diff/allowed 3.0e-09
+PASS  C SYNTHETIC_edge_crossover_smd_noj: pooled (all estimators)           70 values  max diff/allowed 1.2e-09
+PASS  C SYNTHETIC_edge_crossover_smd_noj: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 8.8e-12
+PASS  C SYNTHETIC_edge_crossover_smd_noj: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 2.6e-11
+PASS  C SYNTHETIC_edge_crossover_smd_noj: leave1out                         44 values  max diff/allowed 1.1e-09
+PASS  C SYNTHETIC_edge_crossover_smd_noj: influence                         40 values  max diff/allowed 1.2e-10
+SKIP  C SYNTHETIC_edge_crossover_smd_noj: subgroups                          0 values  no subgroups configured (checked in the config)
+SKIP  C SYNTHETIC_edge_crossover_smd_noj: metareg                            0 values  no moderators configured (checked in the config)
+SKIP  C SYNTHETIC_edge_crossover_smd_noj: Egger                              0 values  not run by either engine; checked: k_studies = 4 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_crossover_smd_noj: sensitivity (imputed correlations)    48 values  max diff/allowed 1.3e-09
+PASS  C SYNTHETIC_edge_crossover_smd_noj: sensitivity exclude_imputed_or_digitised: re-pooled here from the unflagged studies     8 values  max diff/allowed 0.0e+00
+PASS  C SYNTHETIC_edge_crossover_rom: excluded studies                       2 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_crossover_rom: study_effects                         12 values  max diff/allowed 2.3e-09
+PASS  C SYNTHETIC_edge_crossover_rom: Geary min mean sqrt(n)/SD              4 values  max diff/allowed 3.2e-11
+PASS  C SYNTHETIC_edge_crossover_rom: pooled (all estimators)               70 values  max diff/allowed 4.3e-10
+PASS  C SYNTHETIC_edge_crossover_rom: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 1.9e-11
+PASS  C SYNTHETIC_edge_crossover_rom: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 3.9e-11
+PASS  C SYNTHETIC_edge_crossover_rom: leave1out                             44 values  max diff/allowed 2.8e-09
+PASS  C SYNTHETIC_edge_crossover_rom: influence                             40 values  max diff/allowed 8.8e-11
+SKIP  C SYNTHETIC_edge_crossover_rom: subgroups                              0 values  no subgroups configured (checked in the config)
+SKIP  C SYNTHETIC_edge_crossover_rom: metareg                                0 values  no moderators configured (checked in the config)
+SKIP  C SYNTHETIC_edge_crossover_rom: Egger                                  0 values  not run by either engine; checked: k_studies = 4 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_crossover_rom: sensitivity (imputed correlations)    48 values  max diff/allowed 1.2e-03
+PASS  C SYNTHETIC_edge_crossover_rom: sensitivity exclude_imputed_or_digitised: re-pooled here from the unflagged studies     8 values  max diff/allowed 0.0e+00
+SKIP  C SYNTHETIC_edge_crossover_rom: sensitivity rom_bias_correction (Python only)     0 values  no R counterpart and no independent re-pool
+PASS  C SYNTHETIC_edge_crossover_rom_bc: excluded studies                    2 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_crossover_rom_bc: study_effects                      12 values  max diff/allowed 1.8e-09
+PASS  C SYNTHETIC_edge_crossover_rom_bc: Geary min mean sqrt(n)/SD           4 values  max diff/allowed 3.2e-11
+PASS  C SYNTHETIC_edge_crossover_rom_bc: pooled (all estimators)            70 values  max diff/allowed 2.0e-09
+PASS  C SYNTHETIC_edge_crossover_rom_bc: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 2.1e-11
+PASS  C SYNTHETIC_edge_crossover_rom_bc: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 3.7e-11
+PASS  C SYNTHETIC_edge_crossover_rom_bc: leave1out                          44 values  max diff/allowed 1.3e-09
+PASS  C SYNTHETIC_edge_crossover_rom_bc: influence                          40 values  max diff/allowed 7.3e-11
+SKIP  C SYNTHETIC_edge_crossover_rom_bc: subgroups                           0 values  no subgroups configured (checked in the config)
+SKIP  C SYNTHETIC_edge_crossover_rom_bc: metareg                             0 values  no moderators configured (checked in the config)
+SKIP  C SYNTHETIC_edge_crossover_rom_bc: Egger                               0 values  not run by either engine; checked: k_studies = 4 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_crossover_rom_bc: sensitivity (imputed correlations)    48 values  max diff/allowed 1.2e-03
+PASS  C SYNTHETIC_edge_crossover_rom_bc: sensitivity exclude_imputed_or_digitised: re-pooled here from the unflagged studies     8 values  max diff/allowed 0.0e+00
+SKIP  C SYNTHETIC_edge_crossover_rom_bc: sensitivity rom_bias_correction (Python only)     0 values  no R counterpart and no independent re-pool
+PASS  C SYNTHETIC_edge_smd_mixed_auto: excluded studies                      1 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_smd_mixed_auto: study_effects                        12 values  max diff/allowed 7.5e-09
+PASS  C SYNTHETIC_edge_smd_mixed_auto: pooled (all estimators)              70 values  max diff/allowed 1.8e-09
+PASS  C SYNTHETIC_edge_smd_mixed_auto: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 5.2e-11
+PASS  C SYNTHETIC_edge_smd_mixed_auto: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 4.2e-10
+PASS  C SYNTHETIC_edge_smd_mixed_auto: leave1out                            44 values  max diff/allowed 1.9e-09
+PASS  C SYNTHETIC_edge_smd_mixed_auto: influence                            40 values  max diff/allowed 4.7e-10
+SKIP  C SYNTHETIC_edge_smd_mixed_auto: subgroups                             0 values  no subgroups configured (checked in the config)
+SKIP  C SYNTHETIC_edge_smd_mixed_auto: metareg                               0 values  no moderators configured (checked in the config)
+SKIP  C SYNTHETIC_edge_smd_mixed_auto: Egger                                 0 values  not run by either engine; checked: k_studies = 4 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_smd_mixed_auto: sensitivity (imputed correlations)    48 values  max diff/allowed 1.3e-09
+PASS  C SYNTHETIC_edge_smd_mixed_change: excluded studies                    1 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_smd_mixed_change: study_effects                       9 values  max diff/allowed 7.8e-09
+PASS  C SYNTHETIC_edge_smd_mixed_change: pooled (all estimators)            70 values  max diff/allowed 3.4e-08
+PASS  C SYNTHETIC_edge_smd_mixed_change: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 4.6e-11
+PASS  C SYNTHETIC_edge_smd_mixed_change: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 3.0e-10
+PASS  C SYNTHETIC_edge_smd_mixed_change: leave1out                          33 values  max diff/allowed 2.6e-09
+PASS  C SYNTHETIC_edge_smd_mixed_change: influence                          30 values  max diff/allowed 1.5e-09
+SKIP  C SYNTHETIC_edge_smd_mixed_change: subgroups                           0 values  no subgroups configured (checked in the config)
+SKIP  C SYNTHETIC_edge_smd_mixed_change: metareg                             0 values  no moderators configured (checked in the config)
+SKIP  C SYNTHETIC_edge_smd_mixed_change: Egger                               0 values  not run by either engine; checked: k_studies = 3 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_smd_mixed_change: sensitivity (imputed correlations)    48 values  max diff/allowed 7.0e-10
+PASS  C SYNTHETIC_edge_adjusted_md: excluded studies                         1 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_adjusted_md: study_effects                            9 values  max diff/allowed 1.7e-09
+PASS  C SYNTHETIC_edge_adjusted_md: pooled (all estimators)                 70 values  max diff/allowed 6.0e-10
+PASS  C SYNTHETIC_edge_adjusted_md: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 1.5e-11
+PASS  C SYNTHETIC_edge_adjusted_md: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 1.5e-11
+PASS  C SYNTHETIC_edge_adjusted_md: leave1out                               33 values  max diff/allowed 1.6e-09
+PASS  C SYNTHETIC_edge_adjusted_md: influence                               30 values  max diff/allowed 4.8e-09
+SKIP  C SYNTHETIC_edge_adjusted_md: subgroups                                0 values  no subgroups configured (checked in the config)
+SKIP  C SYNTHETIC_edge_adjusted_md: metareg                                  0 values  no moderators configured (checked in the config)
+SKIP  C SYNTHETIC_edge_adjusted_md: Egger                                    0 values  not run by either engine; checked: k_studies = 3 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_adjusted_md: sensitivity (imputed correlations)      48 values  max diff/allowed 2.2e-10
+PASS  C SYNTHETIC_edge_range_unused: excluded studies                        1 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_range_unused: study_effects                           9 values  max diff/allowed 1.2e-09
+PASS  C SYNTHETIC_edge_range_unused: pooled (all estimators)                70 values  max diff/allowed 1.3e-09
+PASS  C SYNTHETIC_edge_range_unused: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 7.1e-12
+PASS  C SYNTHETIC_edge_range_unused: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 3.0e-11
+PASS  C SYNTHETIC_edge_range_unused: leave1out                              33 values  max diff/allowed 8.1e-10
+PASS  C SYNTHETIC_edge_range_unused: influence                              30 values  max diff/allowed 1.7e-10
+SKIP  C SYNTHETIC_edge_range_unused: subgroups                               0 values  no subgroups configured (checked in the config)
+SKIP  C SYNTHETIC_edge_range_unused: metareg                                 0 values  no moderators configured (checked in the config)
+SKIP  C SYNTHETIC_edge_range_unused: Egger                                   0 values  not run by either engine; checked: k_studies = 3 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_range_unused: sensitivity (imputed correlations)     48 values  max diff/allowed 1.3e-09
+PASS  C SYNTHETIC_edge_change_r02: excluded studies                          1 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_change_r02: study_effects                            15 values  max diff/allowed 1.4e-09
+PASS  C SYNTHETIC_edge_change_r02: pooled (all estimators)                  70 values  max diff/allowed 1.3e-09
+PASS  C SYNTHETIC_edge_change_r02: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 9.8e-12
+PASS  C SYNTHETIC_edge_change_r02: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 3.4e-11
+PASS  C SYNTHETIC_edge_change_r02: leave1out                                55 values  max diff/allowed 1.2e-09
+PASS  C SYNTHETIC_edge_change_r02: influence                                50 values  max diff/allowed 1.1e-09
+SKIP  C SYNTHETIC_edge_change_r02: subgroups                                 0 values  no subgroups configured (checked in the config)
+SKIP  C SYNTHETIC_edge_change_r02: metareg                                   0 values  no moderators configured (checked in the config)
+SKIP  C SYNTHETIC_edge_change_r02: Egger                                     0 values  not run by either engine; checked: k_studies = 5 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_change_r02: sensitivity (imputed correlations)       40 values  max diff/allowed 1.3e-09
+PASS  C SYNTHETIC_edge_change_r02: sensitivity exclude_imputed_or_digitised: re-pooled here from the unflagged studies     8 values  max diff/allowed 0.0e+00
+PASS  C SYNTHETIC_edge_change_r05: excluded studies                          1 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_change_r05: study_effects                            15 values  max diff/allowed 1.9e-09
+PASS  C SYNTHETIC_edge_change_r05: pooled (all estimators)                  70 values  max diff/allowed 7.0e-10
+PASS  C SYNTHETIC_edge_change_r05: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 7.8e-12
+PASS  C SYNTHETIC_edge_change_r05: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 1.5e-11
+PASS  C SYNTHETIC_edge_change_r05: leave1out                                55 values  max diff/allowed 8.5e-10
+PASS  C SYNTHETIC_edge_change_r05: influence                                50 values  max diff/allowed 8.5e-10
+SKIP  C SYNTHETIC_edge_change_r05: subgroups                                 0 values  no subgroups configured (checked in the config)
+SKIP  C SYNTHETIC_edge_change_r05: metareg                                   0 values  no moderators configured (checked in the config)
+SKIP  C SYNTHETIC_edge_change_r05: Egger                                     0 values  not run by either engine; checked: k_studies = 5 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_change_r05: sensitivity (imputed correlations)       48 values  max diff/allowed 1.3e-09
+PASS  C SYNTHETIC_edge_change_r05: sensitivity exclude_imputed_or_digitised: re-pooled here from the unflagged studies     8 values  max diff/allowed 0.0e+00
+PASS  C SYNTHETIC_edge_change_r08: excluded studies                          1 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_change_r08: study_effects                            15 values  max diff/allowed 1.4e-09
+PASS  C SYNTHETIC_edge_change_r08: pooled (all estimators)                  70 values  max diff/allowed 6.2e-10
+PASS  C SYNTHETIC_edge_change_r08: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 6.3e-12
+PASS  C SYNTHETIC_edge_change_r08: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 6.6e-11
+PASS  C SYNTHETIC_edge_change_r08: leave1out                                55 values  max diff/allowed 1.3e-09
+PASS  C SYNTHETIC_edge_change_r08: influence                                50 values  max diff/allowed 5.1e-10
+SKIP  C SYNTHETIC_edge_change_r08: subgroups                                 0 values  no subgroups configured (checked in the config)
+SKIP  C SYNTHETIC_edge_change_r08: metareg                                   0 values  no moderators configured (checked in the config)
+SKIP  C SYNTHETIC_edge_change_r08: Egger                                     0 values  not run by either engine; checked: k_studies = 5 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_change_r08: sensitivity (imputed correlations)       40 values  max diff/allowed 1.3e-09
+PASS  C SYNTHETIC_edge_change_r08: sensitivity exclude_imputed_or_digitised: re-pooled here from the unflagged studies     8 values  max diff/allowed 0.0e+00
+PASS  C SYNTHETIC_edge_change_auto: excluded studies                         1 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_change_auto: study_effects                           15 values  max diff/allowed 2.5e-09
+PASS  C SYNTHETIC_edge_change_auto: pooled (all estimators)                 70 values  max diff/allowed 1.2e-09
+PASS  C SYNTHETIC_edge_change_auto: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 4.7e-12
+PASS  C SYNTHETIC_edge_change_auto: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 1.8e-11
+PASS  C SYNTHETIC_edge_change_auto: leave1out                               55 values  max diff/allowed 1.2e-09
+PASS  C SYNTHETIC_edge_change_auto: influence                               50 values  max diff/allowed 1.0e-09
+SKIP  C SYNTHETIC_edge_change_auto: subgroups                                0 values  no subgroups configured (checked in the config)
+SKIP  C SYNTHETIC_edge_change_auto: metareg                                  0 values  no moderators configured (checked in the config)
+SKIP  C SYNTHETIC_edge_change_auto: Egger                                    0 values  not run by either engine; checked: k_studies = 5 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_change_auto: sensitivity (imputed correlations)      48 values  max diff/allowed 1.2e-09
+PASS  C SYNTHETIC_edge_change_auto: sensitivity exclude_imputed_or_digitised: re-pooled here from the unflagged studies     8 values  max diff/allowed 0.0e+00
+PASS  C SYNTHETIC_edge_change_smd: excluded studies                          3 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_change_smd: study_effects                             6 values  max diff/allowed 4.6e-09
+PASS  C SYNTHETIC_edge_change_smd: pooled (all estimators)                  70 values  max diff/allowed 1.2e-09
+PASS  C SYNTHETIC_edge_change_smd: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 3.4e-11
+PASS  C SYNTHETIC_edge_change_smd: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 8.0e-11
+SKIP  C SYNTHETIC_edge_change_smd: leave1out                                 0 values  not run by either engine; checked: k_studies = 2, pooled = True (runs only when pooled and k >= 3)
+SKIP  C SYNTHETIC_edge_change_smd: influence                                 0 values  not computed by either engine; checked: k = 2, pooled = True (runs only when pooled and k >= 3)
+SKIP  C SYNTHETIC_edge_change_smd: subgroups                                 0 values  no subgroups configured (checked in the config)
+SKIP  C SYNTHETIC_edge_change_smd: metareg                                   0 values  no moderators configured (checked in the config)
+SKIP  C SYNTHETIC_edge_change_smd: Egger                                     0 values  not run by either engine; checked: k_studies = 2 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_change_smd: sensitivity (imputed correlations)       48 values  max diff/allowed 1.2e-09
+PASS  C SYNTHETIC_edge_three_arm: excluded studies                           1 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_three_arm: study_effects                             15 values  max diff/allowed 2.3e-09
+PASS  C SYNTHETIC_edge_three_arm: pooled (all estimators)                   70 values  max diff/allowed 3.3e-07
+PASS  C SYNTHETIC_edge_three_arm: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 3.9e-10
+PASS  C SYNTHETIC_edge_three_arm: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 1.5e-10
+PASS  C SYNTHETIC_edge_three_arm: leave1out                                 44 values  max diff/allowed 2.9e-07
+PASS  C SYNTHETIC_edge_three_arm: influence                                 50 values  max diff/allowed 2.8e-08
+SKIP  C SYNTHETIC_edge_three_arm: subgroups                                  0 values  no subgroups configured (checked in the config)
+PASS  C SYNTHETIC_edge_three_arm: metareg                                   32 values  max diff/allowed 1.9e-06
+SKIP  C SYNTHETIC_edge_three_arm: Egger                                      0 values  not run by either engine; checked: k_studies = 4 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_three_arm: sensitivity (imputed correlations)        48 values  max diff/allowed 2.8e-07
+PASS  C SYNTHETIC_edge_three_arm_combine: excluded studies                   1 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_three_arm_combine: study_effects                     12 values  max diff/allowed 2.3e-09
+PASS  C SYNTHETIC_edge_three_arm_combine: pooled (all estimators)           70 values  max diff/allowed 1.0e-05
+PASS  C SYNTHETIC_edge_three_arm_combine: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 1.1e-08
+PASS  C SYNTHETIC_edge_three_arm_combine: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 2.3e-09
+PASS  C SYNTHETIC_edge_three_arm_combine: leave1out                         44 values  max diff/allowed 7.0e-06
+PASS  C SYNTHETIC_edge_three_arm_combine: influence                         40 values  max diff/allowed 9.4e-07
+SKIP  C SYNTHETIC_edge_three_arm_combine: subgroups                          0 values  no subgroups configured (checked in the config)
+SKIP  C SYNTHETIC_edge_three_arm_combine: metareg                            0 values  no moderators configured (checked in the config)
+SKIP  C SYNTHETIC_edge_three_arm_combine: Egger                              0 values  not run by either engine; checked: k_studies = 4 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_three_arm_combine: sensitivity (imputed correlations)    48 values  max diff/allowed 2.8e-06
+PASS  C SYNTHETIC_edge_three_arm_combine_dose: excluded studies              1 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_three_arm_combine_dose: study_effects                12 values  max diff/allowed 2.3e-09
+PASS  C SYNTHETIC_edge_three_arm_combine_dose: pooled (all estimators)      70 values  max diff/allowed 1.0e-05
+PASS  C SYNTHETIC_edge_three_arm_combine_dose: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 1.1e-08
+PASS  C SYNTHETIC_edge_three_arm_combine_dose: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 2.3e-09
+PASS  C SYNTHETIC_edge_three_arm_combine_dose: leave1out                    44 values  max diff/allowed 7.0e-06
+PASS  C SYNTHETIC_edge_three_arm_combine_dose: influence                    40 values  max diff/allowed 9.4e-07
+SKIP  C SYNTHETIC_edge_three_arm_combine_dose: subgroups                     0 values  no subgroups configured (checked in the config)
+PASS  C SYNTHETIC_edge_three_arm_combine_dose: metareg                      32 values  max diff/allowed 1.1e-09
+SKIP  C SYNTHETIC_edge_three_arm_combine_dose: Egger                         0 values  not run by either engine; checked: k_studies = 4 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_three_arm_combine_dose: sensitivity (imputed correlations)    48 values  max diff/allowed 2.8e-06
+PASS  C SYNTHETIC_edge_crossover_change_only: excluded studies               1 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_crossover_change_only: study_effects                  9 values  max diff/allowed 1.4e-09
+PASS  C SYNTHETIC_edge_crossover_change_only: pooled (all estimators)       70 values  max diff/allowed 4.1e-10
+PASS  C SYNTHETIC_edge_crossover_change_only: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 3.9e-11
+PASS  C SYNTHETIC_edge_crossover_change_only: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 1.2e-11
+PASS  C SYNTHETIC_edge_crossover_change_only: leave1out                     33 values  max diff/allowed 2.6e-10
+PASS  C SYNTHETIC_edge_crossover_change_only: influence                     30 values  max diff/allowed 2.6e-11
+SKIP  C SYNTHETIC_edge_crossover_change_only: subgroups                      0 values  no subgroups configured (checked in the config)
+SKIP  C SYNTHETIC_edge_crossover_change_only: metareg                        0 values  no moderators configured (checked in the config)
+SKIP  C SYNTHETIC_edge_crossover_change_only: Egger                          0 values  not run by either engine; checked: k_studies = 3 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_crossover_change_only: sensitivity (imputed correlations)    48 values  max diff/allowed 1.5e-10
+PASS  C SYNTHETIC_edge_const_dose: excluded studies                          1 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_const_dose: study_effects                            12 values  max diff/allowed 3.5e-09
+PASS  C SYNTHETIC_edge_const_dose: pooled (all estimators)                  70 values  max diff/allowed 6.5e-10
+PASS  C SYNTHETIC_edge_const_dose: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 6.2e-12
+PASS  C SYNTHETIC_edge_const_dose: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 1.6e-11
+PASS  C SYNTHETIC_edge_const_dose: leave1out                                44 values  max diff/allowed 1.3e-09
+PASS  C SYNTHETIC_edge_const_dose: influence                                40 values  max diff/allowed 2.0e-09
+SKIP  C SYNTHETIC_edge_const_dose: subgroups                                 0 values  no subgroups configured (checked in the config)
+SKIP  C SYNTHETIC_edge_const_dose: metareg                                   0 values  not fitted by either engine; checked: dose_mg_day: not estimable (k <= p, collinear or constant moderator)
+SKIP  C SYNTHETIC_edge_const_dose: Egger                                     0 values  not run by either engine; checked: k_studies = 4 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_const_dose: sensitivity (imputed correlations)       48 values  max diff/allowed 4.4e-10
+PASS  C SYNTHETIC_edge_three_arm_smd: excluded studies                       1 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_three_arm_smd: study_effects                         15 values  max diff/allowed 1.5e-08
+PASS  C SYNTHETIC_edge_three_arm_smd: pooled (all estimators)               70 values  max diff/allowed 8.1e-08
+PASS  C SYNTHETIC_edge_three_arm_smd: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 7.4e-11
+PASS  C SYNTHETIC_edge_three_arm_smd: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 3.9e-09
+PASS  C SYNTHETIC_edge_three_arm_smd: leave1out                             44 values  max diff/allowed 7.3e-06
+PASS  C SYNTHETIC_edge_three_arm_smd: influence                             50 values  max diff/allowed 4.0e-06
+SKIP  C SYNTHETIC_edge_three_arm_smd: subgroups                              0 values  no subgroups configured (checked in the config)
+SKIP  C SYNTHETIC_edge_three_arm_smd: metareg                                0 values  no moderators configured (checked in the config)
+SKIP  C SYNTHETIC_edge_three_arm_smd: Egger                                  0 values  not run by either engine; checked: k_studies = 4 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_three_arm_smd: sensitivity (imputed correlations)    48 values  max diff/allowed 3.9e-08
+PASS  C SYNTHETIC_edge_three_arm_rom: excluded studies                       1 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_three_arm_rom: study_effects                         15 values  max diff/allowed 1.4e-09
+PASS  C SYNTHETIC_edge_three_arm_rom: Geary min mean sqrt(n)/SD              5 values  max diff/allowed 2.0e-11
+PASS  C SYNTHETIC_edge_three_arm_rom: pooled (all estimators)               70 values  max diff/allowed 3.0e-05
+PASS  C SYNTHETIC_edge_three_arm_rom: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 3.2e-08
+PASS  C SYNTHETIC_edge_three_arm_rom: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 7.7e-09
+PASS  C SYNTHETIC_edge_three_arm_rom: leave1out                             44 values  max diff/allowed 6.6e-05
+PASS  C SYNTHETIC_edge_three_arm_rom: influence                             50 values  max diff/allowed 1.0e-06
+SKIP  C SYNTHETIC_edge_three_arm_rom: subgroups                              0 values  no subgroups configured (checked in the config)
+SKIP  C SYNTHETIC_edge_three_arm_rom: metareg                                0 values  no moderators configured (checked in the config)
+SKIP  C SYNTHETIC_edge_three_arm_rom: Egger                                  0 values  not run by either engine; checked: k_studies = 4 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_three_arm_rom: sensitivity (imputed correlations)    48 values  max diff/allowed 3.0e-05
+SKIP  C SYNTHETIC_edge_three_arm_rom: sensitivity rom_bias_correction (Python only)     0 values  no R counterpart and no independent re-pool
+PASS  C SYNTHETIC_edge_paired_multi_split: excluded studies                  1 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_paired_multi_split: study_effects                     9 values  max diff/allowed 1.7e-09
+PASS  C SYNTHETIC_edge_paired_multi_split: pooled (all estimators)          70 values  max diff/allowed 3.0e-06
+PASS  C SYNTHETIC_edge_paired_multi_split: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 2.8e-09
+PASS  C SYNTHETIC_edge_paired_multi_split: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 1.3e-10
+PASS  C SYNTHETIC_edge_paired_multi_split: leave1out                        33 values  max diff/allowed 1.8e-09
+PASS  C SYNTHETIC_edge_paired_multi_split: influence                        30 values  max diff/allowed 2.7e-08
+SKIP  C SYNTHETIC_edge_paired_multi_split: subgroups                         0 values  no subgroups configured (checked in the config)
+SKIP  C SYNTHETIC_edge_paired_multi_split: metareg                           0 values  no moderators configured (checked in the config)
+SKIP  C SYNTHETIC_edge_paired_multi_split: Egger                             0 values  not run by either engine; checked: k_studies = 3 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_paired_multi_split: sensitivity (imputed correlations)    48 values  max diff/allowed 2.3e-06
+PASS  C SYNTHETIC_edge_paired_multi_combine: excluded studies                1 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_paired_multi_combine: study_effects                  12 values  max diff/allowed 3.2e-09
+PASS  C SYNTHETIC_edge_paired_multi_combine: pooled (all estimators)        70 values  max diff/allowed 2.8e-05
+PASS  C SYNTHETIC_edge_paired_multi_combine: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 2.4e-08
+PASS  C SYNTHETIC_edge_paired_multi_combine: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 7.3e-07
+PASS  C SYNTHETIC_edge_paired_multi_combine: leave1out                      44 values  max diff/allowed 8.6e-06
+PASS  C SYNTHETIC_edge_paired_multi_combine: influence                      40 values  max diff/allowed 9.3e-07
+SKIP  C SYNTHETIC_edge_paired_multi_combine: subgroups                       0 values  no subgroups configured (checked in the config)
+SKIP  C SYNTHETIC_edge_paired_multi_combine: metareg                         0 values  no moderators configured (checked in the config)
+SKIP  C SYNTHETIC_edge_paired_multi_combine: Egger                           0 values  not run by either engine; checked: k_studies = 4 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_paired_multi_combine: sensitivity (imputed correlations)    48 values  max diff/allowed 2.8e-05
+PASS  C SYNTHETIC_edge_two_timepoints: excluded studies                      1 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_two_timepoints: study_effects                        12 values  max diff/allowed 3.5e-09
+PASS  C SYNTHETIC_edge_two_timepoints: pooled (all estimators)              70 values  max diff/allowed 2.6e-10
+PASS  C SYNTHETIC_edge_two_timepoints: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 1.1e-11
+PASS  C SYNTHETIC_edge_two_timepoints: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 1.1e-10
+PASS  C SYNTHETIC_edge_two_timepoints: leave1out                            44 values  max diff/allowed 1.2e-09
+PASS  C SYNTHETIC_edge_two_timepoints: influence                            40 values  max diff/allowed 6.5e-10
+SKIP  C SYNTHETIC_edge_two_timepoints: subgroups                             0 values  no subgroups configured (checked in the config)
+SKIP  C SYNTHETIC_edge_two_timepoints: metareg                               0 values  no moderators configured (checked in the config)
+SKIP  C SYNTHETIC_edge_two_timepoints: Egger                                 0 values  not run by either engine; checked: k_studies = 4 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_two_timepoints: sensitivity (imputed correlations)    48 values  max diff/allowed 2.0e-10
+PASS  C SYNTHETIC_edge_tp_units_last: excluded studies                       1 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_tp_units_last: study_effects                         12 values  max diff/allowed 1.3e-09
+PASS  C SYNTHETIC_edge_tp_units_last: pooled (all estimators)               70 values  max diff/allowed 5.5e-10
+PASS  C SYNTHETIC_edge_tp_units_last: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 6.7e-12
+PASS  C SYNTHETIC_edge_tp_units_last: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 6.8e-11
+PASS  C SYNTHETIC_edge_tp_units_last: leave1out                             44 values  max diff/allowed 1.7e-09
+PASS  C SYNTHETIC_edge_tp_units_last: influence                             40 values  max diff/allowed 1.9e-09
+SKIP  C SYNTHETIC_edge_tp_units_last: subgroups                              0 values  no subgroups configured (checked in the config)
+SKIP  C SYNTHETIC_edge_tp_units_last: metareg                                0 values  no moderators configured (checked in the config)
+SKIP  C SYNTHETIC_edge_tp_units_last: Egger                                  0 values  not run by either engine; checked: k_studies = 4 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_tp_units_last: sensitivity (imputed correlations)    48 values  max diff/allowed 2.6e-10
+PASS  C SYNTHETIC_edge_tp_units_wk6: excluded studies                        3 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_tp_units_wk6: study_effects                           6 values  max diff/allowed 1.9e-09
+PASS  C SYNTHETIC_edge_tp_units_wk6: pooled (all estimators)                70 values  max diff/allowed 2.7e-10
+PASS  C SYNTHETIC_edge_tp_units_wk6: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 2.5e-11
+PASS  C SYNTHETIC_edge_tp_units_wk6: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 9.6e-11
+SKIP  C SYNTHETIC_edge_tp_units_wk6: leave1out                               0 values  not run by either engine; checked: k_studies = 2, pooled = True (runs only when pooled and k >= 3)
+SKIP  C SYNTHETIC_edge_tp_units_wk6: influence                               0 values  not computed by either engine; checked: k = 2, pooled = True (runs only when pooled and k >= 3)
+SKIP  C SYNTHETIC_edge_tp_units_wk6: subgroups                               0 values  no subgroups configured (checked in the config)
+SKIP  C SYNTHETIC_edge_tp_units_wk6: metareg                                 0 values  no moderators configured (checked in the config)
+SKIP  C SYNTHETIC_edge_tp_units_wk6: Egger                                   0 values  not run by either engine; checked: k_studies = 2 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_tp_units_wk6: sensitivity (imputed correlations)     48 values  max diff/allowed 2.7e-10
+PASS  C SYNTHETIC_edge_geary_flag: excluded studies                          1 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_geary_flag: study_effects                            12 values  max diff/allowed 1.2e-09
+PASS  C SYNTHETIC_edge_geary_flag: Geary min mean sqrt(n)/SD                 4 values  max diff/allowed 2.2e-11
+PASS  C SYNTHETIC_edge_geary_flag: pooled (all estimators)                  70 values  max diff/allowed 8.7e-10
+PASS  C SYNTHETIC_edge_geary_flag: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 1.2e-11
+PASS  C SYNTHETIC_edge_geary_flag: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 5.3e-11
+PASS  C SYNTHETIC_edge_geary_flag: leave1out                                44 values  max diff/allowed 9.5e-10
+PASS  C SYNTHETIC_edge_geary_flag: influence                                40 values  max diff/allowed 3.5e-09
+SKIP  C SYNTHETIC_edge_geary_flag: subgroups                                 0 values  no subgroups configured (checked in the config)
+SKIP  C SYNTHETIC_edge_geary_flag: metareg                                   0 values  no moderators configured (checked in the config)
+SKIP  C SYNTHETIC_edge_geary_flag: Egger                                     0 values  not run by either engine; checked: k_studies = 4 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_geary_flag: sensitivity (imputed correlations)       48 values  max diff/allowed 6.7e-10
+SKIP  C SYNTHETIC_edge_geary_flag: sensitivity rom_bias_correction (Python only)     0 values  no R counterpart and no independent re-pool
+PASS  C SYNTHETIC_edge_geary_exclude: excluded studies                       1 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_geary_exclude: study_effects                          9 values  max diff/allowed 1.2e-09
+PASS  C SYNTHETIC_edge_geary_exclude: Geary min mean sqrt(n)/SD              3 values  max diff/allowed 2.2e-11
+PASS  C SYNTHETIC_edge_geary_exclude: pooled (all estimators)               70 values  max diff/allowed 7.6e-08
+PASS  C SYNTHETIC_edge_geary_exclude: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 7.3e-12
+PASS  C SYNTHETIC_edge_geary_exclude: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 8.9e-11
+PASS  C SYNTHETIC_edge_geary_exclude: leave1out                             33 values  max diff/allowed 4.3e-10
+PASS  C SYNTHETIC_edge_geary_exclude: influence                             30 values  max diff/allowed 2.9e-09
+SKIP  C SYNTHETIC_edge_geary_exclude: subgroups                              0 values  no subgroups configured (checked in the config)
+SKIP  C SYNTHETIC_edge_geary_exclude: metareg                                0 values  no moderators configured (checked in the config)
+SKIP  C SYNTHETIC_edge_geary_exclude: Egger                                  0 values  not run by either engine; checked: k_studies = 3 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_geary_exclude: sensitivity (imputed correlations)    48 values  max diff/allowed 4.9e-10
+SKIP  C SYNTHETIC_edge_geary_exclude: sensitivity rom_bias_correction (Python only)     0 values  no R counterpart and no independent re-pool
+PASS  C SYNTHETIC_edge_median: excluded studies                              1 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_median: study_effects                                12 values  max diff/allowed 1.2e-09
+PASS  C SYNTHETIC_edge_median: pooled (all estimators)                      70 values  max diff/allowed 4.7e-06
+PASS  C SYNTHETIC_edge_median: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 4.7e-09
+PASS  C SYNTHETIC_edge_median: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 7.8e-09
+PASS  C SYNTHETIC_edge_median: leave1out                                    44 values  max diff/allowed 9.7e-06
+PASS  C SYNTHETIC_edge_median: influence                                    40 values  max diff/allowed 1.4e-06
+SKIP  C SYNTHETIC_edge_median: subgroups                                     0 values  no subgroups configured (checked in the config)
+SKIP  C SYNTHETIC_edge_median: metareg                                       0 values  no moderators configured (checked in the config)
+SKIP  C SYNTHETIC_edge_median: Egger                                         0 values  not run by either engine; checked: k_studies = 4 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_median: sensitivity (imputed correlations)           48 values  max diff/allowed 4.7e-06
+SKIP  C SYNTHETIC_edge_median: sensitivity median_method (Python only)       0 values  no R counterpart and no independent re-pool
+PASS  C SYNTHETIC_edge_median: sensitivity exclude_converted_from_median: re-pooled here from the unflagged studies     8 values  max diff/allowed 0.0e+00
+PASS  C SYNTHETIC_edge_median: sensitivity exclude_imputed_or_digitised: re-pooled here from the unflagged studies     8 values  max diff/allowed 0.0e+00
+PASS  C SYNTHETIC_edge_median_strict: excluded studies                       1 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_median_strict: study_effects                          9 values  max diff/allowed 1.2e-09
+PASS  C SYNTHETIC_edge_median_strict: pooled (all estimators)               70 values  max diff/allowed 9.7e-06
+PASS  C SYNTHETIC_edge_median_strict: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 1.4e-08
+PASS  C SYNTHETIC_edge_median_strict: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 9.1e-09
+PASS  C SYNTHETIC_edge_median_strict: leave1out                             33 values  max diff/allowed 4.4e-10
+PASS  C SYNTHETIC_edge_median_strict: influence                             30 values  max diff/allowed 3.8e-06
+SKIP  C SYNTHETIC_edge_median_strict: subgroups                              0 values  no subgroups configured (checked in the config)
+SKIP  C SYNTHETIC_edge_median_strict: metareg                                0 values  no moderators configured (checked in the config)
+SKIP  C SYNTHETIC_edge_median_strict: Egger                                  0 values  not run by either engine; checked: k_studies = 3 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_median_strict: sensitivity (imputed correlations)    48 values  max diff/allowed 9.7e-06
+SKIP  C SYNTHETIC_edge_median_strict: sensitivity median_method (Python only)     0 values  no R counterpart and no independent re-pool
+PASS  C SYNTHETIC_edge_median_strict: sensitivity exclude_converted_from_median: re-pooled here from the unflagged studies     8 values  max diff/allowed 0.0e+00
+SKIP  C SYNTHETIC_edge_median_strict: sensitivity allow_range_only (Python only)     0 values  no R counterpart and no independent re-pool
+PASS  C SYNTHETIC_edge_median_wan: excluded studies                          1 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_median_wan: study_effects                            12 values  max diff/allowed 1.2e-09
+PASS  C SYNTHETIC_edge_median_wan: pooled (all estimators)                  70 values  max diff/allowed 5.5e-06
+PASS  C SYNTHETIC_edge_median_wan: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 5.6e-09
+PASS  C SYNTHETIC_edge_median_wan: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 9.0e-09
+PASS  C SYNTHETIC_edge_median_wan: leave1out                                44 values  max diff/allowed 5.9e-06
+PASS  C SYNTHETIC_edge_median_wan: influence                                40 values  max diff/allowed 3.8e-07
+SKIP  C SYNTHETIC_edge_median_wan: subgroups                                 0 values  no subgroups configured (checked in the config)
+SKIP  C SYNTHETIC_edge_median_wan: metareg                                   0 values  no moderators configured (checked in the config)
+SKIP  C SYNTHETIC_edge_median_wan: Egger                                     0 values  not run by either engine; checked: k_studies = 4 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_median_wan: sensitivity (imputed correlations)       48 values  max diff/allowed 5.5e-06
+SKIP  C SYNTHETIC_edge_median_wan: sensitivity median_method (Python only)     0 values  no R counterpart and no independent re-pool
+PASS  C SYNTHETIC_edge_median_wan: sensitivity exclude_converted_from_median: re-pooled here from the unflagged studies     8 values  max diff/allowed 0.0e+00
+PASS  C SYNTHETIC_edge_median_wan: sensitivity exclude_imputed_or_digitised: re-pooled here from the unflagged studies     8 values  max diff/allowed 0.0e+00
+PASS  C SYNTHETIC_edge_k9: excluded studies                                  1 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_k9: study_effects                                    27 values  max diff/allowed 2.5e-09
+PASS  C SYNTHETIC_edge_k9: pooled (all estimators)                          70 values  max diff/allowed 8.0e-06
+PASS  C SYNTHETIC_edge_k9: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 1.0e-08
+PASS  C SYNTHETIC_edge_k9: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 3.6e-08
+PASS  C SYNTHETIC_edge_k9: leave1out                                        99 values  max diff/allowed 1.0e-05
+PASS  C SYNTHETIC_edge_k9: influence                                        90 values  max diff/allowed 9.7e-07
+SKIP  C SYNTHETIC_edge_k9: subgroups                                         0 values  no subgroups configured (checked in the config)
+SKIP  C SYNTHETIC_edge_k9: metareg                                           0 values  no moderators configured (checked in the config)
+SKIP  C SYNTHETIC_edge_k9: Egger                                             0 values  not run by either engine; checked: k_studies = 9 < egger_min_k = 10
+PASS  C SYNTHETIC_edge_k9: sensitivity (imputed correlations)               48 values  max diff/allowed 7.2e-06
+PASS  C SYNTHETIC_edge_k10: excluded studies                                 1 values  max diff/allowed -
+PASS  C SYNTHETIC_edge_k10: study_effects                                   30 values  max diff/allowed 4.8e-09
+PASS  C SYNTHETIC_edge_k10: pooled (all estimators)                         70 values  max diff/allowed 3.9e-06
+PASS  C SYNTHETIC_edge_k10: pooled Wald/HKSJ/truncated-HKSJ intervals and rule    45 values  max diff/allowed 7.3e-09
+PASS  C SYNTHETIC_edge_k10: pooled test statistic and p (hksj_rule revman)    10 values  max diff/allowed 1.7e-09
+PASS  C SYNTHETIC_edge_k10: leave1out                                      110 values  max diff/allowed 6.3e-06
+PASS  C SYNTHETIC_edge_k10: influence                                      100 values  max diff/allowed 1.3e-07
+SKIP  C SYNTHETIC_edge_k10: subgroups                                        0 values  no subgroups configured (checked in the config)
+SKIP  C SYNTHETIC_edge_k10: metareg                                          0 values  no moderators configured (checked in the config)
+PASS  C SYNTHETIC_edge_k10: Egger (k >= egger_min_k)                         8 values  max diff/allowed 1.8e-09
+PASS  C SYNTHETIC_edge_k10: sensitivity (imputed correlations)              48 values  max diff/allowed 1.3e-06
+
+C  hand calculations from the cited formulas (Handbook 6.5.2.8, 23.2.7, 23.3.4, Table 6.5.a; Wan 2014; Luo 2018; Elbourne 2002)
+-------------------------------------------------------------------------------------------------------------------------------
+PASS  C  hand formulas: Python study effects                                66 values  max diff/allowed 0.0e+00
+PASS  C  hand formulas: R study effects                                     66 values  max diff/allowed 3.2e-09
+PASS  C  tau2_zero: every random-effects tau2 is exactly 0 (python)          4 values  max diff/allowed -
+PASS  C  tau2_zero: hksj_rule revman falls back to the Wald interval (python)     4 values  max diff/allowed -
+PASS  C  k = 2: no pooled estimate at the default min_k_pool = 3 (python)     5 values  max diff/allowed -
+PASS  C  combined three-arm trial: dose blank, range 300-1000, never the placebo 0 (python)     1 values  max diff/allowed -
+PASS  C  SYNTHETIC_edge_crossover_change_only: expected exclusion present (python)     1 values  max diff/allowed -
+PASS  C  SYNTHETIC_edge_paired_multi_split: expected exclusion present (python)     1 values  max diff/allowed -
+PASS  C  SYNTHETIC_edge_tp_units_last: expected exclusion present (python)     1 values  max diff/allowed -
+PASS  C  SYNTHETIC_edge_geary_exclude: expected exclusion present (python)     1 values  max diff/allowed -
+PASS  C  SYNTHETIC_edge_median_strict: expected exclusion present (python)     1 values  max diff/allowed -
+PASS  C  SYNTHETIC_edge_change_smd: expected exclusion present (python)      1 values  max diff/allowed -
+PASS  C  SYNTHETIC_edge_crossover_md: multi-period crossover X-5 excluded (python)     1 values  max diff/allowed -
+PASS  C  SYNTHETIC_edge_crossover_md: multi-period crossover X-5 excluded (R)     1 values  max diff/allowed -
+PASS  C  SYNTHETIC_edge_crossover_smd: multi-period crossover X-5 excluded (python)     1 values  max diff/allowed -
+PASS  C  SYNTHETIC_edge_crossover_smd: multi-period crossover X-5 excluded (R)     1 values  max diff/allowed -
+PASS  C  SYNTHETIC_edge_crossover_rom: multi-period crossover X-5 excluded (python)     1 values  max diff/allowed -
+PASS  C  SYNTHETIC_edge_crossover_rom: multi-period crossover X-5 excluded (R)     1 values  max diff/allowed -
+PASS  C  SYNTHETIC_edge_crossover_md: SYNTHETIC-X-6 excluded ('complete pairs') (python)     1 values  max diff/allowed -
+PASS  C  SYNTHETIC_edge_crossover_md: SYNTHETIC-X-6 excluded ('complete pairs') (R)     1 values  max diff/allowed -
+PASS  C  SYNTHETIC_edge_crossover_smd: SYNTHETIC-X-6 excluded ('complete pairs') (python)     1 values  max diff/allowed -
+PASS  C  SYNTHETIC_edge_crossover_smd: SYNTHETIC-X-6 excluded ('complete pairs') (R)     1 values  max diff/allowed -
+PASS  C  SYNTHETIC_edge_crossover_rom: SYNTHETIC-X-6 excluded ('complete pairs') (python)     1 values  max diff/allowed -
+PASS  C  SYNTHETIC_edge_crossover_rom: SYNTHETIC-X-6 excluded ('complete pairs') (R)     1 values  max diff/allowed -
+PASS  C  SYNTHETIC_edge_smd_mixed_change: SYNTHETIC-SM-4 excluded ('10.5.2') (python)     1 values  max diff/allowed -
+PASS  C  SYNTHETIC_edge_smd_mixed_change: SYNTHETIC-SM-4 excluded ('10.5.2') (R)     1 values  max diff/allowed -
+PASS  C  SYNTHETIC_edge_smd_mixed_auto: crossover SM-4 kept under auto (python)     1 values  max diff/allowed -
+PASS  C  SYNTHETIC_edge_smd_mixed_auto: crossover SM-4 kept under auto (R)     1 values  max diff/allowed -
+PASS  C  Egger runs at k = 10 and not at k = 9 (python)                      2 values  max diff/allowed -
+
+Summary
+-------
+696 checks passed, 0 failed, 231 skipped, 28904 values compared.
+Skipped (231; reasons are on each SKIP line above).

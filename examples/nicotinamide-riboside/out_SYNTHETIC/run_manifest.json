@@ -1,0 +1,56 @@
+{
+  "metaproof_version": "0.1.0",
+  "run_at": "2026-11-02T08:45:11+00:00",
+  "extraction": "examples/nicotinamide-riboside/SYNTHETIC_nr_like_extraction.csv",
+  "extraction_sha256": "f0e5a8fbfbf6e62c445768bcf218516cced0dab2e113b371f2b0e9285c9f5341",
+  "config": "examples/nicotinamide-riboside/SYNTHETIC_nr_like_config.yaml",
+  "config_sha256": "504b2919f795e2a8d271f8b45a060de2910532d0c62e9ec7e5d684ede918f536",
+  "analyses": [
+    {
+      "analysis": "SYNTHETIC_whole_blood_nad",
+      "folder": "SYNTHETIC_whole_blood_nad",
+      "outcome": "SYNTHETIC_whole_blood_nad",
+      "k": 5,
+      "k_studies": 5,
+      "pooled": true
+    },
+    {
+      "analysis": "SYNTHETIC_whole_blood_nad_earliest",
+      "folder": "SYNTHETIC_whole_blood_nad_earliest",
+      "outcome": "SYNTHETIC_whole_blood_nad",
+      "k": 5,
+      "k_studies": 5,
+      "pooled": true
+    },
+    {
+      "analysis": "SYNTHETIC_whole_blood_nad_by_dose",
+      "folder": "SYNTHETIC_whole_blood_nad_by_dose",
+      "outcome": "SYNTHETIC_whole_blood_nad",
+      "k": 6,
+      "k_studies": 5,
+      "pooled": true
+    },
+    {
+      "analysis": "SYNTHETIC_sbp",
+      "folder": "SYNTHETIC_sbp",
+      "outcome": "SYNTHETIC_sbp",
+      "k": 4,
+      "k_studies": 4,
+      "pooled": true
+    },
+    {
+      "analysis": "SYNTHETIC_cognitive_score",
+      "folder": "SYNTHETIC_cognitive_score",
+      "outcome": "SYNTHETIC_cognitive_score",
+      "k": 4,
+      "k_studies": 4,
+      "pooled": true
+    }
+  ],
+  "removed_folders": [],
+  "extraction_check": {
+    "other_errors": 0,
+    "warnings": 0,
+    "unused_outcomes": []
+  }
+}
