@@ -2,7 +2,7 @@
 
 A meta-analysis takes trials that tested the same thing and combines them into one result.
 
-In the made-up NR example in this repo, 4 trials measured systolic blood pressure and each found NR lowered it by 1.5 to 3 mmHg. None of them could tell on its own, since every trial's confidence interval crosses zero. Combined, with the more precise trials counting more, they show 2.5 mmHg lower (95% CI 5.1 lower to 0.2 higher). So the trials lean toward a small drop, but no change is still possible.
+In the NR example in this repo, 4 trials measured systolic blood pressure and each found NR lowered it by 1.5 to 3 mmHg. None of them could tell on its own, since every trial's confidence interval crosses zero. Combined, with the more precise trials counting more, they show 2.5 mmHg lower (95% CI 5.1 lower to 0.2 higher). So the trials lean toward a small drop, but no change is still possible.
 
 metaproof does that math for every outcome in your review. You put each trial's numbers into one spreadsheet and it gives the combined result, how much the trials disagree with each other, the range a new trial would likely fall in, and the forest and funnel plots. It also shows how much each trial counts and what happens when each one is left out, and lists any trial it couldn't use in `excluded.csv` with the reason.
 
